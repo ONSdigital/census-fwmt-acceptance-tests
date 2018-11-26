@@ -1,6 +1,6 @@
-rootProject.name = 'acceptancetests'
+rootProject.name = 'fwmt-census-acceptance-tests'
 
-include "shared", "api", "services:webservice"
+include 'shared', 'api', 'services:webservice'
 
 ext.isPush = getProperty('gradle.cache.push')
 
@@ -9,10 +9,10 @@ buildCache {
         enabled = false
     }
     remote(HttpBuildCache) {
-        url = "http://artifactory-sdc.onsdigital.uk/artifactory/libs-snapshot-local/"
+        url = 'http://artifactory-sdc.onsdigital.uk/artifactory/libs-snapshot-local/'
         credentials {
-            username = System.getenv("artifactory_user")
-            password = System.getenv("artifactory_password")
+            username = System.getenv('artifactory_user')
+            password = System.getenv('artifactory_password')
         }
         push = isPush
     }

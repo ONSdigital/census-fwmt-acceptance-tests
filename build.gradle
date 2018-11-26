@@ -1,64 +1,74 @@
 buildscript {
-	repositories {
-		mavenCentral()
-		jcenter()
-	}
+    ext {
+        springBootVersion = '2.1.0.RELEASE'
+    }
+    repositories {
+        mavenCentral()
+        jcenter()
+    }
 }
 
 apply plugin: 'java'
 apply plugin: 'eclipse'
 
-
-task cucumber(dependsOn: testClasses) {
-	doLast {
-		javaexec {
-			main = "cucumber.api.cli.Main"
-			classpath = configurations.testRuntimeClasspath + sourceSets.main.output + sourceSets.test.output
-			args = ['--plugin', 'pretty', '--glue', 'uk.gov.ons.fwmt.acceptancetests', 'src/test/resources']
-		}
-	}
-}
-
-test {
-	dependsOn cleanTest
-	testLogging.showStandardStreams = true
-	systemProperties System.getProperties()
-}
-
 group = 'uk.gov.ons.fwmt'
-version = '0.0.1-SNAPSHOT'
-sourceCompatibility = 1.8
+version = '3.0.0-SNAPSHOT'
+sourceCompatibility = 11
+targetCompatibility = 11
 
 repositories {
-	mavenLocal()
-	maven { url "http://artifactory-sdc.onsdigital.uk/artifactory/libs-snapshot-local" }
-	maven { url "http://artifactory-sdc.onsdigital.uk/artifactory/libs-release-local" }
-	mavenCentral()
+    mavenLocal()
+    if (!project.hasProperty('omitSDCArtifactory')) {
+        maven { url 'http://artifactory-sdc.onsdigital.uk/artifactory/libs-snapshot-local' }
+        maven { url 'http://artifactory-sdc.onsdigital.uk/artifactory/libs-release-local' }
+    }
+    mavenCentral()
 }
 
 configurations {
-	cucumberRuntime {
-		extendsFrom testRuntime
-	}
+    cucumberRuntime {
+        extendsFrom testRuntime
+    }
 }
 
+task cucumber(dependsOn: testClasses) {
+    doLast {
+        javaexec {
+            main = 'cucumber.api.cli.Main'
+            classpath = configurations.testRuntimeClasspath + sourceSets.main.output + sourceSets.test.output
+            args = ['--plugin', 'pretty', '--glue', 'uk.gov.ons.fwmt.census-acceptance-tests', 'src/test/resources']
+        }
+    }
+}
+
+test {
+    dependsOn cleanTest
+    testLogging.showStandardStreams = true
+    systemProperties System.getProperties()
+    systemProperties.remove("java.endorsed.dirs")
+}
 
 dependencies {
-	compile group: 'org.springframework.boot', name: 'spring-boot-test', version: '2.0.6.RELEASE'
-	compile group: 'org.springframework', name: 'spring-test', version: '5.0.8.RELEASE'
-	compile group: 'org.springframework.retry', name: 'spring-retry', version: '1.2.2.RELEASE'
-	compile group: 'org.springframework', name: 'spring-aop', version: '5.0.8.RELEASE'
-	compile group: 'org.projectlombok', name: 'lombok', version: '1.16.8'
-	compile group: 'uk.gov.ons.fwmt', name: 'fwmt-gateway-common', version: '0.0.8-RELEASE'
-	compile group: 'org.springframework.boot', name: 'spring-boot-starter-amqp', version: '1.5.13.RELEASE'
-	compile('org.springframework.boot:spring-boot-starter')
-	compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.5'
-	compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.9.5'
-	compile group: 'org.json', name: 'json', version: '20180130'
-	compile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.6'
+    compile group: 'uk.gov.ons.fwmt', name: 'fwmt-gateway-common', version: '0.0.8-RELEASE'
 
+    compile group: 'org.springframework.boot',  name: 'spring-boot-starter',      version: springBootVersion
+    compile group: 'org.springframework.boot',  name: 'spring-boot-starter-amqp', version: springBootVersion
+    compile group: 'org.springframework.boot',  name: 'spring-boot-test',         version: springBootVersion
+    compile group: 'org.springframework.retry', name: 'spring-retry', version: '1.2.2.RELEASE'
+    compile group: 'org.springframework', name: 'spring-web', version: '5.1.2.RELEASE'
+    compile group: 'org.springframework', name: 'spring-aop', version: '5.1.2.RELEASE'
 
-	testCompile 'io.cucumber:cucumber-java:4.0.2'
-	testCompile 'io.cucumber:cucumber-junit:4.0.2'
-	testCompile 'io.cucumber:cucumber-spring:4.0.2'
+    compile group: 'com.fasterxml.jackson.core',     name: 'jackson-databind',        version: '2.9.7'
+    compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.9.7'
+    compile group: 'org.json', name: 'json', version: '20180813'
+
+    compile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.6'
+
+    compile group: 'org.projectlombok', name: 'lombok', version: '1.18.4'
+
+    testCompile group: 'org.springframework', name: 'spring-test', version: '5.1.2.RELEASE'
+
+    testCompile group: 'io.cucumber', name: 'cucumber-java',   version: '4.0.2'
+    testCompile group: 'io.cucumber', name: 'cucumber-junit',  version: '4.0.2'
+    testCompile group: 'io.cucumber', name: 'cucumber-spring', version: '4.0.2'
 }
