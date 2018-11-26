@@ -49,7 +49,7 @@ test {
 }
 
 dependencies {
-    compile group: 'uk.gov.ons.fwmt', name: 'fwmt-gateway-common', version: '0.0.8-RELEASE'
+    compile group: 'uk.gov.ons.fwmt', name: 'fwmt-gateway-common', version: '3.0.0-SNAPSHOT'
 
     compile group: 'org.springframework.boot',  name: 'spring-boot-starter',      version: springBootVersion
     compile group: 'org.springframework.boot',  name: 'spring-boot-starter-amqp', version: springBootVersion
