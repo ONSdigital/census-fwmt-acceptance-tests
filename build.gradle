@@ -8,9 +8,13 @@ buildscript {
     }
 }
 
-apply plugin: 'java'
-apply plugin: 'eclipse'
+plugins {
+    id 'java'
+    id 'eclipse'
+    id 'idea'
+}
 
+description = 'fwmt-census-acceptance-tests'
 group = 'uk.gov.ons.fwmt'
 version = '3.0.0-SNAPSHOT'
 sourceCompatibility = 11
