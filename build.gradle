@@ -53,22 +53,23 @@ test {
 }
 
 dependencies {
-    compile group: 'uk.gov.ons.fwmt', name: 'fwmt-gateway-common', version: '3.0.0-SNAPSHOT'
+    testCompile group: 'uk.gov.ons.fwmt', name: 'fwmt-gateway-common', version: '3.0.0-SNAPSHOT'
 
-    compile group: 'org.springframework.boot',  name: 'spring-boot-starter',      version: springBootVersion
-    compile group: 'org.springframework.boot',  name: 'spring-boot-starter-amqp', version: springBootVersion
-    compile group: 'org.springframework.boot',  name: 'spring-boot-test',         version: springBootVersion
-    compile group: 'org.springframework.retry', name: 'spring-retry', version: '1.2.2.RELEASE'
-    compile group: 'org.springframework', name: 'spring-web', version: '5.1.2.RELEASE'
-    compile group: 'org.springframework', name: 'spring-aop', version: '5.1.2.RELEASE'
+    testCompile group: 'org.springframework.boot',  name: 'spring-boot-starter',      version: springBootVersion
+    testCompile group: 'org.springframework.boot',  name: 'spring-boot-starter-amqp', version: springBootVersion
+    testCompile group: 'org.springframework.boot',  name: 'spring-boot-test',         version: springBootVersion
+    testCompile group: 'org.springframework.retry', name: 'spring-retry', version: '1.2.2.RELEASE'
+    testCompile group: 'org.springframework', name: 'spring-web', version: '5.1.2.RELEASE'
+    testCompile group: 'org.springframework', name: 'spring-aop', version: '5.1.2.RELEASE'
 
-    compile group: 'com.fasterxml.jackson.core',     name: 'jackson-databind',        version: '2.9.7'
-    compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.9.7'
-    compile group: 'org.json', name: 'json', version: '20180813'
+    testCompile group: 'com.fasterxml.jackson.core',     name: 'jackson-databind',        version: '2.9.7'
+    testCompile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.9.7'
+    testCompile group: 'org.json', name: 'json', version: '20180813'
 
-    compile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.6'
+    testCompile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.6'
 
-    compile group: 'org.projectlombok', name: 'lombok', version: '1.18.4'
+    testCompileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.4'
+    testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.4'
 
     testCompile group: 'org.springframework', name: 'spring-test', version: '5.1.2.RELEASE'
 
