@@ -1,9 +1,6 @@
 package uk.gov.ons.fwmt.acceptancetests.utils;
 
-import static uk.gov.ons.fwmt.fwmtgatewaycommon.config.QueueNames.ADAPTER_TO_RM_QUEUE;
-
-import java.io.IOException;
-
+import lombok.extern.slf4j.Slf4j;
 import org.apache.http.auth.AuthenticationException;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -17,24 +14,26 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
-import lombok.extern.slf4j.Slf4j;
+import java.io.IOException;
+
+import static uk.gov.ons.fwmt.fwmtgatewaycommon.config.QueueNames.ADAPTER_TO_RM_QUEUE;
 
 @Slf4j
 @Component
-public class MessageSenderUtils{
+public class MessageSenderUtils {
 
   @Value("${service.jobservice.username}")
   private String jobserviceUsername;
-  
+
   @Value("${service.jobservice.password}")
   private String jobservicePassword;
-  
+
   @Value("${service.jobservice.url}")
   private String jobSvcURL;
-  
+
   @Value("${service.tmresponse.url}")
   private String tmResponseEndpoint;
-  
+
   @Value("${service.mocktm.url}")
   private String mockTmURL;
 
@@ -71,11 +70,11 @@ public class MessageSenderUtils{
     RestTemplate restTemplate = new RestTemplate();
     String messageUrl = mockTmURL + "/queue/message/?qname=" + ADAPTER_TO_RM_QUEUE;
     String message = null;
-    for(int i=0;i<10;i++) {
+    for (int i = 0; i < 10; i++) {
       ResponseEntity<String> messageEntity = restTemplate.getForEntity(messageUrl, String.class);
       message = messageEntity.getBody();
-      
-      if(message != null) {
+
+      if (message != null) {
         break;
       }
       Thread.sleep(500);
