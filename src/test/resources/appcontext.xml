@@ -10,7 +10,7 @@
        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd">
        
 
-	<context:component-scan base-package="uk.gov.ons.fwmt.acceptancetests" />
+	<context:component-scan base-package="uk.gov.ons.fwmt.census.tests.acceptance" />
     <context:property-placeholder location="classpath:application.properties" />
 
 </beans>

@@ -4,8 +4,8 @@ import cucumber.api.java.Before;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import lombok.extern.slf4j.Slf4j;
-import uk.gov.ons.fwmt.censu.tests.acceptance.utils.AcceptanceTestUtils;
-import uk.gov.ons.fwmt.censu.tests.acceptance.utils.MessageSenderUtils;
+import uk.gov.ons.fwmt.census.tests.acceptance.utils.AcceptanceTestUtils;
+import uk.gov.ons.fwmt.census.tests.acceptance.utils.MessageSenderUtils;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

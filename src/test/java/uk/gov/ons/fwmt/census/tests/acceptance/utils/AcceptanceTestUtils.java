@@ -1,4 +1,4 @@
-package uk.gov.ons.fwmt.censu.tests.acceptance.utils;
+package uk.gov.ons.fwmt.census.tests.acceptance.utils;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,6 +13,7 @@ import java.net.URL;
 import java.util.concurrent.TimeoutException;
 
 @Slf4j
+@Component
 public final class AcceptanceTestUtils {
 
   @Value("${service.mocktm.url}")
