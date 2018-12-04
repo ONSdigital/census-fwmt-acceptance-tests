@@ -1,4 +1,4 @@
-package uk.gov.ons.fwmt.acceptancetests.utils;
+package uk.gov.ons.fwmt.censu.tests.acceptance.utils;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

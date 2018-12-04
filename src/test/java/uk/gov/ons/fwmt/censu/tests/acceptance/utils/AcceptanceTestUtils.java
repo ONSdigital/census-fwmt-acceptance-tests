@@ -1,4 +1,4 @@
-package uk.gov.ons.fwmt.acceptancetests.utils;
+package uk.gov.ons.fwmt.censu.tests.acceptance.utils;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,7 +12,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.concurrent.TimeoutException;
 
-@Component
 @Slf4j
 public final class AcceptanceTestUtils {
 

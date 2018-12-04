@@ -1,4 +1,4 @@
-package uk.gov.ons.fwmt.acceptancetests.utils;
+package uk.gov.ons.fwmt.censu.tests.acceptance.utils;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.auth.AuthenticationException;
