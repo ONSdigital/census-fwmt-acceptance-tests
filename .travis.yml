@@ -33,15 +33,8 @@ cache:
   - "$HOME/.gradle/wrapper/"
 after_success:
 - bash <(curl -s https://codecov.io/bash)
-- |
-  set -e
-  if [[ "$TRAVIS_BRANCH" = "master" ]] && [[ "$TRAVIS_PULL_REQUEST" = "false" ]] && [[ $TRAVIS_COMMIT_MESSAGE != "JENKINS SNAPSHOT UPDATE" ]]; then
-    echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USERNAME" --password-stdin
-    docker build -t sdcplatform/fwmt-census-acceptance-tests -t sdcplatform/fwmt-census-acceptance-tests:census-acceptance-tests-$TRAVIS_BUILD_NUMBER --build-arg jar=build/libs/fwmt-census-acceptance-tests-*.jar .
-    docker push sdcplatform/fwmt-census-acceptance-tests
-  fi
-- |
-  set -e
-  if [[ "$TRAVIS_BRANCH" = "master" ]] && [[ "$TRAVIS_PULL_REQUEST" = "false" ]] && [[ $TRAVIS_COMMIT_MESSAGE != "JENKINS SNAPSHOT UPDATE" ]]; then
-    ./gradlew artifactPublish
-  fi
+- '[[ "$TRAVIS_BRANCH" = "master" ]] && [[ "$TRAVIS_PULL_REQUEST" = "false" ]] && [[ $TRAVIS_COMMIT_MESSAGE != "JENKINS SNAPSHOT UPDATE" ]] && docker_run=true'
+- '[[ "$docker_run" = true ]] && echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USERNAME" --password-stdin'
+- '[[ "$docker_run" = true ]] && docker build -t sdcplatform/fwmt-census-acceptance-tests -t sdcplatform/fwmt-census-acceptance-tests:census-acceptance-tests-$TRAVIS_BUILD_NUMBER --build-arg jar=build/libs/fwmt-census-acceptance-tests-*.jar .'
+- '[[ "$docker_run" = true ]] && docker push sdcplatform/fwmt-census-acceptance-tests'
+- '[[ "$docker_run" = true ]] && ./gradlew artifactPublish'
