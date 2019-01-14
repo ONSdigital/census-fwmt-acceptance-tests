@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
+import uk.gov.ons.fwmt.census.tests.acceptance.exceptions.MockInaccessibleException;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -39,14 +40,13 @@ public final class AcceptanceTestUtils {
     restTemplate.delete(uri);
   }
 
-  public void resetMock() throws IOException, TimeoutException {
+  public void resetMock() throws IOException {
     URL url = new URL(mockTmURL + "/logger/reset");
     log.info("rest-mock_url:" + url.toString());
     HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
     httpURLConnection.setRequestMethod("GET");
     if (httpURLConnection.getResponseCode() != 200) {
-      throw new RuntimeException("Failed : HTTP error code : "
-          + httpURLConnection.getResponseCode());
+      throw new MockInaccessibleException("Failed : HTTP error code : " + httpURLConnection.getResponseCode());
     }
   }
 
