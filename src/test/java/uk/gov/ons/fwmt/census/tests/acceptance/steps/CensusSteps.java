@@ -30,8 +30,8 @@ import static org.junit.Assert.fail;
 @PropertySource("classpath:application.properties")
 public class CensusSteps {
 
-  private String CENSUS_RESPONSE = null; 
-  private String EXPECTED_XML = null;
+  private String censusResponse = null;
+  private String expectedXml = null;
 
   @Autowired
   private AcceptanceTestUtils acceptanceTestUtils;
@@ -44,8 +44,8 @@ public class CensusSteps {
 
   @Before
   public void reset() throws IOException, TimeoutException, URISyntaxException {
-    CENSUS_RESPONSE = Resources.toString(Resources.getResource("files/census_response.txt"), Charsets.UTF_8);
-    EXPECTED_XML = Resources.toString(Resources.getResource("files/feedback.xml"), Charsets.UTF_8);
+    censusResponse = Resources.toString(Resources.getResource("files/census_response.txt"), Charsets.UTF_8);
+    expectedXml = Resources.toString(Resources.getResource("files/feedback.xml"), Charsets.UTF_8);
     
     acceptanceTestUtils.resetMock();
     acceptanceTestUtils.clearQueues();
@@ -53,14 +53,14 @@ public class CensusSteps {
 
   @Given("^TM sends a Census case outcome to the Job Service$")
   public void tm_sends_a_LMS_case_outcome_to_the_Job_Service() throws Exception {
-    int response = ms.sendTMResponseMessage(CENSUS_RESPONSE);
+    int response = ms.sendTMResponseMessage(censusResponse);
     assertEquals(200, response);
   }
 
   @Given("^the response contains the outcome and caseId$")
   public void the_response_contains_the_outcome_and_caseId() throws JsonParseException, JsonMappingException, IOException {
     ObjectMapper ob = new ObjectMapper();
-    CensusCaseOutcomeDTO dto = ob.readValue(CENSUS_RESPONSE.getBytes(), CensusCaseOutcomeDTO.class);
+    CensusCaseOutcomeDTO dto = ob.readValue(censusResponse.getBytes(), CensusCaseOutcomeDTO.class);
     assertEquals("6c9b1177-3e03-4060-b6db-f6a8456292ef", dto.getCaseId());
     assertEquals("Will complete", dto.getOutcome());
     assertEquals("Will complete", dto.getOutcomeCategory());
@@ -70,7 +70,7 @@ public class CensusSteps {
   public void the_response_is_a_Census_job() {
       ObjectMapper ob = new ObjectMapper();
       try {
-        ob.readValue(CENSUS_RESPONSE.getBytes(), CensusCaseOutcomeDTO.class);
+        ob.readValue(censusResponse.getBytes(), CensusCaseOutcomeDTO.class);
       } catch (IOException e) {
         fail();
       }
@@ -78,7 +78,7 @@ public class CensusSteps {
 
   @Then("^the message is in the RM composite format$")
   public void the_message_is_in_the_RM_composite_format() throws Exception {
-    assertEquals(EXPECTED_XML, ms.getMessage("rm.feedback"));
+    assertEquals(expectedXml, ms.getMessage("rm.feedback"));
   }
 
   @Then("^the message will be put on the queue to RM$")
