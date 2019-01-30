@@ -22,16 +22,14 @@ public final class AcceptanceTestUtils {
   private RestTemplate restTemplate = new RestTemplate();
 
   public void clearQueues() throws URISyntaxException {
-    clearQueue("adapter-jobSvc");
-    clearQueue("adapter-jobSvc");
-    clearQueue("adapter-jobSvc.DLQ");
-    clearQueue("adapter-rm");
-    clearQueue("adapter-rm.DLQ");
-    clearQueue("jobsvc-adapter");
-    clearQueue("jobSvc-adapter.DLQ");
-    clearQueue("rm-adapter.DLQ");
-    //    clearQueue("Action.Field");
-    //    clearQueue("Action.FieldDLQ");
+    clearQueue("gateway.actions");
+    clearQueue("gateway.actions.DLQ");
+    clearQueue("gateway.feedback");
+    clearQueue("gateway.actions.DLQ");
+    clearQueue("rm.feedback");
+    clearQueue("rm.feedback.DLQ");
+    clearQueue("Action.Field");
+    clearQueue("Action.FieldDLQ");
   }
 
   public void clearQueue(String queueName) throws URISyntaxException {

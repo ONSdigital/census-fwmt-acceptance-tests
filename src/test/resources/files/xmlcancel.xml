@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<ins:actionInstruction
-        xmlns:ins="http://ons.gov.uk/ctp/response/action/message/instruction">
-    <actionCancel>
-        <actionId>5a9f4323</actionId>
-        <responseRequired>true</responseRequired>
-        <reason>deleted for test</reason>
-    </actionCancel>
-</ins:actionInstruction>
