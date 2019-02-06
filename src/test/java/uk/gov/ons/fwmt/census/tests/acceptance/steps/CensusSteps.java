@@ -19,11 +19,11 @@ import uk.gov.ons.fwmt.census.tests.acceptance.utils.GatewayEventMonitor;
 import uk.gov.ons.fwmt.census.tests.acceptance.utils.MessageSenderUtils;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.util.concurrent.TimeoutException;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 @Slf4j
@@ -67,7 +67,7 @@ public class CensusSteps {
   }
 
   @Given("^TM sends a Census case outcome to the Job Service$")
-  public void tm_sends_a_LMS_case_outcome_to_the_Job_Service() throws Exception {
+  public void tm_sends_a_LMS_case_outcome_to_the_Job_Service() {
     int response = messageSenderUtils.sendTMResponseMessage(censusResponse);
     assertEquals(200, response);
   }
@@ -102,19 +102,19 @@ public class CensusSteps {
   }
 
   @Given("a job with the id {string} doesn't exist")
-  public void aJobWithTheIdDoesnTExist(String id) throws MalformedURLException {
+  public void aJobWithTheIdDoesnTExist(String id) {
     acceptanceTestUtils.getCaseById(id);
   }
 
   @And("RM sends a create job request")
   public void rm_sends_a_create_job_request() throws URISyntaxException, InterruptedException {
     messageSenderUtils.sendToRMQueue(receivedRMMessage);
+    assertTrue(messageSenderUtils.hasEventTriggered("caseId eventType"));
   }
 
   @When("the gateway sends a create message to TM")
   public void the_gateway_sends_a_create_message_to_TM() {
-    // Write code here that turns the phrase above into concrete actions
-    throw new cucumber.api.PendingException();
+    assertTrue(messageSenderUtils.hasEventTriggered("caseId eventType"));
   }
 
   @Then("a new case is created in TM")
@@ -125,7 +125,6 @@ public class CensusSteps {
 
   @Given("a message in an invalid format from RM")
   public void a_message_in_an_invalid_format_from_RM() throws URISyntaxException, InterruptedException {
-    // Write code here that turns the phrase above into concrete actions
     messageSenderUtils.sendToRMQueue(invalidRMMessage);
   }
 

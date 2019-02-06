@@ -2,7 +2,7 @@ package uk.gov.ons.fwmt.census.tests.acceptance.utils;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
-import org.apache.http.auth.AuthenticationException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -12,13 +12,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
-import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
 @Slf4j
 @Component
 public class MessageSenderUtils {
+
+  @Autowired
+  GatewayEventMonitor gatewayEventMonitor;
 
   @Value("${service.jobservice.username}")
   private String jobserviceUsername;
@@ -35,7 +37,7 @@ public class MessageSenderUtils {
   @Value("${service.mocktm.url}")
   private String mockTmURL;
 
-  public int sendTMResponseMessage(String data) throws IOException, AuthenticationException {
+  public int sendTMResponseMessage(String data) {
     HttpHeaders headers = new HttpHeaders();
     final String plainCreds = jobserviceUsername + ":" + jobservicePassword;
     byte[] plainCredsBytes = plainCreds.getBytes();
@@ -49,9 +51,8 @@ public class MessageSenderUtils {
 
     HttpEntity<String> post = new HttpEntity<String>(data, headers);
     ResponseEntity<Void> response = restTemplate.exchange(postUrl, HttpMethod.POST, post, Void.class);
-    int responseCode = response.getStatusCode().value();
- 
-    return responseCode;
+
+    return response.getStatusCode().value();
   }
 
   public long getMessageCount(String qname) {
@@ -87,5 +88,9 @@ public class MessageSenderUtils {
     HttpEntity<String> httpEntity = new HttpEntity<>(message);
     URI uri = new URI(mockTmURL + "/queue/?exchange=" + exchangeName + "&routingkey=" + routingKey);
     rt.postForLocation(uri, httpEntity);
+  }
+
+  public boolean hasEventTriggered(String eventKey) {
+    return gatewayEventMonitor.getEventMap().keySet().contains(eventKey);
   }
 }

@@ -8,15 +8,14 @@ import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.Consumer;
 import com.rabbitmq.client.DefaultConsumer;
 import com.rabbitmq.client.Envelope;
-import cucumber.api.java.After;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.ons.fwmt.census.jobservice.data.dto.GatewayEventDTO;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.Vector;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeoutException;
 
 @Slf4j
@@ -27,11 +26,10 @@ public class GatewayEventMonitor {
   private static final String GATEWAY_EVENTS_EXCHANGE = "Gateway.Events.Exchange";
   private static final String GATEWAY_EVENTS_ROUTING_KEY = "Gateway.Event";
   private final static ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-  private List<GatewayEventDTO> eventList = null;
+  private static Map<String, GatewayEventDTO> gatewayEventMap = null;
   private Channel channel = null;
   private Connection connection = null;
 
-  @After
   public void tearDownGatewayEventMonitor() throws IOException, TimeoutException {
     if (channel != null) {
       channel.close();
@@ -41,13 +39,13 @@ public class GatewayEventMonitor {
       connection.close();
       connection = null;
     }
-    if (eventList != null) {
-      eventList = null;
+    if (gatewayEventMap != null) {
+      gatewayEventMap = null;
     }
   }
 
   public void enableEventMonitor() throws IOException, TimeoutException {
-    eventList = new Vector<>();
+    gatewayEventMap = new HashMap<>();
     ConnectionFactory factory = new ConnectionFactory();
     factory.setHost("localhost");
     connection = factory.newConnection();
@@ -63,9 +61,13 @@ public class GatewayEventMonitor {
           throws IOException {
         String message = new String(body, StandardCharsets.UTF_8);
         GatewayEventDTO dto = OBJECT_MAPPER.readValue(message.getBytes(), GatewayEventDTO.class);
-        eventList.add(dto);
+        gatewayEventMap.put(dto.getCaseId() + " " + dto.getEventType(), dto);
       }
     };
     channel.basicConsume(queueName, true, consumer);
+  }
+
+  public Map<String, GatewayEventDTO> getEventMap() {
+    return gatewayEventMap;
   }
 }
