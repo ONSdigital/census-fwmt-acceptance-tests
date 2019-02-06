@@ -9,11 +9,13 @@ import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.After;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import uk.gov.ons.fwmt.census.jobservice.data.dto.CensusCaseOutcomeDTO;
 import uk.gov.ons.fwmt.census.tests.acceptance.utils.AcceptanceTestUtils;
+import uk.gov.ons.fwmt.census.tests.acceptance.utils.GatewayEventMonitor;
 import uk.gov.ons.fwmt.census.tests.acceptance.utils.MessageSenderUtils;
 
 import java.io.IOException;
@@ -40,6 +42,9 @@ public class CensusSteps {
   @Autowired
   private MessageSenderUtils messageSenderUtils;
 
+  @Autowired
+  private GatewayEventMonitor gatewayEventMonitor;
+
   @Value("${service.mocktm.url}")
   private String mockTmURL;
 
@@ -53,6 +58,12 @@ public class CensusSteps {
     
     acceptanceTestUtils.resetMock();
     acceptanceTestUtils.clearQueues();
+    gatewayEventMonitor.enableEventMonitor();
+  }
+
+  @After
+  public void tearDownGatewayEventMonitor() throws IOException, TimeoutException {
+    gatewayEventMonitor.tearDownGatewayEventMonitor();
   }
 
   @Given("^TM sends a Census case outcome to the Job Service$")

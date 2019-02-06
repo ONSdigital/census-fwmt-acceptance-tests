@@ -1,4 +1,4 @@
-package uk.gov.ons.fwmt.census.tests.acceptance.steps;
+package uk.gov.ons.fwmt.census.tests.acceptance.utils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rabbitmq.client.AMQP;
@@ -9,9 +9,8 @@ import com.rabbitmq.client.Consumer;
 import com.rabbitmq.client.DefaultConsumer;
 import com.rabbitmq.client.Envelope;
 import cucumber.api.java.After;
-import cucumber.api.java.en.Given;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.PropertySource;
+import org.springframework.stereotype.Component;
 import uk.gov.ons.fwmt.census.jobservice.data.dto.GatewayEventDTO;
 
 import java.io.IOException;
@@ -21,8 +20,8 @@ import java.util.Vector;
 import java.util.concurrent.TimeoutException;
 
 @Slf4j
-@PropertySource("classpath:application.properties")
-public class RabbitCaptureSteps {
+@Component
+public class GatewayEventMonitor {
 
   private final static String QUEUE_NAME = "Gateway.Event.Receiver";
   private static final String GATEWAY_EVENTS_EXCHANGE = "Gateway.Events.Exchange";
@@ -33,7 +32,7 @@ public class RabbitCaptureSteps {
   private Connection connection = null;
 
   @After
-  public void tearDown() throws IOException, TimeoutException {
+  public void tearDownGatewayEventMonitor() throws IOException, TimeoutException {
     if (channel != null) {
       channel.close();
       channel = null;
@@ -47,8 +46,7 @@ public class RabbitCaptureSteps {
     }
   }
 
-  @Given("the rabbit monitor is enabled")
-  public void theRabbitMonitorIsEnabled() throws IOException, TimeoutException {
+  public void enableEventMonitor() throws IOException, TimeoutException {
     eventList = new Vector<>();
     ConnectionFactory factory = new ConnectionFactory();
     factory.setHost("localhost");
