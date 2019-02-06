@@ -14,6 +14,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Set;
 
 @Slf4j
 @Component
@@ -90,7 +91,7 @@ public class MessageSenderUtils {
     rt.postForLocation(uri, httpEntity);
   }
 
-  public boolean hasEventTriggered(String eventKey) {
-    return gatewayEventMonitor.getEventMap().keySet().contains(eventKey);
+  public Set<String> hasEventTriggered() {
+    return gatewayEventMonitor.getEventMap().keySet();
   }
 }

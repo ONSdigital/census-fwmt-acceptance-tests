@@ -20,10 +20,11 @@ import uk.gov.ons.fwmt.census.tests.acceptance.utils.MessageSenderUtils;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.Set;
 import java.util.concurrent.TimeoutException;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 @Slf4j
@@ -108,13 +109,21 @@ public class CensusSteps {
 
   @And("RM sends a create job request")
   public void rm_sends_a_create_job_request() throws URISyntaxException, InterruptedException {
+    String expectedKey = "39bad71c-7de5-4e1b-9a07-d9597737977f - RM - Request Received";
     messageSenderUtils.sendToRMQueue(receivedRMMessage);
-    assertTrue(messageSenderUtils.hasEventTriggered("caseId eventType"));
+
+    Set<String> strings = messageSenderUtils.hasEventTriggered();
+
+    assertThat(strings).contains(expectedKey);
   }
 
   @When("the gateway sends a create message to TM")
   public void the_gateway_sends_a_create_message_to_TM() {
-    assertTrue(messageSenderUtils.hasEventTriggered("caseId eventType"));
+    String expectedKey = "39bad71c-7de5-4e1b-9a07-d9597737977f - Comet - Create Job Request";
+
+    Set<String> strings = messageSenderUtils.hasEventTriggered();
+
+    assertThat(strings).contains(expectedKey);
   }
 
   @Then("a new case is created in TM")

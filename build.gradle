@@ -81,6 +81,8 @@ dependencies {
     testCompile("io.cucumber:cucumber-java:4.0.2")
     testCompile("io.cucumber:cucumber-junit:4.0.2")
     testCompile("io.cucumber:cucumber-spring:4.0.2")
+    testCompile("org.assertj:assertj-core:3.11.1")
+
 
     testCompile("org.projectlombok:lombok:1.18.4")
     testAnnotationProcessor("org.projectlombok:lombok:1.18.4")
