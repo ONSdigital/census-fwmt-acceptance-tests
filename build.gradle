@@ -56,7 +56,7 @@ test {
 }
 
 dependencies {
-    compile("com.google.guava:guava:27.0.1-jre")	
+    compile("com.google.guava:guava:27.0.1-jre")
 
     compile("org.projectlombok:lombok:1.18.4")
     annotationProcessor("org.projectlombok:lombok:1.18.4")

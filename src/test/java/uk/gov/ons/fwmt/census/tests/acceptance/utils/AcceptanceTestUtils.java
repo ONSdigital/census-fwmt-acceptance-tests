@@ -47,4 +47,7 @@ public final class AcceptanceTestUtils {
     }
   }
 
+  public void getCaseById(String id) {
+
+  }
 }

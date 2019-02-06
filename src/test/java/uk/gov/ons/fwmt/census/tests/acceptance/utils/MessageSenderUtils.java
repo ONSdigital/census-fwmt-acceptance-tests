@@ -1,8 +1,6 @@
 package uk.gov.ons.fwmt.census.tests.acceptance.utils;
 
-
-import java.io.IOException;
-
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.auth.AuthenticationException;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,7 +12,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
-import lombok.extern.slf4j.Slf4j;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 @Slf4j
 @Component
@@ -75,5 +75,17 @@ public class MessageSenderUtils {
       Thread.sleep(500);
     }
     return message;
+  }
+
+  public void sendToRMQueue(String message) throws URISyntaxException, InterruptedException {
+    Thread.sleep(3000);
+    //    String exchangeName = "action-outbound-exchange";
+    //    String routingKey = "Action.Field.binding";
+    String exchangeName = "rm-jobsvc-exchange";
+    String routingKey = "Action.Field";
+    RestTemplate rt = new RestTemplate();
+    HttpEntity<String> httpEntity = new HttpEntity<>(message);
+    URI uri = new URI(mockTmURL + "/queue/?exchange=" + exchangeName + "&routingkey=" + routingKey);
+    rt.postForLocation(uri, httpEntity);
   }
 }
