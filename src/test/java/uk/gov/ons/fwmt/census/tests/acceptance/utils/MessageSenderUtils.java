@@ -14,6 +14,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Date;
 import java.util.Set;
 
 @Slf4j
@@ -91,7 +92,32 @@ public class MessageSenderUtils {
     rt.postForLocation(uri, httpEntity);
   }
 
-  public Set<String> hasEventTriggered() {
-    return gatewayEventMonitor.getEventMap().keySet();
+  public boolean hasEventTriggered(String receivedRMMessage) {
+    Date startTime = new Date();
+    boolean keepChecking = true;
+    boolean isFound = false;
+
+    while (keepChecking) {
+      isFound = gatewayEventMonitor.getEventMap().keySet().contains(receivedRMMessage);
+      Date now = new Date();
+      long timeElapsed = now.getTime() - startTime.getTime();
+      if (isFound || timeElapsed > 10000) {
+        keepChecking = false;
+      } else {
+        try {
+          Thread.sleep(1000);
+        } catch (InterruptedException e) {
+          e.printStackTrace();
+        }
+      }
+    }
+    if (isFound == false) {
+      log.info("Searcjing for key:" + receivedRMMessage + " in :-");
+      Set<String> keys = gatewayEventMonitor.getEventMap().keySet();
+      for (String key : keys) {
+        log.info(key);
+      }
+    }
+    return isFound;
   }
 }

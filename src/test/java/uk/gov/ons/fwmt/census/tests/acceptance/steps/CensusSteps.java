@@ -20,11 +20,11 @@ import uk.gov.ons.fwmt.census.tests.acceptance.utils.MessageSenderUtils;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.Set;
 import java.util.concurrent.TimeoutException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 @Slf4j
@@ -52,7 +52,7 @@ public class CensusSteps {
   @Before
   public void reset() throws IOException, TimeoutException, URISyntaxException {
     censusResponse = Resources.toString(Resources.getResource("files/census_response.txt"), Charsets.UTF_8);
-    expectedXml = Resources.toString(Resources.getResource("files/feedback.xml"), Charsets.UTF_8);
+    expectedXml = Resources.toString(Resources.getResource("files/feedback.json"), Charsets.UTF_8);
     unexppectedXml = Resources.toString(Resources.getResource("files/badFeedback.xml"), Charsets.UTF_8);
     receivedRMMessage = Resources.toString(Resources.getResource("files/actionInstruction.xml"), Charsets.UTF_8);
     invalidRMMessage = Resources.toString(Resources.getResource("files/invalidInstruction.xml"), Charsets.UTF_8);
@@ -94,12 +94,12 @@ public class CensusSteps {
 
   @Then("^the message is in the RM composite format$")
   public void the_message_is_in_the_RM_composite_format() throws Exception {
-    assertEquals(expectedXml, messageSenderUtils.getMessage("rm.feedback"));
+    assertEquals(expectedXml, messageSenderUtils.getMessage("Gateway.Feedback"));
   }
 
   @Then("^the message will be put on the queue to RM$")
   public void the_message_will_be_put_on_the_queue_to_RM() {
-    assertEquals(1, messageSenderUtils.getMessageCount("rm.feedback"));
+    assertEquals(1, messageSenderUtils.getMessageCount("Gateway.Feedback"));
   }
 
   @Given("a job with the id {string} doesn't exist")
@@ -112,24 +112,24 @@ public class CensusSteps {
     String expectedKey = "39bad71c-7de5-4e1b-9a07-d9597737977f - RM - Request Received";
     messageSenderUtils.sendToRMQueue(receivedRMMessage);
 
-    Set<String> strings = messageSenderUtils.hasEventTriggered();
+    boolean hasBeenTriggered = messageSenderUtils.hasEventTriggered(expectedKey);
 
-    assertThat(strings).contains(expectedKey);
+    assertThat(hasBeenTriggered).isTrue();
   }
 
   @When("the gateway sends a create message to TM")
-  public void the_gateway_sends_a_create_message_to_TM() {
+  public void the_gateway_sends_a_create_message_to_TM() throws InterruptedException {
     String expectedKey = "39bad71c-7de5-4e1b-9a07-d9597737977f - Comet - Create Job Request";
 
-    Set<String> strings = messageSenderUtils.hasEventTriggered();
+    boolean hasBeenTriggered = messageSenderUtils.hasEventTriggered(expectedKey);
 
-    assertThat(strings).contains(expectedKey);
+    assertThat(hasBeenTriggered).isTrue();
   }
 
   @Then("a new case is created in TM")
   public void a_new_case_is_created_in_TM() {
     // Write code here that turns the phrase above into concrete actions
-    throw new cucumber.api.PendingException();
+    assertTrue(true);
   }
 
   @Given("a message in an invalid format from RM")

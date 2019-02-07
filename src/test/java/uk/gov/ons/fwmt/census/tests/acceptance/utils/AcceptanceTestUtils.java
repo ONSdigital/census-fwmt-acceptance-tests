@@ -22,12 +22,9 @@ public final class AcceptanceTestUtils {
   private RestTemplate restTemplate = new RestTemplate();
 
   public void clearQueues() throws URISyntaxException {
-    clearQueue("gateway.actions");
-    clearQueue("gateway.actions.DLQ");
-    clearQueue("gateway.feedback");
-    clearQueue("gateway.actions.DLQ");
-    clearQueue("rm.feedback");
-    clearQueue("rm.feedback.DLQ");
+    clearQueue("Gateway.Actions");
+    clearQueue("Gateway.ActionsDLQ");
+    clearQueue("Gateway.Feedback");
     clearQueue("Action.Field");
     clearQueue("Action.FieldDLQ");
   }
