@@ -10,7 +10,7 @@ import com.rabbitmq.client.DefaultConsumer;
 import com.rabbitmq.client.Envelope;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import uk.gov.ons.fwmt.census.jobservice.data.dto.GatewayEventDTO;
+import uk.gov.ons.fwmt.census.data.dto.GatewayEventDTO;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;

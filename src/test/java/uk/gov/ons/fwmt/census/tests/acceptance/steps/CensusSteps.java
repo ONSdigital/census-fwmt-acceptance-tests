@@ -13,18 +13,19 @@ import org.junit.After;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
-import uk.gov.ons.fwmt.census.jobservice.data.dto.CensusCaseOutcomeDTO;
+import uk.gov.ons.fwmt.census.data.dto.CensusCaseOutcomeDTO;
 import uk.gov.ons.fwmt.census.tests.acceptance.utils.AcceptanceTestUtils;
 import uk.gov.ons.fwmt.census.tests.acceptance.utils.GatewayEventMonitor;
 import uk.gov.ons.fwmt.census.tests.acceptance.utils.MessageSenderUtils;
+import uk.gov.ons.fwmt.census.tests.acceptance.utils.MockMessage;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.util.concurrent.TimeoutException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 @Slf4j
@@ -103,8 +104,10 @@ public class CensusSteps {
   }
 
   @Given("a job with the id {string} doesn't exist")
-  public void aJobWithTheIdDoesnTExist(String id) {
-    acceptanceTestUtils.getCaseById(id);
+  public void aJobWithTheIdDoesnTExist(String id) throws MalformedURLException {
+    int result;
+    result = acceptanceTestUtils.getCaseById(id);
+    assertEquals(404, result);
   }
 
   @And("RM sends a create job request")
@@ -127,9 +130,9 @@ public class CensusSteps {
   }
 
   @Then("a new case is created in TM")
-  public void a_new_case_is_created_in_TM() {
-    // Write code here that turns the phrase above into concrete actions
-    assertTrue(true);
+  public void a_new_case_is_created_in_TM() throws IOException {
+    MockMessage[] messages = acceptanceTestUtils.getMessages();
+    assertEquals(1, messages.length);
   }
 
   @Given("a message in an invalid format from RM")

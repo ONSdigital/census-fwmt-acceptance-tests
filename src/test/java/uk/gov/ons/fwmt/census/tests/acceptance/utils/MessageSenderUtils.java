@@ -14,7 +14,6 @@ import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Date;
 import java.util.Set;
 
 @Slf4j
@@ -81,8 +80,8 @@ public class MessageSenderUtils {
   }
 
   public void sendToRMQueue(String message) throws URISyntaxException, InterruptedException {
-    Thread.sleep(3000);
-    //    String exchangeName = "action-outbound-exchange";
+    Thread.sleep(3000); // TODO do we need this thread sleep?
+    //    String exchangeName = "action-outbound-exchange"; // TODO do we need these commented out variables
     //    String routingKey = "Action.Field.binding";
     String exchangeName = "rm-jobsvc-exchange";
     String routingKey = "Action.Field";
@@ -93,15 +92,15 @@ public class MessageSenderUtils {
   }
 
   public boolean hasEventTriggered(String receivedRMMessage) {
-    Date startTime = new Date();
+    Long startTime = System.nanoTime();
     boolean keepChecking = true;
     boolean isFound = false;
 
     while (keepChecking) {
       isFound = gatewayEventMonitor.getEventMap().keySet().contains(receivedRMMessage);
-      Date now = new Date();
-      long timeElapsed = now.getTime() - startTime.getTime();
-      if (isFound || timeElapsed > 10000) {
+
+      long elapsedTime = System.nanoTime() - startTime;
+      if (isFound || elapsedTime > 2e+9) {
         keepChecking = false;
       } else {
         try {
@@ -111,7 +110,7 @@ public class MessageSenderUtils {
         }
       }
     }
-    if (isFound == false) {
+    if (!isFound) {
       log.info("Searcjing for key:" + receivedRMMessage + " in :-");
       Set<String> keys = gatewayEventMonitor.getEventMap().keySet();
       for (String key : keys) {

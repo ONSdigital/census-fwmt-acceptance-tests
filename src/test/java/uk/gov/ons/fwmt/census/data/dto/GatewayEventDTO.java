@@ -1,4 +1,4 @@
-package uk.gov.ons.fwmt.census.jobservice.data.dto;
+package uk.gov.ons.fwmt.census.data.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

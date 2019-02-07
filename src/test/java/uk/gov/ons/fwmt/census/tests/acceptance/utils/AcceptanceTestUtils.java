@@ -2,12 +2,16 @@ package uk.gov.ons.fwmt.census.tests.acceptance.utils;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+import uk.gov.ons.fwmt.census.data.dto.modelcase.ModelCase;
 import uk.gov.ons.fwmt.census.tests.acceptance.exceptions.MockInaccessibleException;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -36,7 +40,7 @@ public final class AcceptanceTestUtils {
 
   public void resetMock() throws IOException {
     URL url = new URL(mockTmURL + "/logger/reset");
-    log.info("rest-mock_url:" + url.toString());
+    log.info("reset-mock_url:" + url.toString());
     HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
     httpURLConnection.setRequestMethod("GET");
     if (httpURLConnection.getResponseCode() != 200) {
@@ -44,7 +48,21 @@ public final class AcceptanceTestUtils {
     }
   }
 
-  public void getCaseById(String id) {
+  public MockMessage[] getMessages() throws IOException {
+    URL url = new URL(mockTmURL + "/logger/allMessages");
+    log.info("allMessages-mock_url:" + url.toString());
+    return restTemplate.getForObject(mockTmURL + "/logger/allMessages", MockMessage[].class);
+  }
 
+  public int getCaseById(String id) throws MalformedURLException {
+    URL url = new URL(mockTmURL + "/cases/" + id);
+    log.info("getCaseById-mock_url:" + url.toString());
+    ResponseEntity responseEntity = null;
+    try {
+      responseEntity = restTemplate.getForEntity(mockTmURL + "/cases/casesByIdGet/" + id, ModelCase.class);
+    } catch (HttpClientErrorException e) {
+      return 404;
+    }
+    return responseEntity.getStatusCodeValue();
   }
 }
