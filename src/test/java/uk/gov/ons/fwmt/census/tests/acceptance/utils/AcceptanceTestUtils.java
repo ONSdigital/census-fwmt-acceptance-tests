@@ -6,7 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
-import uk.gov.ons.fwmt.census.data.dto.modelcase.ModelCase;
+import uk.gov.ons.fwmt.census.common.data.modelcase.ModelCase;
 import uk.gov.ons.fwmt.census.tests.acceptance.exceptions.MockInaccessibleException;
 
 import java.io.IOException;

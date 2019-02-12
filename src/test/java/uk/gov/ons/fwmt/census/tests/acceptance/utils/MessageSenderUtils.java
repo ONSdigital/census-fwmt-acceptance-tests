@@ -2,7 +2,6 @@ package uk.gov.ons.fwmt.census.tests.acceptance.utils;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -14,14 +13,10 @@ import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Set;
 
 @Slf4j
 @Component
 public class MessageSenderUtils {
-
-  @Autowired
-  GatewayEventMonitor gatewayEventMonitor;
 
   @Value("${service.jobservice.username}")
   private String jobserviceUsername;
@@ -39,12 +34,8 @@ public class MessageSenderUtils {
   private String mockTmURL;
 
   public int sendTMResponseMessage(String data) {
-    HttpHeaders headers = new HttpHeaders();
-    final String plainCreds = jobserviceUsername + ":" + jobservicePassword;
-    byte[] plainCredsBytes = plainCreds.getBytes();
-    byte[] base64CredsBytes = Base64.encodeBase64(plainCredsBytes);
-    String base64Creds = new String(base64CredsBytes);
-    headers.add("Authorization", "Basic " + base64Creds);
+    HttpHeaders headers = createBasicAuthHeaders(jobserviceUsername, jobservicePassword);
+
     headers.setContentType(MediaType.APPLICATION_JSON);
     
     RestTemplate restTemplate = new RestTemplate();
@@ -54,6 +45,16 @@ public class MessageSenderUtils {
     ResponseEntity<Void> response = restTemplate.exchange(postUrl, HttpMethod.POST, post, Void.class);
 
     return response.getStatusCode().value();
+  }
+
+  public HttpHeaders createBasicAuthHeaders(String username, String password) {
+    HttpHeaders headers = new HttpHeaders();
+    final String plainCreds = username + ":" + password;
+    byte[] plainCredsBytes = plainCreds.getBytes();
+    byte[] base64CredsBytes = Base64.encodeBase64(plainCredsBytes);
+    String base64Creds = new String(base64CredsBytes);
+    headers.add("Authorization", "Basic " + base64Creds);
+    return headers;
   }
 
   public long getMessageCount(String qname) {
@@ -81,42 +82,11 @@ public class MessageSenderUtils {
 
   public void sendToRMQueue(String message) throws URISyntaxException, InterruptedException {
     Thread.sleep(3000); // TODO do we need this thread sleep?
-    //    String exchangeName = "action-outbound-exchange"; // TODO do we need these commented out variables
-    //    String routingKey = "Action.Field.binding";
-    String exchangeName = "rm-jobsvc-exchange";
+    String exchangeName = "";
     String routingKey = "Action.Field";
     RestTemplate rt = new RestTemplate();
     HttpEntity<String> httpEntity = new HttpEntity<>(message);
     URI uri = new URI(mockTmURL + "/queue/?exchange=" + exchangeName + "&routingkey=" + routingKey);
     rt.postForLocation(uri, httpEntity);
-  }
-
-  public boolean hasEventTriggered(String receivedRMMessage) {
-    Long startTime = System.nanoTime();
-    boolean keepChecking = true;
-    boolean isFound = false;
-
-    while (keepChecking) {
-      isFound = gatewayEventMonitor.getEventMap().keySet().contains(receivedRMMessage);
-
-      long elapsedTime = System.nanoTime() - startTime;
-      if (isFound || elapsedTime > 2e+9) {
-        keepChecking = false;
-      } else {
-        try {
-          Thread.sleep(1000);
-        } catch (InterruptedException e) {
-          e.printStackTrace();
-        }
-      }
-    }
-    if (!isFound) {
-      log.info("Searcjing for key:" + receivedRMMessage + " in :-");
-      Set<String> keys = gatewayEventMonitor.getEventMap().keySet();
-      for (String key : keys) {
-        log.info(key);
-      }
-    }
-    return isFound;
   }
 }

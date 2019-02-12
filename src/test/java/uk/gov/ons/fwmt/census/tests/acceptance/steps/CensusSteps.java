@@ -14,8 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import uk.gov.ons.fwmt.census.data.dto.CensusCaseOutcomeDTO;
+import uk.gov.ons.fwmt.census.events.utils.GatewayEventMonitor;
 import uk.gov.ons.fwmt.census.tests.acceptance.utils.AcceptanceTestUtils;
-import uk.gov.ons.fwmt.census.tests.acceptance.utils.GatewayEventMonitor;
 import uk.gov.ons.fwmt.census.tests.acceptance.utils.MessageSenderUtils;
 import uk.gov.ons.fwmt.census.tests.acceptance.utils.MockMessage;
 
@@ -26,6 +26,7 @@ import java.util.concurrent.TimeoutException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
 @Slf4j
@@ -33,8 +34,8 @@ import static org.junit.Assert.fail;
 public class CensusSteps {
 
   private String censusResponse = null;
-  private String expectedXml = null;
-  private String unexppectedXml = null;
+  public static final String RM_REQUEST_RECEIVED = "RM - Request Received";
+  public static final String COMET_CREATE_JOB_REQUEST = "Comet - Create Job Request";
   private String receivedRMMessage = null;
   private String invalidRMMessage = null;
 
@@ -44,22 +45,26 @@ public class CensusSteps {
   @Autowired
   private MessageSenderUtils messageSenderUtils;
 
-  @Autowired
   private GatewayEventMonitor gatewayEventMonitor;
+  private String expectedJSON = null;
 
   @Value("${service.mocktm.url}")
   private String mockTmURL;
+  private String unexppectedJSON = null;
+  private ObjectMapper objectMapper = new ObjectMapper();
 
   @Before
   public void reset() throws IOException, TimeoutException, URISyntaxException {
     censusResponse = Resources.toString(Resources.getResource("files/census_response.txt"), Charsets.UTF_8);
-    expectedXml = Resources.toString(Resources.getResource("files/feedback.json"), Charsets.UTF_8);
-    unexppectedXml = Resources.toString(Resources.getResource("files/badFeedback.xml"), Charsets.UTF_8);
+    expectedJSON = Resources.toString(Resources.getResource("files/feedback.json"), Charsets.UTF_8);
+    unexppectedJSON = Resources.toString(Resources.getResource("files/badFeedback.xml"), Charsets.UTF_8);
     receivedRMMessage = Resources.toString(Resources.getResource("files/actionInstruction.xml"), Charsets.UTF_8);
     invalidRMMessage = Resources.toString(Resources.getResource("files/invalidInstruction.xml"), Charsets.UTF_8);
     
     acceptanceTestUtils.resetMock();
     acceptanceTestUtils.clearQueues();
+
+    gatewayEventMonitor = new GatewayEventMonitor();
     gatewayEventMonitor.enableEventMonitor();
   }
 
@@ -68,64 +73,25 @@ public class CensusSteps {
     gatewayEventMonitor.tearDownGatewayEventMonitor();
   }
 
-  @Given("^TM sends a Census case outcome to the Job Service$")
-  public void tm_sends_a_LMS_case_outcome_to_the_Job_Service() {
-    int response = messageSenderUtils.sendTMResponseMessage(censusResponse);
-    assertEquals(200, response);
-  }
-
-  @Given("^the response contains the outcome and caseId$")
-  public void the_response_contains_the_outcome_and_caseId() throws IOException {
-    ObjectMapper ob = new ObjectMapper();
-    CensusCaseOutcomeDTO dto = ob.readValue(censusResponse.getBytes(), CensusCaseOutcomeDTO.class);
-    assertEquals("6c9b1177-3e03-4060-b6db-f6a8456292ef", dto.getCaseId());
-    assertEquals("Will complete", dto.getOutcome());
-    assertEquals("Will complete", dto.getOutcomeCategory());
-  }
-
-  @Then("^the response is an Census job$")
-  public void the_response_is_a_Census_job() {
-    ObjectMapper objectMapper = new ObjectMapper();
-      try {
-        objectMapper.readValue(censusResponse.getBytes(), CensusCaseOutcomeDTO.class);
-      } catch (IOException e) {
-        fail();
-      }
-  }
-
-  @Then("^the message is in the RM composite format$")
-  public void the_message_is_in_the_RM_composite_format() throws Exception {
-    assertEquals(expectedXml, messageSenderUtils.getMessage("Gateway.Feedback"));
-  }
-
-  @Then("^the message will be put on the queue to RM$")
-  public void the_message_will_be_put_on_the_queue_to_RM() {
-    assertEquals(1, messageSenderUtils.getMessageCount("Gateway.Feedback"));
-  }
-
-  @Given("a job with the id {string} doesn't exist")
-  public void aJobWithTheIdDoesnTExist(String id) throws MalformedURLException {
+  @Given("a TM doesnt have an existing job with id {string}")
+  public void aTMDoesntHaveAnExistingJobWithId(String id) throws MalformedURLException {
     int result;
     result = acceptanceTestUtils.getCaseById(id);
     assertEquals(404, result);
   }
 
-  @And("RM sends a create job request")
-  public void rm_sends_a_create_job_request() throws URISyntaxException, InterruptedException {
-    String expectedKey = "39bad71c-7de5-4e1b-9a07-d9597737977f - RM - Request Received";
+  @And("RM sends a create HouseHold job request")
+  public void rmSendsACreateHouseHoldJobRequest() throws URISyntaxException, InterruptedException {
+    String caseID = "39bad71c-7de5-4e1b-9a07-d9597737977f";
     messageSenderUtils.sendToRMQueue(receivedRMMessage);
-
-    boolean hasBeenTriggered = messageSenderUtils.hasEventTriggered(expectedKey);
-
+    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseID, RM_REQUEST_RECEIVED);
     assertThat(hasBeenTriggered).isTrue();
   }
 
-  @When("the gateway sends a create message to TM")
-  public void the_gateway_sends_a_create_message_to_TM() throws InterruptedException {
-    String expectedKey = "39bad71c-7de5-4e1b-9a07-d9597737977f - Comet - Create Job Request";
-
-    boolean hasBeenTriggered = messageSenderUtils.hasEventTriggered(expectedKey);
-
+  @When("the Gateway sends a Create Job message to TM")
+  public void theGatewaySendsACreateJobMessageToTM() {
+    String caseID = "39bad71c-7de5-4e1b-9a07-d9597737977f";
+    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseID, COMET_CREATE_JOB_REQUEST);
     assertThat(hasBeenTriggered).isTrue();
   }
 
@@ -150,6 +116,44 @@ public class CensusSteps {
   public void a_message_received_from_RM_that_fails_to_send_to_TM_after_attempts(Integer attempts) {
     // Write code here that turns the phrase above into concrete actions
     throw new cucumber.api.PendingException();
+  }
+
+  @Given("TM sends a Census Case Outcome to the Gateway")
+  public void tmSendsACensusCaseOutcomeToTheGateway() {
+    int response = messageSenderUtils.sendTMResponseMessage(censusResponse);
+    assertEquals(200, response);
+  }
+
+  @And("the response is of a Census Case Outcome format")
+  public void theResponseIsOfACensusCaseOutcomeFormat() {
+    try {
+      objectMapper.readValue(censusResponse.getBytes(), CensusCaseOutcomeDTO.class);
+    } catch (IOException e) {
+      fail();
+    }
+  }
+
+  @And("the response contains the Outcome value of {string} and the Case Id of {string}")
+  public void theResponseContainsTheOutcomeValueOfAndTheCaseIdOf(String outCome, String caseId) throws IOException {
+    CensusCaseOutcomeDTO dto = objectMapper.readValue(censusResponse.getBytes(), CensusCaseOutcomeDTO.class);
+    assertEquals(outCome, dto.getOutcome());
+    assertEquals(caseId, dto.getCaseId());
+    assertNotNull(dto.getOutcomeCategory());
+  }
+
+  @Then("the message will made available for RM to pick up")
+  public void theMessageWillMadeAvailableForRMToPickUp() {
+    assertEquals(1, messageSenderUtils.getMessageCount("Gateway.Feedback"));
+  }
+
+  @And("the message is in the format RM is expecting")
+  public void theMessageIsInTheFormatRMIsExpecting() {
+    try {
+      CensusCaseOutcomeDTO actualDTO = objectMapper
+          .readValue(messageSenderUtils.getMessage("Gateway.Feedback"), CensusCaseOutcomeDTO.class);
+    } catch (IOException | InterruptedException e) {
+      fail();
+    }
   }
 
   // Shared step
