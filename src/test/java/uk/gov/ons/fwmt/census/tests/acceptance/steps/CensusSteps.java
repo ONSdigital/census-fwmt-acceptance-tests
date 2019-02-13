@@ -1,33 +1,37 @@
 package uk.gov.ons.fwmt.census.tests.acceptance.steps;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Charsets;
-import com.google.common.io.Resources;
-import cucumber.api.java.Before;
-import cucumber.api.java.en.And;
-import cucumber.api.java.en.Given;
-import cucumber.api.java.en.Then;
-import cucumber.api.java.en.When;
-import lombok.extern.slf4j.Slf4j;
-import org.junit.After;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.PropertySource;
-import uk.gov.ons.fwmt.census.data.dto.CensusCaseOutcomeDTO;
-import uk.gov.ons.fwmt.census.events.utils.GatewayEventMonitor;
-import uk.gov.ons.fwmt.census.tests.acceptance.utils.AcceptanceTestUtils;
-import uk.gov.ons.fwmt.census.tests.acceptance.utils.MessageSenderUtils;
-import uk.gov.ons.fwmt.census.tests.acceptance.utils.MockMessage;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.util.concurrent.TimeoutException;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
+import org.junit.After;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.client.HttpClientErrorException;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Charsets;
+import com.google.common.io.Resources;
+
+import cucumber.api.java.Before;
+import cucumber.api.java.en.And;
+import cucumber.api.java.en.Given;
+import cucumber.api.java.en.Then;
+import cucumber.api.java.en.When;
+import lombok.extern.slf4j.Slf4j;
+import uk.gov.ons.fwmt.census.common.data.modelcase.ModelCase;
+import uk.gov.ons.fwmt.census.data.dto.CensusCaseOutcomeDTO;
+import uk.gov.ons.fwmt.census.events.utils.GatewayEventMonitor;
+import uk.gov.ons.fwmt.census.tests.acceptance.utils.QueueUtils;
+import uk.gov.ons.fwmt.census.tests.acceptance.utils.TMMockUtils;
 
 @Slf4j
 @PropertySource("classpath:application.properties")
@@ -40,29 +44,25 @@ public class CensusSteps {
   private String invalidRMMessage = null;
 
   @Autowired
-  private AcceptanceTestUtils acceptanceTestUtils;
+  private TMMockUtils tmMockUtils;
 
   @Autowired
-  private MessageSenderUtils messageSenderUtils;
+  private QueueUtils queueUtils;
 
   private GatewayEventMonitor gatewayEventMonitor;
-  private String expectedJSON = null;
 
   @Value("${service.mocktm.url}")
   private String mockTmURL;
-  private String unexppectedJSON = null;
   private ObjectMapper objectMapper = new ObjectMapper();
 
   @Before
   public void reset() throws IOException, TimeoutException, URISyntaxException {
     censusResponse = Resources.toString(Resources.getResource("files/census_response.txt"), Charsets.UTF_8);
-    expectedJSON = Resources.toString(Resources.getResource("files/feedback.json"), Charsets.UTF_8);
-    unexppectedJSON = Resources.toString(Resources.getResource("files/badFeedback.xml"), Charsets.UTF_8);
     receivedRMMessage = Resources.toString(Resources.getResource("files/actionInstruction.xml"), Charsets.UTF_8);
     invalidRMMessage = Resources.toString(Resources.getResource("files/invalidInstruction.xml"), Charsets.UTF_8);
     
-    acceptanceTestUtils.resetMock();
-    acceptanceTestUtils.clearQueues();
+    tmMockUtils.resetMock();
+    queueUtils.clearQueues();
 
     gatewayEventMonitor = new GatewayEventMonitor();
     gatewayEventMonitor.enableEventMonitor();
@@ -75,15 +75,18 @@ public class CensusSteps {
 
   @Given("a TM doesnt have an existing job with id {string}")
   public void aTMDoesntHaveAnExistingJobWithId(String id) throws MalformedURLException {
-    int result;
-    result = acceptanceTestUtils.getCaseById(id);
-    assertEquals(404, result);
+    try {
+      tmMockUtils.getCaseById(id);
+      fail("Case should not exist");
+    } catch (HttpClientErrorException e) {
+      assertEquals(HttpStatus.NOT_FOUND, e.getStatusCode());
+    }
   }
 
   @And("RM sends a create HouseHold job request")
   public void rmSendsACreateHouseHoldJobRequest() throws URISyntaxException, InterruptedException {
     String caseID = "39bad71c-7de5-4e1b-9a07-d9597737977f";
-    messageSenderUtils.sendToRMQueue(receivedRMMessage);
+    queueUtils.sendToActionFieldQueue(receivedRMMessage);
     boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseID, RM_REQUEST_RECEIVED);
     assertThat(hasBeenTriggered).isTrue();
   }
@@ -95,15 +98,15 @@ public class CensusSteps {
     assertThat(hasBeenTriggered).isTrue();
   }
 
-  @Then("a new case is created in TM")
-  public void a_new_case_is_created_in_TM() throws IOException {
-    MockMessage[] messages = acceptanceTestUtils.getMessages();
-    assertEquals(1, messages.length);
+  @Then("a new case is with id of {string} created in TM")
+  public void a_new_case_is_created_in_TM(String caseId) throws IOException {
+    ModelCase kase = tmMockUtils.getCaseById(caseId);
+    assertEquals(caseId, kase.getId());
   }
 
   @Given("a message in an invalid format from RM")
   public void a_message_in_an_invalid_format_from_RM() throws URISyntaxException, InterruptedException {
-    messageSenderUtils.sendToRMQueue(invalidRMMessage);
+    queueUtils.sendToActionFieldQueue(invalidRMMessage);
   }
 
   @Given("a message in an invalid format from TM")
@@ -120,7 +123,7 @@ public class CensusSteps {
 
   @Given("TM sends a Census Case Outcome to the Gateway")
   public void tmSendsACensusCaseOutcomeToTheGateway() {
-    int response = messageSenderUtils.sendTMResponseMessage(censusResponse);
+    int response = tmMockUtils.sendTMResponseMessage(censusResponse);
     assertEquals(200, response);
   }
 
@@ -143,14 +146,13 @@ public class CensusSteps {
 
   @Then("the message will made available for RM to pick up")
   public void theMessageWillMadeAvailableForRMToPickUp() {
-    assertEquals(1, messageSenderUtils.getMessageCount("Gateway.Feedback"));
+    assertEquals(1, queueUtils.getMessageCount("Gateway.Feedback"));
   }
 
   @And("the message is in the format RM is expecting")
   public void theMessageIsInTheFormatRMIsExpecting() {
     try {
-      CensusCaseOutcomeDTO actualDTO = objectMapper
-          .readValue(messageSenderUtils.getMessage("Gateway.Feedback"), CensusCaseOutcomeDTO.class);
+      objectMapper.readValue(queueUtils.getMessage("Gateway.Feedback"), CensusCaseOutcomeDTO.class);
     } catch (IOException | InterruptedException e) {
       fail();
     }
@@ -159,6 +161,6 @@ public class CensusSteps {
   // Shared step
   @Then("the error is logged via SPLUNK & stored in a queue {string}")
   public void theErrorIsLoggedViaSPLUNKStoredInA(String queueName) {
-    assertEquals(1, messageSenderUtils.getMessageCount(queueName));
+    assertEquals(1, queueUtils.getMessageCount(queueName));
   }
 }
