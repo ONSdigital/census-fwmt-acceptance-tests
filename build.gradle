@@ -26,8 +26,8 @@ targetCompatibility = 11
 repositories {
     mavenLocal()
     if (!project.hasProperty('omitSDCArtifactory')) {
-        maven { url 'http://artifactory-sdc.onsdigital.uk/artifactory/libs-snapshot-local' }
-        maven { url 'http://artifactory-sdc.onsdigital.uk/artifactory/libs-release-local' }
+        maven { url 'http://artifactory-sdc.onsdigital.uk/artifactory/libs-snapshot' }
+        maven { url 'http://artifactory-sdc.onsdigital.uk/artifactory/libs-release' }
     }
 }
 
