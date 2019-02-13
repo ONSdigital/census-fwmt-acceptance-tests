@@ -8,7 +8,7 @@ install: true
 script:
 - |
   if [[ $TRAVIS_COMMIT_MESSAGE != 'JENKINS SNAPSHOT UPDATE' ]]; then
-    ./gradlew build --info;
+    ./gradlew build --info -x test;
   fi
 env:
   global:
@@ -37,4 +37,4 @@ after_success:
 - '[[ "$docker_run" = true ]] && echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USERNAME" --password-stdin'
 - '[[ "$docker_run" = true ]] && docker build -t sdcplatform/fwmt-census-acceptance-tests -t sdcplatform/fwmt-census-acceptance-tests:census-acceptance-tests-$TRAVIS_BUILD_NUMBER --build-arg jar=build/libs/fwmt-census-acceptance-tests-*.jar .'
 - '[[ "$docker_run" = true ]] && docker push sdcplatform/fwmt-census-acceptance-tests'
-- '[[ "$docker_run" = true ]] && ./gradlew artifactPublish'
+- '[[ "$docker_run" = true ]] && ./gradlew artifactPublish -x test'

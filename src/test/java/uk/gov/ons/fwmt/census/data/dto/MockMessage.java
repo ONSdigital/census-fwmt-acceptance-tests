@@ -1,4 +1,4 @@
-package uk.gov.ons.fwmt.census.tests.acceptance.utils;
+package uk.gov.ons.fwmt.census.data.dto;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

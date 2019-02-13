@@ -25,11 +25,11 @@ targetCompatibility = 11
 
 repositories {
     mavenLocal()
-    mavenCentral()
     if (!project.hasProperty('omitSDCArtifactory')) {
-        maven { url 'http://artifactory-sdc.onsdigital.uk/artifactory/libs-release-local' }
-        maven { url 'http://artifactory-sdc.onsdigital.uk/artifactory/libs-snapshot-local' }
+        maven { url 'http://artifactory-sdc.onsdigital.uk/artifactory/libs-release' }
+        maven { url 'http://artifactory-sdc.onsdigital.uk/artifactory/libs-snapshot' }
     }
+    mavenCentral()
 }
 
 configurations {
@@ -56,7 +56,10 @@ test {
 }
 
 dependencies {
-    compile("com.google.guava:guava:27.0.1-jre")	
+    compile("uk.gov.ons.fwmt:fwmt-census-common:1.0.1-SNAPSHOT")
+    compile("uk.gov.ons.fwmt:fwmt-census-events:1.0.0-SNAPSHOT")
+
+    compile("com.google.guava:guava:27.0.1-jre")
 
     compile("org.projectlombok:lombok:1.18.4")
     annotationProcessor("org.projectlombok:lombok:1.18.4")
@@ -81,6 +84,8 @@ dependencies {
     testCompile("io.cucumber:cucumber-java:4.0.2")
     testCompile("io.cucumber:cucumber-junit:4.0.2")
     testCompile("io.cucumber:cucumber-spring:4.0.2")
+    testCompile("org.assertj:assertj-core:3.11.1")
+
 
     testCompile("org.projectlombok:lombok:1.18.4")
     testAnnotationProcessor("org.projectlombok:lombok:1.18.4")
