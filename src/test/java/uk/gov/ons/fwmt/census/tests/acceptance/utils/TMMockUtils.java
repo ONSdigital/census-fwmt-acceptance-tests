@@ -52,16 +52,16 @@ public final class TMMockUtils {
   }
 
   public MockMessage[] getMessages() throws IOException {
-    URL url = new URL(mockTmURL + "/logger/allMessages");
-    log.info("allMessages-mock_url:" + url.toString());
-    return restTemplate.getForObject(mockTmURL + "/logger/allMessages", MockMessage[].class);
+    String url = mockTmURL + "/logger/allMessages";
+    log.info("allMessages-mock_url:" + url);
+    return restTemplate.getForObject(url, MockMessage[].class);
   }
 
   public ModelCase getCaseById(String id) throws MalformedURLException {
-    URL url = new URL(mockTmURL + "/cases/" + id);
-    log.info("getCaseById-mock_url:" + url.toString());
+    String url = mockTmURL + "/cases/" + id;
+    log.info("getCaseById-mock_url:" + url);
     ResponseEntity<ModelCase> responseEntity = null;
-    responseEntity = restTemplate.getForEntity(mockTmURL + "/cases/casesByIdGet/" + id, ModelCase.class);
+    responseEntity = restTemplate.getForEntity(url, ModelCase.class);
     return responseEntity.getBody();
   }
 

@@ -5,7 +5,7 @@ Feature: Census Tests
     Given a TM doesnt have an existing job with id "39bad71c-7de5-4e1b-9a07-d9597737977f"
     And RM sends a create HouseHold job request
     When the Gateway sends a Create Job message to TM
-    Then a new case with id of "39bad71c-7de5-4e1b-9a07-d9597737977f" is created in TM
+    Then a new case is with id of "39bad71c-7de5-4e1b-9a07-d9597737977f" created in TM
 
   Scenario: As a system (FWMT Gateway) I can receive final outcome of cases from TM
     Given TM sends a Census Case Outcome to the Gateway
