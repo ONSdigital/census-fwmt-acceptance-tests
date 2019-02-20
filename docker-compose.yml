@@ -1,41 +1,60 @@
 version: '3'
 services:
+  rabbit:
+    container_name: rabbit
+    image: rabbitmq:3.6.10-management
+    ports:
+      - "4369:4369"
+      - "25672:25672"
+      - "5671-5672:5671-5672"
+      - "15671-15672:15671-15672"
+    networks:
+      - internal
   job:
     container_name: job
-    image: sdcplatform/fwmtjobsvc
+    image: eu.gcr.io/census-ci/census-rm-fwmtjobsvc
     ports:
-      - "${JOB_PORT}:9091"
-    links:
-      - resource
-    environment:
-      - service.resource.username=user
-      - service.resource.password=password
-      - service.resource.baseUrl=http://${RESOURCE_HOST}:${RESOURCE_PORT}/resources
+      - "${JOB_PORT}:9999"
     networks:
       - internal
-  resource:
-    container_name: resource
-    image: sdcplatform/fwmtresourcesvc
-    ports:
-      - "${RESOURCE_PORT}:9093"
     environment:
-      - spring.datasource.url=jdbc:postgresql://${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_HOST}?currentSchema=gateway
-      - liquibase.url=jdbc:postgresql://${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_HOST}?currentSchema=gateway
+      - RABBITMQ_HOSTNAME=rabbit
+      - TOTALMOBILE_BASEURL=http://mock:9099/
+    depends_on:
+      - rabbit
+  adapter:
+    container_name: adapter
+    image: eu.gcr.io/census-ci/census-rm-fwmtrmadapter
+    ports:
+      - "${ADAPTER_PORT}:9094"
     networks:
       - internal
-  staff:
-    container_name: staff
-    image: sdcplatform/fwmtstaffsvc
-    ports:
-      - "${STAFF_PORT}:9092"
     environment:
-      - service.resource.username=user
-      - service.resource.password=password
-      - service.resource.baseUrl=http://${RESOURCE_HOST}:${RESOURCE_PORT}/resources
-    links:
-      - resource
+      - RABBITMQ_HOSTNAME=rabbit
+    depends_on:
+      - rabbit
+  mock:
+    container_name: mock
+    image: eu.gcr.io/census-ci/census-rm-fwmttmmock
+    ports:
+      - "${MOCK_PORT}:9099"
     networks:
       - internal
+    environment:
+      - RABBITMQ_HOST=rabbit
+    depends_on:
+      - rabbit
+  feedback:
+    container_name: feedback
+    image: eu.gcr.io/census-ci/census-rm-fwmtfeedbacksvc
+    ports:
+      - "${FEEDBACK_PORT}:9990"
+    networks:
+      - internal
+    environment:
+      - RABBITMQ_HOSTNAME=rabbit
+    depends_on:
+      - rabbit
 networks:
   internal:
     driver: bridge
