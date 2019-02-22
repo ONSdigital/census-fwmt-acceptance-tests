@@ -98,7 +98,7 @@ public class CensusSteps {
     assertThat(hasBeenTriggered).isTrue();
   }
 
-  @Then("a new case is with id of {string} created in TM")
+  @Then("a new case with id of {string} is created in TM")
   public void a_new_case_is_created_in_TM(String caseId) throws IOException {
     ModelCase kase = tmMockUtils.getCaseById(caseId);
     assertEquals(caseId, kase.getId());
