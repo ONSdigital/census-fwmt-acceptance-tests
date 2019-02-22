@@ -6,7 +6,7 @@ before_install:
 - docker-compose up -d
 install: true
 script:
-  - travis_wait 15
+  - sleep 60
   - ./gradlew build --info;
 env:
   global:
@@ -22,4 +22,8 @@ cache:
   - "$HOME/.gradle/caches/"
   - "$HOME/.gradle/wrapper/"
 after_failure:
-- docker-compose logs
+- docker logs adapter
+- docker logs job
+- docker logs mock
+- docker logs feedback
+- docker logs rabbit
