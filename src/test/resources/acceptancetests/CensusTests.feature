@@ -13,6 +13,3 @@ Feature: Census Tests
     And the response contains the Outcome value of "Will complete" and the Case Id of "6c9b1177-3e03-4060-b6db-f6a8456292ef"
     Then the message will made available for RM to pick up
     And the message is in the format RM is expecting
-
-
-
