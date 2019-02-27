@@ -1,4 +1,4 @@
-package uk.gov.ons.fwmt.census.tests.acceptance.utils;
+package uk.gov.ons.census.fwmt.tests.acceptance.utils;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -16,9 +16,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import lombok.extern.slf4j.Slf4j;
-import uk.gov.ons.fwmt.census.common.data.modelcase.ModelCase;
-import uk.gov.ons.fwmt.census.data.dto.MockMessage;
-import uk.gov.ons.fwmt.census.tests.acceptance.exceptions.MockInaccessibleException;
+import uk.gov.ons.census.fwmt.common.data.modelcase.ModelCase;
+import uk.gov.ons.census.fwmt.data.dto.MockMessage;
+import uk.gov.ons.census.fwmt.tests.acceptance.exceptions.MockInaccessibleException;
 
 @Slf4j
 @Component

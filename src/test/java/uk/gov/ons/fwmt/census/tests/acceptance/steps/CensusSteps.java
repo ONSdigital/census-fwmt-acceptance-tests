@@ -1,4 +1,4 @@
-package uk.gov.ons.fwmt.census.tests.acceptance.steps;
+package uk.gov.ons.census.fwmt.tests.acceptance.steps;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
@@ -27,11 +27,11 @@ import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
 import lombok.extern.slf4j.Slf4j;
-import uk.gov.ons.fwmt.census.common.data.modelcase.ModelCase;
-import uk.gov.ons.fwmt.census.data.dto.CensusCaseOutcomeDTO;
-import uk.gov.ons.fwmt.census.events.utils.GatewayEventMonitor;
-import uk.gov.ons.fwmt.census.tests.acceptance.utils.QueueUtils;
-import uk.gov.ons.fwmt.census.tests.acceptance.utils.TMMockUtils;
+import uk.gov.ons.census.fwmt.common.data.modelcase.ModelCase;
+import uk.gov.ons.census.fwmt.data.dto.CensusCaseOutcomeDTO;
+import uk.gov.ons.census.fwmt.events.utils.GatewayEventMonitor;
+import uk.gov.ons.census.fwmt.tests.acceptance.utils.QueueUtils;
+import uk.gov.ons.census.fwmt.tests.acceptance.utils.TMMockUtils;
 
 @Slf4j
 @PropertySource("classpath:application.properties")
