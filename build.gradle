@@ -16,7 +16,7 @@ plugins {
 
 description = 'census-fwmt-acceptance-tests'
 
-group = 'uk.gov.ons.fwmt'
+group = 'uk.gov.ons.census.fwmt'
 
 version = '3.0.0-SNAPSHOT'
 
