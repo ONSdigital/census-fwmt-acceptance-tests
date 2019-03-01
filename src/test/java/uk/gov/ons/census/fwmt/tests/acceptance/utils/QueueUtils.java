@@ -1,4 +1,4 @@
-package uk.gov.ons.fwmt.census.tests.acceptance.utils;
+package uk.gov.ons.census.fwmt.tests.acceptance.utils;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
@@ -58,7 +58,7 @@ public final class QueueUtils {
   public void clearQueues() throws URISyntaxException {
     clearQueue("Gateway.Actions");
     clearQueue("Gateway.ActionsDLQ");
-    clearQueue("Gateway.Feedback");
+    clearQueue("Gateway.Outcome");
     clearQueue("Action.Field");
     clearQueue("Action.FieldDLQ");
   }

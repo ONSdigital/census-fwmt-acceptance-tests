@@ -44,11 +44,11 @@ services:
       - RABBITMQ_HOST=rabbit
     depends_on:
       - rabbit
-  feedback:
-    container_name: feedback
-    image: eu.gcr.io/census-ci/census-rm-fwmtfeedbacksvc
+  outcome:
+    container_name: outcome
+    image: eu.gcr.io/census-ci/census-rm-fwmtoutcomesvc
     ports:
-      - "${FEEDBACK_PORT}:9990"
+      - "${OUTCOME_PORT}:9990"
     networks:
       - internal
     environment:

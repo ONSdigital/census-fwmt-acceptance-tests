@@ -1,4 +1,4 @@
-package uk.gov.ons.fwmt.census.tests.acceptance.utils;
+package uk.gov.ons.census.fwmt.tests.acceptance.utils;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -16,9 +16,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import lombok.extern.slf4j.Slf4j;
-import uk.gov.ons.fwmt.census.common.data.modelcase.ModelCase;
-import uk.gov.ons.fwmt.census.data.dto.MockMessage;
-import uk.gov.ons.fwmt.census.tests.acceptance.exceptions.MockInaccessibleException;
+import uk.gov.ons.census.fwmt.common.data.modelcase.ModelCase;
+import uk.gov.ons.census.fwmt.data.dto.MockMessage;
+import uk.gov.ons.census.fwmt.tests.acceptance.exceptions.MockInaccessibleException;
 
 @Slf4j
 @Component
@@ -33,14 +33,14 @@ public final class TMMockUtils {
   @Value("${service.jobservice.password}")
   private String jobservicePassword;
 
-  @Value("${service.feedback.url}")
-  private String feedbackSvcURL;
+  @Value("${service.outcome.url}")
+  private String outcomeSvcURL;
 
-  @Value("${service.feedback.username}")
-  private String feedbackSvcUsername;
+  @Value("${service.outcome.username}")
+  private String outcomeSvcUsername;
 
-  @Value("${service.feedback.password}")
-  private String feedbackSvcPassword;
+  @Value("${service.outcome.password}")
+  private String outcomeSvcPassword;
 
   @Value("${service.mocktm.url}")
   private String mockTmURL;
@@ -75,12 +75,12 @@ public final class TMMockUtils {
   }
 
   public int sendTMResponseMessage(String data) {
-    HttpHeaders headers = createBasicAuthHeaders(feedbackSvcUsername, feedbackSvcPassword);
+    HttpHeaders headers = createBasicAuthHeaders(outcomeSvcUsername, outcomeSvcPassword);
 
     headers.setContentType(MediaType.APPLICATION_JSON);
     
     RestTemplate restTemplate = new RestTemplate();
-    String postUrl = feedbackSvcURL + tmResponseEndpoint;
+    String postUrl = outcomeSvcURL + tmResponseEndpoint;
 
     HttpEntity<String> post = new HttpEntity<String>(data, headers);
     ResponseEntity<Void> response = restTemplate.exchange(postUrl, HttpMethod.POST, post, Void.class);

@@ -1,4 +1,4 @@
-rootProject.name = 'fwmt-census-acceptance-tests'
+rootProject.name = 'census-fwmt-acceptance-tests'
 
 include 'shared', 'api', 'services:webservice'
 
