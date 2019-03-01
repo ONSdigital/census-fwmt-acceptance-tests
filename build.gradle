@@ -56,8 +56,8 @@ test {
 }
 
 dependencies {
-    compile("uk.gov.ons.fwmt:census-fwmt-common:1.0.1-SNAPSHOT")
-    compile("uk.gov.ons.fwmt:census-fwmt-events:1.0.0-SNAPSHOT")
+    compile("uk.gov.ons.census.fwmt:census-fwmt-common:1.0.1-SNAPSHOT")
+    compile("uk.gov.ons.census.fwmt:census-fwmt-events:1.0.0-SNAPSHOT")
 
     compile("com.google.guava:guava:27.0.1-jre")
 

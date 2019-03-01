@@ -25,5 +25,5 @@ after_failure:
 - docker logs adapter
 - docker logs job
 - docker logs mock
-- docker logs feedback
+- docker logs outcome
 - docker logs rabbit

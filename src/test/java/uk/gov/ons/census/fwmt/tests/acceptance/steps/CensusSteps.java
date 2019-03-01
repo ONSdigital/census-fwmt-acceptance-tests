@@ -146,13 +146,13 @@ public class CensusSteps {
 
   @Then("the message will made available for RM to pick up")
   public void theMessageWillMadeAvailableForRMToPickUp() {
-    assertEquals(1, queueUtils.getMessageCount("Gateway.Feedback"));
+    assertEquals(1, queueUtils.getMessageCount("Gateway.Outcome"));
   }
 
   @And("the message is in the format RM is expecting")
   public void theMessageIsInTheFormatRMIsExpecting() {
     try {
-      objectMapper.readValue(queueUtils.getMessage("Gateway.Feedback"), CensusCaseOutcomeDTO.class);
+      objectMapper.readValue(queueUtils.getMessage("Gateway.Outcome"), CensusCaseOutcomeDTO.class);
     } catch (IOException | InterruptedException e) {
       fail();
     }
