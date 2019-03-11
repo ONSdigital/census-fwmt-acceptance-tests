@@ -51,7 +51,7 @@ public class CensusSteps {
 
   @Value("${service.mocktm.url}")
   private String mockTmURL;
-  @Value("${service.rabbit.url")
+  @Value("${service.rabbit.url}")
   private String rabbitLocation;
   private ObjectMapper objectMapper = new ObjectMapper();
 
