@@ -1,12 +1,8 @@
 package uk.gov.ons.census.fwmt.tests.acceptance.utils;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -46,7 +42,8 @@ public final class QueueUtils {
   }
 
   public void sendToActionFieldQueue(String message) throws URISyntaxException, InterruptedException {
-    Thread.sleep(3000); // TODO do we need this thread sleep?
+    // TODO do we need this thread sleep?
+    Thread.sleep(3000);
     String exchangeName = "";
     String routingKey = "Action.Field";
     RestTemplate rt = new RestTemplate();

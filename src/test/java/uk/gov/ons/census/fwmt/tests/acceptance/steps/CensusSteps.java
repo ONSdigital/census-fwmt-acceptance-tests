@@ -22,7 +22,6 @@ import uk.gov.ons.census.fwmt.tests.acceptance.utils.QueueUtils;
 import uk.gov.ons.census.fwmt.tests.acceptance.utils.TMMockUtils;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.util.concurrent.TimeoutException;
 
@@ -74,7 +73,7 @@ public class CensusSteps {
   }
 
   @Given("a TM doesnt have an existing job with id {string}")
-  public void aTMDoesntHaveAnExistingJobWithId(String id) throws MalformedURLException {
+  public void aTMDoesntHaveAnExistingJobWithId(String id) {
     try {
       tmMockUtils.getCaseById(id);
       fail("Case should not exist");
@@ -99,7 +98,7 @@ public class CensusSteps {
   }
 
   @Then("a new case with id of {string} is created in TM")
-  public void a_new_case_is_created_in_TM(String caseId) throws IOException {
+  public void a_new_case_is_created_in_TM(String caseId) {
     ModelCase kase = tmMockUtils.getCaseById(caseId);
     assertEquals(caseId, kase.getId());
   }
