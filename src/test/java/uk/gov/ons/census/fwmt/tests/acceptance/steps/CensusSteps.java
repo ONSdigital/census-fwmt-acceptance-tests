@@ -100,7 +100,7 @@ public class CensusSteps {
   @Then("a new case with id of {string} is created in TM")
   public void a_new_case_is_created_in_TM(String caseId) {
     ModelCase kase = tmMockUtils.getCaseById(caseId);
-    assertEquals(caseId, kase.getId());
+    assertEquals(caseId, kase.getId().toString());
   }
 
   @Given("a message in an invalid format from RM")
