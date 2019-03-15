@@ -35,8 +35,8 @@ import static org.junit.Assert.fail;
 public class CensusSteps {
 
   private String censusResponse = null;
-  public static final String RM_REQUEST_RECEIVED = "RM - Request Received";
-  public static final String COMET_CREATE_JOB_REQUEST = "Comet - Create Job Request";
+  private static final String RM_REQUEST_RECEIVED = "RM - Request Received";
+  private static final String COMET_CREATE_JOB_REQUEST = "Comet - Create Job Request";
   private String receivedRMMessage = null;
   private String invalidRMMessage = null;
 
