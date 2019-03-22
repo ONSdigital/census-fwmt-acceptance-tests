@@ -1,10 +1,6 @@
 package uk.gov.ons.census.fwmt.tests.acceptance.utils;
 
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -14,11 +10,13 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
-
-import lombok.extern.slf4j.Slf4j;
 import uk.gov.ons.census.fwmt.common.data.modelcase.ModelCase;
 import uk.gov.ons.census.fwmt.data.dto.MockMessage;
 import uk.gov.ons.census.fwmt.tests.acceptance.exceptions.MockInaccessibleException;
+
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 @Slf4j
 @Component
@@ -60,16 +58,16 @@ public final class TMMockUtils {
     }
   }
 
-  public MockMessage[] getMessages() throws IOException {
+  public MockMessage[] getMessages() {
     String url = mockTmURL + "/logger/allMessages";
     log.info("allMessages-mock_url:" + url);
     return restTemplate.getForObject(url, MockMessage[].class);
   }
 
-  public ModelCase getCaseById(String id) throws MalformedURLException {
+  public ModelCase getCaseById(String id) {
     String url = mockTmURL + "/cases/" + id;
     log.info("getCaseById-mock_url:" + url);
-    ResponseEntity<ModelCase> responseEntity = null;
+    ResponseEntity<ModelCase> responseEntity;
     responseEntity = restTemplate.getForEntity(url, ModelCase.class);
     return responseEntity.getBody();
   }
@@ -82,13 +80,13 @@ public final class TMMockUtils {
     RestTemplate restTemplate = new RestTemplate();
     String postUrl = outcomeSvcURL + tmResponseEndpoint;
 
-    HttpEntity<String> post = new HttpEntity<String>(data, headers);
+    HttpEntity<String> post = new HttpEntity<>(data, headers);
     ResponseEntity<Void> response = restTemplate.exchange(postUrl, HttpMethod.POST, post, Void.class);
 
     return response.getStatusCode().value();
   }
 
-  public HttpHeaders createBasicAuthHeaders(String username, String password) {
+  private HttpHeaders createBasicAuthHeaders(String username, String password) {
     HttpHeaders headers = new HttpHeaders();
     final String plainCreds = username + ":" + password;
     byte[] plainCredsBytes = plainCreds.getBytes();
