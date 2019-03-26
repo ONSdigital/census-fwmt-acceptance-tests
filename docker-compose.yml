@@ -12,7 +12,7 @@ services:
       - internal
   job:
     container_name: job
-    image: eu.gcr.io/census-ci/census-rm-fwmtjobsvc
+    image: eu.gcr.io/census-fwmt-ci-233109/census-rm-fwmtjobsvc
     ports:
       - "${JOB_PORT}:8020"
     networks:
@@ -24,7 +24,7 @@ services:
       - rabbit
   adapter:
     container_name: adapter
-    image: eu.gcr.io/census-ci/census-rm-fwmtrmadapter
+    image: eu.gcr.io/census-fwmt-ci-233109/census-rm-fwmtrmadapter
     ports:
       - "${ADAPTER_PORT}:8010"
     networks:
@@ -35,7 +35,7 @@ services:
       - rabbit
   mock:
     container_name: mock
-    image: eu.gcr.io/census-ci/census-rm-fwmttmmock
+    image: eu.gcr.io/census-fwmt-ci-233109/census-rm-fwmttmmock
     ports:
       - "${MOCK_PORT}:8000"
     networks:
@@ -46,7 +46,7 @@ services:
       - rabbit
   outcome:
     container_name: outcome
-    image: eu.gcr.io/census-ci/census-rm-fwmtoutcomesvc
+    image: eu.gcr.io/census-fwmt-ci-233109/census-rm-fwmtoutcomesvc
     ports:
       - "${OUTCOME_PORT}:8030"
     networks:
