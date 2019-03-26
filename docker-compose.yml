@@ -14,7 +14,7 @@ services:
     container_name: job
     image: eu.gcr.io/census-ci/census-rm-fwmtjobsvc
     ports:
-      - "${JOB_PORT}:9999"
+      - "${JOB_PORT}:8020"
     networks:
       - internal
     environment:
@@ -26,7 +26,7 @@ services:
     container_name: adapter
     image: eu.gcr.io/census-ci/census-rm-fwmtrmadapter
     ports:
-      - "${ADAPTER_PORT}:9094"
+      - "${ADAPTER_PORT}:8010"
     networks:
       - internal
     environment:
@@ -37,7 +37,7 @@ services:
     container_name: mock
     image: eu.gcr.io/census-ci/census-rm-fwmttmmock
     ports:
-      - "${MOCK_PORT}:9099"
+      - "${MOCK_PORT}:8000"
     networks:
       - internal
     environment:
@@ -48,7 +48,7 @@ services:
     container_name: outcome
     image: eu.gcr.io/census-ci/census-rm-fwmtoutcomesvc
     ports:
-      - "${OUTCOME_PORT}:9990"
+      - "${OUTCOME_PORT}:8030"
     networks:
       - internal
     environment:
