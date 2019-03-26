@@ -19,7 +19,7 @@ services:
       - internal
     environment:
       - RABBITMQ_HOSTNAME=rabbit
-      - TOTALMOBILE_BASEURL=http://mock:9099/
+      - TOTALMOBILE_BASEURL=http://mock:8000/
     depends_on:
       - rabbit
   adapter:
