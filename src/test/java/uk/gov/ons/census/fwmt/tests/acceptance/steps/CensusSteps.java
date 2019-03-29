@@ -98,7 +98,8 @@ public class CensusSteps {
   }
 
   @Then("a new case with id of {string} is created in TM")
-  public void a_new_case_is_created_in_TM(String caseId) {
+  public void a_new_case_is_created_in_TM(String caseId) throws InterruptedException {
+    Thread.sleep(1000);
     ModelCase kase = tmMockUtils.getCaseById(caseId);
     assertEquals(caseId, kase.getId().toString());
   }
