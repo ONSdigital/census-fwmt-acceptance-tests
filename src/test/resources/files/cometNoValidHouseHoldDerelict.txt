@@ -1,0 +1,25 @@
+{
+  "eventDate": "string",
+  "username": "string",
+  "caseId": "6c9b1177-3e03-4060-b6db-f6a8456292ef",
+  "caseReference": "string",
+  "primaryOutcome": "No Valid Household",
+  "secondaryOutcome": "derelict",
+  "outcomeNote": "string",
+  "ceDetails": {
+    "establishmentName": "string",
+    "managerName": "string",
+    "usualResidents": 0,
+    "mgrPhone": "string"
+  },
+  "fulfillmentRequests": [
+    {
+      "questionnaireType": "string",
+      "deliveryFormat": "string",
+      "deliveryMethod": "string",
+      "questionnaireID": "string",
+      "requesterName": "string",
+      "requesterPhone": "string"
+    }
+  ]
+}

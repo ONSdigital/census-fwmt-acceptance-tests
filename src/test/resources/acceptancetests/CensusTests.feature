@@ -10,6 +10,6 @@ Feature: Census Tests
   Scenario: As a system (FWMT Gateway) I can receive final outcome of cases from TM
     Given TM sends a Census Case Outcome to the Gateway
     And the response is of a Census Case Outcome format
-    And the response contains the Outcome value of "Will complete" and the Case Id of "6c9b1177-3e03-4060-b6db-f6a8456292ef"
+    And the response contains the Primary Outcome value of "No Valid Household", Secondary Outcome "derelict" and the Case Id of "6c9b1177-3e03-4060-b6db-f6a8456292ef"
     Then the message will made available for RM to pick up
     And the message is in the format RM is expecting
