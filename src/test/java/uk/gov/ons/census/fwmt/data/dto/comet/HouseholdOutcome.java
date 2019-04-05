@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
@@ -43,6 +44,8 @@ public class HouseholdOutcome {
   private String secondaryOutcome;
   @JsonProperty("outcomeNote")
   private String outcomeNote;
+  @JsonProperty("transactionId")
+  private UUID transactionId;
   @JsonProperty("ceDetails")
   private CeDetails ceDetails;
   @JsonProperty("fulfillmentRequests")
