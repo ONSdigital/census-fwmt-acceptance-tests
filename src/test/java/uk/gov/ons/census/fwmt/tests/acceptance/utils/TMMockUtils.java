@@ -96,4 +96,23 @@ public final class TMMockUtils {
     return headers;
   }
 
+  public void enableCaseManager() throws IOException {
+    URL url = new URL(mockTmURL + "/logger/enableCaseManager");
+    log.info("enableCaseManager-mock_url:" + url.toString());
+    HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+    httpURLConnection.setRequestMethod("GET");
+    if (httpURLConnection.getResponseCode() != 200) {
+      throw new MockInaccessibleException("Failed : HTTP error code : " + httpURLConnection.getResponseCode());
+    }
+  }
+
+  public void disableCaseManager() throws IOException {
+    URL url = new URL(mockTmURL + "/logger/disableCaseManager");
+    log.info("enableCaseManager-mock_url:" + url.toString());
+    HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+    httpURLConnection.setRequestMethod("GET");
+    if (httpURLConnection.getResponseCode() != 200) {
+      throw new MockInaccessibleException("Failed : HTTP error code : " + httpURLConnection.getResponseCode());
+    }
+  }
 }
