@@ -61,7 +61,7 @@ public class CensusSteps {
     receivedRMMessage = Resources.toString(Resources.getResource("files/actionInstruction.xml"), Charsets.UTF_8);
     invalidRMMessage = Resources.toString(Resources.getResource("files/invalidInstruction.xml"), Charsets.UTF_8);
 
-    tmMockUtils.enableCaseManager();
+    tmMockUtils.enableRequestRecorder();
     tmMockUtils.resetMock();
     queueUtils.clearQueues();
 
@@ -72,7 +72,7 @@ public class CensusSteps {
   @After
   public void tearDownGatewayEventMonitor() throws IOException, TimeoutException {
     gatewayEventMonitor.tearDownGatewayEventMonitor();
-    tmMockUtils.disableCaseManager();
+    tmMockUtils.disableRequestRecorder();
   }
 
   @Given("a TM doesnt have an existing job with id {string}")

@@ -96,9 +96,9 @@ public final class TMMockUtils {
     return headers;
   }
 
-  public void enableCaseManager() throws IOException {
-    URL url = new URL(mockTmURL + "/logger/enableCaseManager");
-    log.info("enableCaseManager-mock_url:" + url.toString());
+  public void enableRequestRecorder() throws IOException {
+    URL url = new URL(mockTmURL + "/logger/enableRequestRecorder");
+    log.info("enableRequestRecorder-mock_url:" + url.toString());
     HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
     httpURLConnection.setRequestMethod("GET");
     if (httpURLConnection.getResponseCode() != 200) {
@@ -106,9 +106,9 @@ public final class TMMockUtils {
     }
   }
 
-  public void disableCaseManager() throws IOException {
-    URL url = new URL(mockTmURL + "/logger/disableCaseManager");
-    log.info("enableCaseManager-mock_url:" + url.toString());
+  public void disableRequestRecorder() throws IOException {
+    URL url = new URL(mockTmURL + "/logger/disableRequestRecorder");
+    log.info("enableRequestRecorder-mock_url:" + url.toString());
     HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
     httpURLConnection.setRequestMethod("GET");
     if (httpURLConnection.getResponseCode() != 200) {
