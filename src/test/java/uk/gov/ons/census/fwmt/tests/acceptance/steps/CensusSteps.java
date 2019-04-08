@@ -8,8 +8,8 @@ import cucumber.api.java.en.And;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
+import cucumber.api.java.After;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.After;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
@@ -28,7 +28,6 @@ import java.util.concurrent.TimeoutException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
 @Slf4j
@@ -56,7 +55,7 @@ public class CensusSteps {
   private ObjectMapper objectMapper = new ObjectMapper();
 
   @Before
-  public void reset() throws IOException, TimeoutException, URISyntaxException {
+  public void reset() throws IOException, TimeoutException, URISyntaxException, InterruptedException {
     noValidHouseholdDerelict = Resources.toString(Resources.getResource("files/cometNoValidHouseHoldDerelict.txt"), Charsets.UTF_8);
     receivedRMMessage = Resources.toString(Resources.getResource("files/actionInstruction.xml"), Charsets.UTF_8);
     invalidRMMessage = Resources.toString(Resources.getResource("files/invalidInstruction.xml"), Charsets.UTF_8);

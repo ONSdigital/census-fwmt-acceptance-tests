@@ -108,7 +108,7 @@ public final class TMMockUtils {
 
   public void disableRequestRecorder() throws IOException {
     URL url = new URL(mockTmURL + "/logger/disableRequestRecorder");
-    log.info("enableRequestRecorder-mock_url:" + url.toString());
+    log.info("disableRequestRecorder-mock_url:" + url.toString());
     HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
     httpURLConnection.setRequestMethod("GET");
     if (httpURLConnection.getResponseCode() != 200) {
