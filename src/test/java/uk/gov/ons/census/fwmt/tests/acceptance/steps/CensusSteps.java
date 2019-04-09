@@ -1,40 +1,46 @@
 package uk.gov.ons.census.fwmt.tests.acceptance.steps;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
+import cucumber.api.java.After;
 import cucumber.api.java.Before;
 import cucumber.api.java.en.And;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.After;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.web.client.HttpClientErrorException;
 import uk.gov.ons.census.fwmt.common.data.modelcase.ModelCase;
-import uk.gov.ons.census.fwmt.data.dto.CensusCaseOutcomeDTO;
+import uk.gov.ons.census.fwmt.data.dto.comet.HouseholdOutcome;
+import uk.gov.ons.census.fwmt.data.dto.rm.OutcomeEvent;
 import uk.gov.ons.census.fwmt.events.utils.GatewayEventMonitor;
 import uk.gov.ons.census.fwmt.tests.acceptance.utils.QueueUtils;
 import uk.gov.ons.census.fwmt.tests.acceptance.utils.TMMockUtils;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.concurrent.TimeoutException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
 @Slf4j
 @PropertySource("classpath:application.properties")
 public class CensusSteps {
 
-  private String censusResponse = null;
+  private String noValidHouseholdDerelict = null;
   private static final String RM_REQUEST_RECEIVED = "RM - Request Received";
   private static final String COMET_CREATE_JOB_REQUEST = "Comet - Create Job Request";
   private String receivedRMMessage = null;
@@ -55,11 +61,12 @@ public class CensusSteps {
   private ObjectMapper objectMapper = new ObjectMapper();
 
   @Before
-  public void reset() throws IOException, TimeoutException, URISyntaxException {
-    censusResponse = Resources.toString(Resources.getResource("files/census_response.txt"), Charsets.UTF_8);
+  public void reset() throws IOException, TimeoutException, URISyntaxException, InterruptedException {
+    noValidHouseholdDerelict = Resources.toString(Resources.getResource("files/cometNoValidHouseHoldDerelict.txt"), Charsets.UTF_8);
     receivedRMMessage = Resources.toString(Resources.getResource("files/actionInstruction.xml"), Charsets.UTF_8);
     invalidRMMessage = Resources.toString(Resources.getResource("files/invalidInstruction.xml"), Charsets.UTF_8);
-    
+
+    tmMockUtils.enableRequestRecorder();
     tmMockUtils.resetMock();
     queueUtils.clearQueues();
 
@@ -70,6 +77,7 @@ public class CensusSteps {
   @After
   public void tearDownGatewayEventMonitor() throws IOException, TimeoutException {
     gatewayEventMonitor.tearDownGatewayEventMonitor();
+    tmMockUtils.disableRequestRecorder();
   }
 
   @Given("a TM doesnt have an existing job with id {string}")
@@ -123,25 +131,36 @@ public class CensusSteps {
 
   @Given("TM sends a Census Case Outcome to the Gateway")
   public void tmSendsACensusCaseOutcomeToTheGateway() {
-    int response = tmMockUtils.sendTMResponseMessage(censusResponse);
+    int response = tmMockUtils.sendTMResponseMessage(noValidHouseholdDerelict);
     assertEquals(200, response);
   }
 
   @And("the response is of a Census Case Outcome format")
   public void theResponseIsOfACensusCaseOutcomeFormat() {
+    JavaTimeModule module = new JavaTimeModule();
+    LocalDateTimeDeserializer localDateTimeDeserializer = new LocalDateTimeDeserializer(
+        DateTimeFormatter.ISO_DATE_TIME);
+    module.addDeserializer(LocalDateTime.class, localDateTimeDeserializer);
+    objectMapper = Jackson2ObjectMapperBuilder.json()
+        .modules(module)
+        .featuresToDisable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+        .build();
+
     try {
-      objectMapper.readValue(censusResponse.getBytes(), CensusCaseOutcomeDTO.class);
+      objectMapper.readValue(noValidHouseholdDerelict.getBytes(), HouseholdOutcome.class);
     } catch (IOException e) {
       fail();
     }
   }
 
-  @And("the response contains the Outcome value of {string} and the Case Id of {string}")
-  public void theResponseContainsTheOutcomeValueOfAndTheCaseIdOf(String outCome, String caseId) throws IOException {
-    CensusCaseOutcomeDTO dto = objectMapper.readValue(censusResponse.getBytes(), CensusCaseOutcomeDTO.class);
-    assertEquals(outCome, dto.getOutcome());
-    assertEquals(caseId, dto.getCaseId());
-    assertNotNull(dto.getOutcomeCategory());
+  @And("the response contains the Primary Outcome value of {string}, Secondary Outcome {string} and the Case Id of {string}")
+  public void theResponseContainsThePrimaryOutcomeValueOfSecondaryOutcomeAndTheCaseIdOf(String primaryOutcome,
+      String secondaryOutcome,
+      String caseId) throws IOException {
+    HouseholdOutcome householdOutcome = objectMapper.readValue(noValidHouseholdDerelict.getBytes(), HouseholdOutcome.class);
+    assertEquals(primaryOutcome, householdOutcome.getPrimaryOutcome());
+    assertEquals(secondaryOutcome, householdOutcome.getSecondaryOutcome());
+    assertEquals(caseId, householdOutcome.getCaseId());
   }
 
   @Then("the message will made available for RM to pick up")
@@ -152,7 +171,7 @@ public class CensusSteps {
   @And("the message is in the format RM is expecting")
   public void theMessageIsInTheFormatRMIsExpecting() {
     try {
-      objectMapper.readValue(queueUtils.getMessage("Gateway.Outcome"), CensusCaseOutcomeDTO.class);
+      objectMapper.readValue(queueUtils.getMessage("Gateway.Outcome"), OutcomeEvent.class);
     } catch (IOException | InterruptedException e) {
       fail();
     }
@@ -163,4 +182,5 @@ public class CensusSteps {
   public void theErrorIsLoggedViaSPLUNKStoredInA(String queueName) {
     assertEquals(1, queueUtils.getMessageCount(queueName));
   }
+
 }

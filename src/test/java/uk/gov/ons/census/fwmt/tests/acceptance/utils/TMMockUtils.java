@@ -96,4 +96,23 @@ public final class TMMockUtils {
     return headers;
   }
 
+  public void enableRequestRecorder() throws IOException {
+    URL url = new URL(mockTmURL + "/logger/enableRequestRecorder");
+    log.info("enableRequestRecorder-mock_url:" + url.toString());
+    HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+    httpURLConnection.setRequestMethod("GET");
+    if (httpURLConnection.getResponseCode() != 200) {
+      throw new MockInaccessibleException("Failed : HTTP error code : " + httpURLConnection.getResponseCode());
+    }
+  }
+
+  public void disableRequestRecorder() throws IOException {
+    URL url = new URL(mockTmURL + "/logger/disableRequestRecorder");
+    log.info("disableRequestRecorder-mock_url:" + url.toString());
+    HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+    httpURLConnection.setRequestMethod("GET");
+    if (httpURLConnection.getResponseCode() != 200) {
+      throw new MockInaccessibleException("Failed : HTTP error code : " + httpURLConnection.getResponseCode());
+    }
+  }
 }

@@ -60,7 +60,7 @@ public final class QueueUtils {
     clearQueue("Action.FieldDLQ");
   }
 
-  public void clearQueue(String queueName) throws URISyntaxException {
+  private void clearQueue(String queueName) throws URISyntaxException {
     URI uri = new URI(mockTmURL + "/queue/?qname=" + queueName);
     restTemplate.delete(uri);
   }
