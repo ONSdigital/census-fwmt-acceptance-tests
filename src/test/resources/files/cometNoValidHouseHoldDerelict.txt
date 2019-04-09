@@ -1,12 +1,12 @@
 {
-  "eventDate": "string",
+  "eventDate": "2007-12-03T10:15:30",
   "username": "string",
   "caseId": "6c9b1177-3e03-4060-b6db-f6a8456292ef",
-  "caseReference": "string",
+  "caseReference": "caseReference",
   "primaryOutcome": "No Valid Household",
   "secondaryOutcome": "Derelict",
-  "outcomeNote": "string",
-  "transactionId: "c45de4dc-3c3b-11e9-b210-d663bd873d93",
+  "outcomeNote": "Property derelict.",
+  "transactionId": "c45de4dc-3c3b-11e9-b210-d663bd873d93",
   "ceDetails": {
     "establishmentName": "string",
     "managerName": "string",

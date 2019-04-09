@@ -1,19 +1,23 @@
 package uk.gov.ons.census.fwmt.tests.acceptance.steps;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
+import cucumber.api.java.After;
 import cucumber.api.java.Before;
 import cucumber.api.java.en.And;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
-import cucumber.api.java.After;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.web.client.HttpClientErrorException;
 import uk.gov.ons.census.fwmt.common.data.modelcase.ModelCase;
 import uk.gov.ons.census.fwmt.data.dto.comet.HouseholdOutcome;
@@ -24,6 +28,8 @@ import uk.gov.ons.census.fwmt.tests.acceptance.utils.TMMockUtils;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.concurrent.TimeoutException;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -131,6 +137,15 @@ public class CensusSteps {
 
   @And("the response is of a Census Case Outcome format")
   public void theResponseIsOfACensusCaseOutcomeFormat() {
+    JavaTimeModule module = new JavaTimeModule();
+    LocalDateTimeDeserializer localDateTimeDeserializer = new LocalDateTimeDeserializer(
+        DateTimeFormatter.ISO_DATE_TIME);
+    module.addDeserializer(LocalDateTime.class, localDateTimeDeserializer);
+    objectMapper = Jackson2ObjectMapperBuilder.json()
+        .modules(module)
+        .featuresToDisable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+        .build();
+
     try {
       objectMapper.readValue(noValidHouseholdDerelict.getBytes(), HouseholdOutcome.class);
     } catch (IOException e) {
@@ -139,10 +154,11 @@ public class CensusSteps {
   }
 
   @And("the response contains the Primary Outcome value of {string}, Secondary Outcome {string} and the Case Id of {string}")
-  public void theResponseContainsThePrimaryOutcomeValueOfSecondaryOutcomeAndTheCaseIdOf(String primaryoutcome, String secondaryOutcome,
+  public void theResponseContainsThePrimaryOutcomeValueOfSecondaryOutcomeAndTheCaseIdOf(String primaryOutcome,
+      String secondaryOutcome,
       String caseId) throws IOException {
     HouseholdOutcome householdOutcome = objectMapper.readValue(noValidHouseholdDerelict.getBytes(), HouseholdOutcome.class);
-    assertEquals(primaryoutcome, householdOutcome.getPrimaryOutcome());
+    assertEquals(primaryOutcome, householdOutcome.getPrimaryOutcome());
     assertEquals(secondaryOutcome, householdOutcome.getSecondaryOutcome());
     assertEquals(caseId, householdOutcome.getCaseId());
   }

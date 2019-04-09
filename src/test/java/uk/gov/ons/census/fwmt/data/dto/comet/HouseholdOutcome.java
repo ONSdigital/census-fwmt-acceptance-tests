@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,26 +32,35 @@ import java.util.UUID;
 public class HouseholdOutcome {
 
   @JsonProperty("eventDate")
-  private String eventDate;
+  private LocalDateTime eventDate;
+
   @JsonProperty("username")
   private String username;
+
   @JsonProperty("caseId")
   private String caseId;
+
   @JsonProperty("caseReference")
   private String caseReference;
+
   @JsonProperty("primaryOutcome")
   private String primaryOutcome;
+
   @JsonProperty("secondaryOutcome")
   private String secondaryOutcome;
+
   @JsonProperty("outcomeNote")
   private String outcomeNote;
+
   @JsonProperty("transactionId")
   private UUID transactionId;
+
   @JsonProperty("ceDetails")
   private CeDetails ceDetails;
+
   @JsonProperty("fulfillmentRequests")
   private List<FulfillmentRequest> fulfillmentRequests = null;
+
   @JsonIgnore
   private Map<String, Object> additionalProperties = new HashMap<>();
-
 }
