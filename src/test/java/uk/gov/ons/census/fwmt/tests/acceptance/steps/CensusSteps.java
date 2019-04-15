@@ -94,14 +94,14 @@ public class CensusSteps {
   public void rmSendsACreateHouseHoldJobRequest() throws URISyntaxException, InterruptedException {
     String caseID = "39bad71c-7de5-4e1b-9a07-d9597737977f";
     queueUtils.sendToActionFieldQueue(receivedRMMessage);
-    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseID, RM_REQUEST_RECEIVED);
+    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseID, RM_REQUEST_RECEIVED, 10000L);
     assertThat(hasBeenTriggered).isTrue();
   }
 
   @When("the Gateway sends a Create Job message to TM")
   public void theGatewaySendsACreateJobMessageToTM() {
     String caseID = "39bad71c-7de5-4e1b-9a07-d9597737977f";
-    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseID, COMET_CREATE_JOB_REQUEST);
+    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseID, COMET_CREATE_JOB_REQUEST, 10000L);
     assertThat(hasBeenTriggered).isTrue();
   }
 
