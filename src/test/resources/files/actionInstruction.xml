@@ -16,7 +16,7 @@
             <arid>1234567890</arid>
             <uprn>1234567890</uprn>
             <type>HH</type>
-            <estabType>HH</estabType>
+            <estabType>Residential</estabType>
             <locality>E</locality>
             <line1>1 Whalesborough Place</line1>
             <line2></line2>
@@ -29,12 +29,6 @@
             <longitude>-4.5314548</longitude>
             <oa>E</oa>
         </address>
-        <pause>
-            <effectiveDate>06/02/2019</effectiveDate>
-            <code>code</code>
-            <reason>reason</reason>
-            <holdUntil>2019-02-06</holdUntil>
-        </pause>
         <legalBasis>Voluntary Not Stated</legalBasis>
         <caseGroupStatus>NOTSTARTED</caseGroupStatus>
         <caseId>39bad71c-7de5-4e1b-9a07-d9597737977f</caseId>
@@ -51,7 +45,7 @@
         <returnByDate>06/02/2019</returnByDate>
         <addressType>HH</addressType>
         <treatmentID>treatmentId</treatmentID>
-        <coordinatorId>EX23</coordinatorId>
+        <coordinatorId>TWH1-HA</coordinatorId>
         <undeliveredAsAddress>false</undeliveredAsAddress>
         <blankQreReturned>false</blankQreReturned>
     </actionRequest>
