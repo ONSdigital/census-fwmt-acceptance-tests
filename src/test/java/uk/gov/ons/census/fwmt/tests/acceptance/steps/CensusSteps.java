@@ -47,7 +47,6 @@ public class CensusSteps {
   private static final String COMET_CREATE_JOB_REQUEST = "Comet - Create Job Request";
   private String householdMessage = null;
   private String nisraHouseholdMessage = null;
-  private String invalidRMMessage = null;
   private String outcomeMessage = null;
 
   @Autowired
@@ -70,8 +69,6 @@ public class CensusSteps {
   public void setup() throws IOException, TimeoutException, URISyntaxException {
     householdMessage = Resources.toString(Resources.getResource("files/input/actionInstruction.xml"), Charsets.UTF_8);
     nisraHouseholdMessage = Resources.toString(Resources.getResource("files/input/nisraActionInstruction.xml"), Charsets.UTF_8);
-    invalidRMMessage = Resources.toString(Resources.getResource("files/input/invalidInstruction.xml"), Charsets.UTF_8);
-    outcomeMessage = null;
 
     tmMockUtils.enableRequestRecorder();
     tmMockUtils.resetMock();
@@ -116,6 +113,27 @@ public class CensusSteps {
     Thread.sleep(1000);
     ModelCase modelCase = tmMockUtils.getCaseById(caseId);
     assertEquals(caseId, modelCase.getId().toString());
+  }
+
+  @Given("RM sends a create HouseHold job request job which has a case ID of {string} and a field officer ID {string}")
+  public void rmSendsACreateHouseHoldJobRequestJobWhichHasACaseIDOfAndAFieldOfficerID(String caseId,
+      String fieldOfficerId)
+      throws URISyntaxException, InterruptedException, JAXBException {
+    JAXBElement<ActionInstruction> actionInstruction = tmMockUtils.unmarshalXml(nisraHouseholdMessage);
+    queueUtils.sendToActionFieldQueue(nisraHouseholdMessage);
+    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, RM_REQUEST_RECEIVED, 10000L);
+    assertEquals(fieldOfficerId, actionInstruction.getValue().getActionRequest().getFieldOfficerId());
+    assertThat(hasBeenTriggered).isTrue();
+  }
+
+  @Then("a new case with id of {string} and allocated officer ID {string} is created in TM")
+  public void aNewCaseWithIdOfAndAllocatedOfficerIDIsCreatedInTM(String caseId, String allocatedOfficerId)
+      throws InterruptedException {
+    Thread.sleep(1000);
+    ModelCase modelCase = tmMockUtils.getCaseById(caseId);
+    assertEquals(caseId, modelCase.getId().toString());
+    fail("allocatedOfficerId in object is not implemented");
+    //assertEquals(allocatedOfficerId, modelCase.getAllocatedOfficerId());
   }
 
   @Given("TM sends a {string} Census Case Outcome to the Gateway")
@@ -181,48 +199,10 @@ public class CensusSteps {
     }
   }
 
-  // Unused steps - should I delete?
-  @Given("a message in an invalid format from RM")
-  public void aMessageInAnInvalidFormatFromRm() throws URISyntaxException, InterruptedException {
-    queueUtils.sendToActionFieldQueue(invalidRMMessage);
-    throw new cucumber.api.PendingException();
-  }
-
-  @Given("a message in an invalid format from TM")
-  public void aMessageInAnInvalidFormatFromTm() {
-    // Write code here that turns the phrase above into concrete actions
-    throw new cucumber.api.PendingException();
-  }
-
-  @Given("a message received from RM that fails to send to TM after {int} attempts")
-  public void aMessageReceivedFromRmThatFailsToSendToTmAfterAttempts(Integer attempts) {
-    // Write code here that turns the phrase above into concrete actions
-    throw new cucumber.api.PendingException();
-  }
-
   // Shared steps
   @Then("the error is logged via SPLUNK & stored in a queue {string}")
   public void theErrorIsLoggedViaSPLUNKStoredInA(String queueName) {
     assertEquals(1, queueUtils.getMessageCount(queueName));
   }
-
-  @Given("RM sends a create HouseHold job request job which has a case ID of {string} and a field officer ID {string}")
-  public void rmSendsACreateHouseHoldJobRequestJobWhichHasACaseIDOfAndAFieldOfficerID(String caseId, String fieldOfficerId)
-      throws URISyntaxException, InterruptedException, JAXBException { JAXBElement<ActionInstruction> actionInstruction = tmMockUtils.unmarshalXml(householdMessage);
-    queueUtils.sendToActionFieldQueue(nisraHouseholdMessage);
-    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, RM_REQUEST_RECEIVED, 10000L);
-    assertEquals(fieldOfficerId,actionInstruction.getValue().getActionRequest().getFieldOfficerId());
-    assertThat(hasBeenTriggered).isTrue();
-  }
-
-  @Then("a new case with id of {string} and allocated officer ID {string} is created in TM")
-  public void aNewCaseWithIdOfAndAllocatedOfficerIDIsCreatedInTM(String caseId, String allocatedOfficerId)
-      throws InterruptedException {
-    Thread.sleep(1000);
-    ModelCase modelCase = tmMockUtils.getCaseById(caseId);
-    assertEquals(caseId, modelCase.getId().toString());
-    //assertEquals(allocatedOfficerId, modelCase.getAllocatedOfficerId());
-  }
-
 
 }
