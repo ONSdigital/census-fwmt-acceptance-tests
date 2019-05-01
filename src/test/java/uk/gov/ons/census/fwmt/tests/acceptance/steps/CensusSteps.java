@@ -45,7 +45,8 @@ public class CensusSteps {
 
   private static final String RM_REQUEST_RECEIVED = "RM - Request Received";
   private static final String COMET_CREATE_JOB_REQUEST = "Comet - Create Job Request";
-  private String receivedRMMessage = null;
+  private String householdMessage = null;
+  private String nisraHouseholdMessage = null;
   private String invalidRMMessage = null;
   private String testOutcomeJson = null;
 
@@ -67,7 +68,8 @@ public class CensusSteps {
 
   @Before
   public void setup() throws IOException, TimeoutException, URISyntaxException {
-    receivedRMMessage = Resources.toString(Resources.getResource("files/input/actionInstruction.xml"), Charsets.UTF_8);
+    householdMessage = Resources.toString(Resources.getResource("files/input/actionInstruction.xml"), Charsets.UTF_8);
+    nisraHouseholdMessage = Resources.toString(Resources.getResource("files/input/actionInstruction.xml"), Charsets.UTF_8);
     invalidRMMessage = Resources.toString(Resources.getResource("files/input/invalidInstruction.xml"), Charsets.UTF_8);
     testOutcomeJson = null;
 
@@ -98,7 +100,7 @@ public class CensusSteps {
   @And("RM sends a create HouseHold job request with case ID of {string}")
   public void rmSendsACreateHouseHoldJobRequestWithCaseIDOf(String caseId)
       throws URISyntaxException, InterruptedException {
-    queueUtils.sendToActionFieldQueue(receivedRMMessage);
+    queueUtils.sendToActionFieldQueue(householdMessage);
     boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, RM_REQUEST_RECEIVED, 10000L);
     assertThat(hasBeenTriggered).isTrue();
   }
@@ -206,9 +208,8 @@ public class CensusSteps {
 
   @Given("RM sends a create HouseHold job request job which has a case ID of {string} and a field officer ID {string}")
   public void rmSendsACreateHouseHoldJobRequestJobWhichHasACaseIDOfAndAFieldOfficerID(String caseId, String fieldOfficerId)
-      throws URISyntaxException, InterruptedException, JAXBException {
-    JAXBElement<ActionInstruction> actionInstruction = tmMockUtils.unmarshalXml(receivedRMMessage);
-    queueUtils.sendToActionFieldQueue(receivedRMMessage);
+      throws URISyntaxException, InterruptedException, JAXBException { JAXBElement<ActionInstruction> actionInstruction = tmMockUtils.unmarshalXml(householdMessage);
+    queueUtils.sendToActionFieldQueue(nisraHouseholdMessage);
     boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, RM_REQUEST_RECEIVED, 10000L);
     assertEquals(fieldOfficerId,actionInstruction.getValue().getActionRequest().getFieldOfficerId());
     assertThat(hasBeenTriggered).isTrue();

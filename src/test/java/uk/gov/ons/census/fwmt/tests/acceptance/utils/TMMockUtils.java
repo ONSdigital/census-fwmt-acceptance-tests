@@ -126,6 +126,7 @@ public final class TMMockUtils {
   }
 
   public JAXBElement<ActionInstruction> unmarshalXml(String message) throws JAXBException {
+    jaxbContext = JAXBContext.newInstance(ActionInstruction.class);
     Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
     ByteArrayInputStream input = new ByteArrayInputStream(message.getBytes());
     JAXBElement<ActionInstruction> rmActionInstruction = unmarshaller

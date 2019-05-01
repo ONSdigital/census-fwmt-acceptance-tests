@@ -44,7 +44,7 @@
         <surveyRef>HH</surveyRef>
         <returnByDate>06/02/2019</returnByDate>
         <addressType>HH</addressType>
-        <treatmentID>treatmentId</treatmentID>
+        <treatmentId>treatmentId</treatmentId>
         <coordinatorId>TWH1-HA</coordinatorId>
         <undeliveredAsAddress>false</undeliveredAsAddress>
         <blankQreReturned>false</blankQreReturned>
