@@ -208,7 +208,7 @@ public class CensusSteps {
 
   @Given("RM sends a create HouseHold job request job which has a case ID of {string} and a field officer ID {string}")
   public void rmSendsACreateHouseHoldJobRequestJobWhichHasACaseIDOfAndAFieldOfficerID(String caseId, String fieldOfficerId)
-      throws URISyntaxException, InterruptedException, JAXBException { JAXBElement<ActionInstruction> actionInstruction = tmMockUtils.unmarshalXml(householdMessage);
+      throws URISyntaxException, InterruptedException, JAXBException { JAXBElement<ActionInstruction> actionInstruction = tmMockUtils.unmarshalXml(nisraHouseholdMessage);
     queueUtils.sendToActionFieldQueue(nisraHouseholdMessage);
     boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, RM_REQUEST_RECEIVED, 10000L);
     assertEquals(fieldOfficerId,actionInstruction.getValue().getActionRequest().getFieldOfficerId());
