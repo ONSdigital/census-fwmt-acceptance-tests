@@ -55,7 +55,8 @@ public final class QueueUtils {
   public void clearQueues() throws URISyntaxException {
     clearQueue("Gateway.Actions");
     clearQueue("Gateway.ActionsDLQ");
-    clearQueue("Gateway.Outcome");
+    clearQueue("Gateway.Address.Update");
+    clearQueue("Gateway.Respondent.Refusal");
     clearQueue("Action.Field");
     clearQueue("Action.FieldDLQ");
   }

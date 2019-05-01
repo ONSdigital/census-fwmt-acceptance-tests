@@ -40,11 +40,11 @@ import static org.junit.Assert.fail;
 @PropertySource("classpath:application.properties")
 public class CensusSteps {
 
-  private String noValidHouseholdDerelict = null;
   private static final String RM_REQUEST_RECEIVED = "RM - Request Received";
   private static final String COMET_CREATE_JOB_REQUEST = "Comet - Create Job Request";
   private String receivedRMMessage = null;
   private String invalidRMMessage = null;
+  private String testOutcomeJson = null;
 
   @Autowired
   private TMMockUtils tmMockUtils;
@@ -55,16 +55,18 @@ public class CensusSteps {
   private GatewayEventMonitor gatewayEventMonitor;
 
   @Value("${service.mocktm.url}")
-  private String mockTmURL;
+  private String mockTmUrl;
+
   @Value("${service.rabbit.url}")
   private String rabbitLocation;
+
   private ObjectMapper objectMapper = new ObjectMapper();
 
   @Before
-  public void reset() throws IOException, TimeoutException, URISyntaxException, InterruptedException {
-    noValidHouseholdDerelict = Resources.toString(Resources.getResource("files/cometNoValidHouseHoldDerelict.txt"), Charsets.UTF_8);
-    receivedRMMessage = Resources.toString(Resources.getResource("files/actionInstruction.xml"), Charsets.UTF_8);
-    invalidRMMessage = Resources.toString(Resources.getResource("files/invalidInstruction.xml"), Charsets.UTF_8);
+  public void setup() throws IOException, TimeoutException, URISyntaxException {
+    receivedRMMessage = Resources.toString(Resources.getResource("files/input/actionInstruction.xml"), Charsets.UTF_8);
+    invalidRMMessage = Resources.toString(Resources.getResource("files/input/invalidInstruction.xml"), Charsets.UTF_8);
+    testOutcomeJson = null;
 
     tmMockUtils.enableRequestRecorder();
     tmMockUtils.resetMock();
@@ -80,10 +82,10 @@ public class CensusSteps {
     tmMockUtils.disableRequestRecorder();
   }
 
-  @Given("a TM doesnt have an existing job with id {string}")
-  public void aTMDoesntHaveAnExistingJobWithId(String id) {
+  @Given("a TM doesnt have an existing job with case ID {string}")
+  public void aTMDoesntHaveAnExistingJobWithCaseId(String caseId) {
     try {
-      tmMockUtils.getCaseById(id);
+      tmMockUtils.getCaseById(caseId);
       fail("Case should not exist");
     } catch (HttpClientErrorException e) {
       assertEquals(HttpStatus.NOT_FOUND, e.getStatusCode());
@@ -92,46 +94,44 @@ public class CensusSteps {
 
   @And("RM sends a create HouseHold job request")
   public void rmSendsACreateHouseHoldJobRequest() throws URISyntaxException, InterruptedException {
-    String caseID = "39bad71c-7de5-4e1b-9a07-d9597737977f";
+    String caseId = "39bad71c-7de5-4e1b-9a07-d9597737977f";
     queueUtils.sendToActionFieldQueue(receivedRMMessage);
-    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseID, RM_REQUEST_RECEIVED, 10000L);
+    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, RM_REQUEST_RECEIVED, 10000L);
     assertThat(hasBeenTriggered).isTrue();
   }
 
   @When("the Gateway sends a Create Job message to TM")
   public void theGatewaySendsACreateJobMessageToTM() {
-    String caseID = "39bad71c-7de5-4e1b-9a07-d9597737977f";
-    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseID, COMET_CREATE_JOB_REQUEST, 10000L);
+    String caseId = "39bad71c-7de5-4e1b-9a07-d9597737977f";
+    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, COMET_CREATE_JOB_REQUEST, 10000L);
     assertThat(hasBeenTriggered).isTrue();
   }
 
   @Then("a new case with id of {string} is created in TM")
-  public void a_new_case_is_created_in_TM(String caseId) throws InterruptedException {
+  public void aNewCaseIsCreatedInTm(String caseId) throws InterruptedException {
     Thread.sleep(1000);
-    ModelCase kase = tmMockUtils.getCaseById(caseId);
-    assertEquals(caseId, kase.getId().toString());
+    ModelCase modelCase = tmMockUtils.getCaseById(caseId);
+    assertEquals(caseId, modelCase.getId().toString());
   }
 
-  @Given("a message in an invalid format from RM")
-  public void a_message_in_an_invalid_format_from_RM() throws URISyntaxException, InterruptedException {
-    queueUtils.sendToActionFieldQueue(invalidRMMessage);
-  }
+  @Given("TM sends a {string} Census Case Outcome to the Gateway")
+  public void tmSendsACensusCaseOutcomeToTheGateway(String outcomeType) throws IOException {
+    switch (outcomeType) {
+    case "derelict":
+      testOutcomeJson = Resources
+          .toString(Resources.getResource("files/outcome/noValidHouseHoldDerelict.txt"), Charsets.UTF_8);
+      break;
+    case "splitAddress":
+      testOutcomeJson = Resources
+          .toString(Resources.getResource("files/outcome/contactMadeSplitAddress.txt"), Charsets.UTF_8);
+      break;
+    case "hardRefusal":
+      testOutcomeJson = Resources
+          .toString(Resources.getResource("files/outcome/contactMadeHardRefusal.txt"), Charsets.UTF_8);
+      break;
+    }
 
-  @Given("a message in an invalid format from TM")
-  public void a_message_in_an_invalid_format_from_TM() {
-    // Write code here that turns the phrase above into concrete actions
-    throw new cucumber.api.PendingException();
-  }
-
-  @Given("a message received from RM that fails to send to TM after {int} attempts")
-  public void a_message_received_from_RM_that_fails_to_send_to_TM_after_attempts(Integer attempts) {
-    // Write code here that turns the phrase above into concrete actions
-    throw new cucumber.api.PendingException();
-  }
-
-  @Given("TM sends a Census Case Outcome to the Gateway")
-  public void tmSendsACensusCaseOutcomeToTheGateway() {
-    int response = tmMockUtils.sendTMResponseMessage(noValidHouseholdDerelict);
+    int response = tmMockUtils.sendTMResponseMessage(testOutcomeJson);
     assertEquals(200, response);
   }
 
@@ -147,40 +147,58 @@ public class CensusSteps {
         .build();
 
     try {
-      objectMapper.readValue(noValidHouseholdDerelict.getBytes(), HouseholdOutcome.class);
+      objectMapper.readValue(testOutcomeJson.getBytes(), HouseholdOutcome.class);
     } catch (IOException e) {
       fail();
     }
   }
 
-  @And("the response contains the Primary Outcome value of {string}, Secondary Outcome {string} and the Case Id of {string}")
+  @And("the response contains the Primary Outcome value of {string} and Secondary Outcome {string} and the Case Id of {string}")
   public void theResponseContainsThePrimaryOutcomeValueOfSecondaryOutcomeAndTheCaseIdOf(String primaryOutcome,
       String secondaryOutcome,
       String caseId) throws IOException {
-    HouseholdOutcome householdOutcome = objectMapper.readValue(noValidHouseholdDerelict.getBytes(), HouseholdOutcome.class);
+    HouseholdOutcome householdOutcome = objectMapper.readValue(testOutcomeJson.getBytes(), HouseholdOutcome.class);
     assertEquals(primaryOutcome, householdOutcome.getPrimaryOutcome());
     assertEquals(secondaryOutcome, householdOutcome.getSecondaryOutcome());
-    assertEquals(caseId, householdOutcome.getCaseId());
+    assertEquals(caseId, String.valueOf(householdOutcome.getCaseId()));
   }
 
-  @Then("the message will made available for RM to pick up")
-  public void theMessageWillMadeAvailableForRMToPickUp() {
-    assertEquals(1, queueUtils.getMessageCount("Gateway.Outcome"));
+  @Then("the message will made available for RM to pick up from queue {string}")
+  public void theMessageWillMadeAvailableForRMToPickUpFromQueue(String queueName) {
+    assertEquals(1, queueUtils.getMessageCount(queueName));
   }
 
-  @And("the message is in the format RM is expecting")
-  public void theMessageIsInTheFormatRMIsExpecting() {
+  @And("the message is in the format RM is expecting from queue {string}")
+  public void theMessageIsInTheFormatRMIsExpectingFromQueue(String queueName) {
     try {
-      objectMapper.readValue(queueUtils.getMessage("Gateway.Outcome"), OutcomeEvent.class);
+      objectMapper.readValue(queueUtils.getMessage(queueName), OutcomeEvent.class);
     } catch (IOException | InterruptedException e) {
       fail();
     }
   }
 
-  // Shared step
+  // Unused steps - should I delete?
+  @Given("a message in an invalid format from RM")
+  public void aMessageInAnInvalidFormatFromRm() throws URISyntaxException, InterruptedException {
+    queueUtils.sendToActionFieldQueue(invalidRMMessage);
+    throw new cucumber.api.PendingException();
+  }
+
+  @Given("a message in an invalid format from TM")
+  public void aMessageInAnInvalidFormatFromTm() {
+    // Write code here that turns the phrase above into concrete actions
+    throw new cucumber.api.PendingException();
+  }
+
+  @Given("a message received from RM that fails to send to TM after {int} attempts")
+  public void aMessageReceivedFromRmThatFailsToSendToTmAfterAttempts(Integer attempts) {
+    // Write code here that turns the phrase above into concrete actions
+    throw new cucumber.api.PendingException();
+  }
+
+  // Shared steps
   @Then("the error is logged via SPLUNK & stored in a queue {string}")
   public void theErrorIsLoggedViaSPLUNKStoredInA(String queueName) {
     assertEquals(1, queueUtils.getMessageCount(queueName));
   }
-
 }
