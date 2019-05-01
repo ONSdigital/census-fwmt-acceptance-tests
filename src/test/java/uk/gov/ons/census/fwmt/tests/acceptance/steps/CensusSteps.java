@@ -48,7 +48,7 @@ public class CensusSteps {
   private String householdMessage = null;
   private String nisraHouseholdMessage = null;
   private String invalidRMMessage = null;
-  private String testOutcomeJson = null;
+  private String outcomeMessage = null;
 
   @Autowired
   private TMMockUtils tmMockUtils;
@@ -69,9 +69,9 @@ public class CensusSteps {
   @Before
   public void setup() throws IOException, TimeoutException, URISyntaxException {
     householdMessage = Resources.toString(Resources.getResource("files/input/actionInstruction.xml"), Charsets.UTF_8);
-    nisraHouseholdMessage = Resources.toString(Resources.getResource("files/input/actionInstruction.xml"), Charsets.UTF_8);
+    nisraHouseholdMessage = Resources.toString(Resources.getResource("files/input/nisraActionInstruction.xml"), Charsets.UTF_8);
     invalidRMMessage = Resources.toString(Resources.getResource("files/input/invalidInstruction.xml"), Charsets.UTF_8);
-    testOutcomeJson = null;
+    outcomeMessage = null;
 
     tmMockUtils.enableRequestRecorder();
     tmMockUtils.resetMock();
@@ -122,20 +122,20 @@ public class CensusSteps {
   public void tmSendsACensusCaseOutcomeToTheGateway(String outcomeType) throws IOException {
     switch (outcomeType) {
     case "derelict":
-      testOutcomeJson = Resources
+      outcomeMessage = Resources
           .toString(Resources.getResource("files/outcome/noValidHouseHoldDerelict.txt"), Charsets.UTF_8);
       break;
     case "splitAddress":
-      testOutcomeJson = Resources
+      outcomeMessage = Resources
           .toString(Resources.getResource("files/outcome/contactMadeSplitAddress.txt"), Charsets.UTF_8);
       break;
     case "hardRefusal":
-      testOutcomeJson = Resources
+      outcomeMessage = Resources
           .toString(Resources.getResource("files/outcome/contactMadeHardRefusal.txt"), Charsets.UTF_8);
       break;
     }
 
-    int response = tmMockUtils.sendTMResponseMessage(testOutcomeJson);
+    int response = tmMockUtils.sendTMResponseMessage(outcomeMessage);
     assertEquals(200, response);
   }
 
@@ -151,7 +151,7 @@ public class CensusSteps {
         .build();
 
     try {
-      objectMapper.readValue(testOutcomeJson.getBytes(), HouseholdOutcome.class);
+      objectMapper.readValue(outcomeMessage.getBytes(), HouseholdOutcome.class);
     } catch (IOException e) {
       fail();
     }
@@ -161,7 +161,7 @@ public class CensusSteps {
   public void theResponseContainsThePrimaryOutcomeValueOfSecondaryOutcomeAndTheCaseIdOf(String primaryOutcome,
       String secondaryOutcome,
       String caseId) throws IOException {
-    HouseholdOutcome householdOutcome = objectMapper.readValue(testOutcomeJson.getBytes(), HouseholdOutcome.class);
+    HouseholdOutcome householdOutcome = objectMapper.readValue(outcomeMessage.getBytes(), HouseholdOutcome.class);
     assertEquals(primaryOutcome, householdOutcome.getPrimaryOutcome());
     assertEquals(secondaryOutcome, householdOutcome.getSecondaryOutcome());
     assertEquals(caseId, String.valueOf(householdOutcome.getCaseId()));
