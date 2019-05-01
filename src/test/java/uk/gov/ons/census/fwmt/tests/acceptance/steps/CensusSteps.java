@@ -152,7 +152,7 @@ public class CensusSteps {
     }
   }
 
-  @And("the response contains the Primary Outcome value of {string} and Secondary Outcome {string} and the Case Id of {string}")
+  @And("the response contains the Primary Outcome value of {string} and Secondary Outcome {string} and the Case ID of {string}")
   public void theResponseContainsThePrimaryOutcomeValueOfSecondaryOutcomeAndTheCaseIdOf(String primaryOutcome,
       String secondaryOutcome,
       String caseId) throws IOException {
