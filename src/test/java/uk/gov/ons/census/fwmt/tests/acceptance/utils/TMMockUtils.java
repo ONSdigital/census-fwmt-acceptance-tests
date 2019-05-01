@@ -13,7 +13,14 @@ import org.springframework.web.client.RestTemplate;
 import uk.gov.ons.census.fwmt.common.data.modelcase.ModelCase;
 import uk.gov.ons.census.fwmt.data.dto.MockMessage;
 import uk.gov.ons.census.fwmt.tests.acceptance.exceptions.MockInaccessibleException;
+import uk.gov.ons.ctp.response.action.message.instruction.ActionInstruction;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.transform.stream.StreamSource;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -47,6 +54,8 @@ public final class TMMockUtils {
   private String mockTmUrl;
 
   private RestTemplate restTemplate = new RestTemplate();
+
+  private JAXBContext jaxbContext;
 
   public void resetMock() throws IOException {
     URL url = new URL(mockTmUrl + "/logger/reset");
@@ -114,5 +123,13 @@ public final class TMMockUtils {
     if (httpURLConnection.getResponseCode() != 200) {
       throw new MockInaccessibleException("Failed : HTTP error code : " + httpURLConnection.getResponseCode());
     }
+  }
+
+  public JAXBElement<ActionInstruction> unmarshalXml(String message) throws JAXBException {
+    Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+    ByteArrayInputStream input = new ByteArrayInputStream(message.getBytes());
+    JAXBElement<ActionInstruction> rmActionInstruction = unmarshaller
+        .unmarshal(new StreamSource(input), ActionInstruction.class);
+    return rmActionInstruction;
   }
 }

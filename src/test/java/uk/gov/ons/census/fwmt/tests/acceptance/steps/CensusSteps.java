@@ -25,7 +25,10 @@ import uk.gov.ons.census.fwmt.data.dto.rm.OutcomeEvent;
 import uk.gov.ons.census.fwmt.events.utils.GatewayEventMonitor;
 import uk.gov.ons.census.fwmt.tests.acceptance.utils.QueueUtils;
 import uk.gov.ons.census.fwmt.tests.acceptance.utils.TMMockUtils;
+import uk.gov.ons.ctp.response.action.message.instruction.ActionInstruction;
 
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.time.LocalDateTime;
@@ -200,4 +203,25 @@ public class CensusSteps {
   public void theErrorIsLoggedViaSPLUNKStoredInA(String queueName) {
     assertEquals(1, queueUtils.getMessageCount(queueName));
   }
+
+  @Given("RM sends a create HouseHold job request job which has a case ID of {string} and a field officer ID {string}")
+  public void rmSendsACreateHouseHoldJobRequestJobWhichHasACaseIDOfAndAFieldOfficerID(String caseId, String fieldOfficerId)
+      throws URISyntaxException, InterruptedException, JAXBException {
+    JAXBElement<ActionInstruction> actionInstruction = tmMockUtils.unmarshalXml(receivedRMMessage);
+    queueUtils.sendToActionFieldQueue(receivedRMMessage);
+    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, RM_REQUEST_RECEIVED, 10000L);
+    assertEquals(fieldOfficerId,actionInstruction.getValue().getActionRequest().getFieldOfficerId());
+    assertThat(hasBeenTriggered).isTrue();
+  }
+
+  @Then("a new case with id of {string} and allocated officer ID {string} is created in TM")
+  public void aNewCaseWithIdOfAndAllocatedOfficerIDIsCreatedInTM(String caseId, String allocatedOfficerId)
+      throws InterruptedException {
+    Thread.sleep(1000);
+    ModelCase modelCase = tmMockUtils.getCaseById(caseId);
+    assertEquals(caseId, modelCase.getId().toString());
+    //assertEquals(allocatedOfficerId, modelCase.getAllocatedOfficerId());
+  }
+
+
 }
