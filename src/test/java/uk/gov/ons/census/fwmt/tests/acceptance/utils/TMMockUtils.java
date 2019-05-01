@@ -23,33 +23,33 @@ import java.net.URL;
 public final class TMMockUtils {
 
   @Value("${service.jobservice.url}")
-  private String jobSvcURL;
+  private String jobServiceUrl;
 
   @Value("${service.jobservice.username}")
-  private String jobserviceUsername;
+  private String jobServiceUsername;
 
   @Value("${service.jobservice.password}")
-  private String jobservicePassword;
+  private String jobServicePassword;
 
   @Value("${service.outcome.url}")
-  private String outcomeSvcURL;
+  private String outcomeServiceUrl;
+
+  @Value("${service.outcome.endpoint}")
+  private String householdOutcomeEndpoint;
 
   @Value("${service.outcome.username}")
-  private String outcomeSvcUsername;
+  private String outcomeServiceUsername;
 
   @Value("${service.outcome.password}")
-  private String outcomeSvcPassword;
+  private String outcomeServicePassword;
 
   @Value("${service.mocktm.url}")
-  private String mockTmURL;
-
-  @Value("${service.tmresponse.url}")
-  private String tmResponseEndpoint;
+  private String mockTmUrl;
 
   private RestTemplate restTemplate = new RestTemplate();
 
   public void resetMock() throws IOException {
-    URL url = new URL(mockTmURL + "/logger/reset");
+    URL url = new URL(mockTmUrl + "/logger/reset");
     log.info("reset-mock_url:" + url.toString());
     HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
     httpURLConnection.setRequestMethod("GET");
@@ -59,13 +59,13 @@ public final class TMMockUtils {
   }
 
   public MockMessage[] getMessages() {
-    String url = mockTmURL + "/logger/allMessages";
+    String url = mockTmUrl + "/logger/allMessages";
     log.info("allMessages-mock_url:" + url);
     return restTemplate.getForObject(url, MockMessage[].class);
   }
 
   public ModelCase getCaseById(String id) {
-    String url = mockTmURL + "/cases/" + id;
+    String url = mockTmUrl + "/cases/" + id;
     log.info("getCaseById-mock_url:" + url);
     ResponseEntity<ModelCase> responseEntity;
     responseEntity = restTemplate.getForEntity(url, ModelCase.class);
@@ -73,12 +73,12 @@ public final class TMMockUtils {
   }
 
   public int sendTMResponseMessage(String data) {
-    HttpHeaders headers = createBasicAuthHeaders(outcomeSvcUsername, outcomeSvcPassword);
+    HttpHeaders headers = createBasicAuthHeaders(outcomeServiceUsername, outcomeServicePassword);
 
     headers.setContentType(MediaType.APPLICATION_JSON);
     
     RestTemplate restTemplate = new RestTemplate();
-    String postUrl = outcomeSvcURL + tmResponseEndpoint;
+    String postUrl = outcomeServiceUrl + householdOutcomeEndpoint;
 
     HttpEntity<String> post = new HttpEntity<>(data, headers);
     ResponseEntity<Void> response = restTemplate.exchange(postUrl, HttpMethod.POST, post, Void.class);
@@ -97,7 +97,7 @@ public final class TMMockUtils {
   }
 
   public void enableRequestRecorder() throws IOException {
-    URL url = new URL(mockTmURL + "/logger/enableRequestRecorder");
+    URL url = new URL(mockTmUrl + "/logger/enableRequestRecorder");
     log.info("enableRequestRecorder-mock_url:" + url.toString());
     HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
     httpURLConnection.setRequestMethod("GET");
@@ -107,7 +107,7 @@ public final class TMMockUtils {
   }
 
   public void disableRequestRecorder() throws IOException {
-    URL url = new URL(mockTmURL + "/logger/disableRequestRecorder");
+    URL url = new URL(mockTmUrl + "/logger/disableRequestRecorder");
     log.info("disableRequestRecorder-mock_url:" + url.toString());
     HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
     httpURLConnection.setRequestMethod("GET");
