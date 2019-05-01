@@ -92,22 +92,21 @@ public class CensusSteps {
     }
   }
 
-  @And("RM sends a create HouseHold job request")
-  public void rmSendsACreateHouseHoldJobRequest() throws URISyntaxException, InterruptedException {
-    String caseId = "39bad71c-7de5-4e1b-9a07-d9597737977f";
+  @And("RM sends a create HouseHold job request with case ID of {string}")
+  public void rmSendsACreateHouseHoldJobRequestWithCaseIDOf(String caseId)
+      throws URISyntaxException, InterruptedException {
     queueUtils.sendToActionFieldQueue(receivedRMMessage);
     boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, RM_REQUEST_RECEIVED, 10000L);
     assertThat(hasBeenTriggered).isTrue();
   }
 
-  @When("the Gateway sends a Create Job message to TM")
-  public void theGatewaySendsACreateJobMessageToTM() {
-    String caseId = "39bad71c-7de5-4e1b-9a07-d9597737977f";
+  @When("the Gateway sends a Create Job message to TM with case ID of {string}")
+  public void theGatewaySendsACreateJobMessageToTMWithCaseIdOf(String caseId) {
     boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, COMET_CREATE_JOB_REQUEST, 10000L);
     assertThat(hasBeenTriggered).isTrue();
   }
 
-  @Then("a new case with id of {string} is created in TM")
+  @Then("a new case with ID of {string} is created in TM")
   public void aNewCaseIsCreatedInTm(String caseId) throws InterruptedException {
     Thread.sleep(1000);
     ModelCase modelCase = tmMockUtils.getCaseById(caseId);
