@@ -19,3 +19,13 @@ Feature: Census Tests
       | derelict     | No Valid Household | Derelict         | Gateway.Address.Update     |
       | hardRefusal  | Contact Made       | Hard Refusal     | Gateway.Respondent.Refusal |
       | splitAddress | Contact Made       | Split Address    | Gateway.Address.Update     |
+
+
+  Scenario: As Gateway I can receive a HouseHold cancel job request from RM
+    Given RM sends a cancel case Household job request with case ID "4d9294f6-8edc-4d32-99ad-1bdb485e3495"
+    When the Gateway sends a Cancel Case request to TM with case ID "4d9294f6-8edc-4d32-99ad-1bdb485e3495"
+    Then a pause datetime of "2030-01-01T00:00+00:00" will be assigned to the case with id "4d9294f6-8edc-4d32-99ad-1bdb485e3495"
+
+  Scenario: As Gateway I cannot send a non-HouseHold cancel job request from RM
+    Given RM sends a cancel case CSS job request with case ID "81ec8f8e-1dfc-4b96-9bbd-c95f43ea0aa4"
+    Then the job with case ID "81ec8f8e-1dfc-4b96-9bbd-c95f43ea0aa4" will not be passed to TM

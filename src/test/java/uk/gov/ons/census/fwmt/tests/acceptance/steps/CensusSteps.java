@@ -19,6 +19,7 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.web.client.HttpClientErrorException;
+import uk.gov.ons.census.fwmt.common.data.modelcase.CasePause;
 import uk.gov.ons.census.fwmt.common.data.modelcase.ModelCase;
 import uk.gov.ons.census.fwmt.data.dto.comet.HouseholdOutcome;
 import uk.gov.ons.census.fwmt.data.dto.rm.OutcomeEvent;
@@ -29,12 +30,12 @@ import uk.gov.ons.census.fwmt.tests.acceptance.utils.TMMockUtils;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.concurrent.TimeoutException;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 @Slf4j
 @PropertySource("classpath:application.properties")
@@ -42,8 +43,13 @@ public class CensusSteps {
 
   private static final String RM_REQUEST_RECEIVED = "RM - Request Received";
   private static final String COMET_CREATE_JOB_REQUEST = "Comet - Create Job Request";
-  private String receivedRMMessage = null;
+  private static final String CANONICAL_CANCEL_SENT = "Canonical - Action Cancel Sent";
+  private static final String CANONICAL_CANCEL_RECEIVED = "Canonical - Cancel Job Received";
+  private static final String CANONICAL_CANCEL_FAILED ="Canonical - Action cancel failed. Address type is not a Household (HH)";
+  private String cancelMessage = null;
+  private String cancelMessageNonHH = null;
   private String invalidRMMessage = null;
+  private String receivedRMMessage = null;
   private String testOutcomeJson = null;
 
   @Autowired
@@ -64,8 +70,10 @@ public class CensusSteps {
 
   @Before
   public void setup() throws IOException, TimeoutException, URISyntaxException {
-    receivedRMMessage = Resources.toString(Resources.getResource("files/input/actionInstruction.xml"), Charsets.UTF_8);
+    cancelMessage = Resources.toString(Resources.getResource("files/input/actionCancelInstruction.xml"), Charsets.UTF_8);
+    cancelMessageNonHH = Resources.toString(Resources.getResource("files/input/actionNonHHCancelInstruction.xml"), Charsets.UTF_8);
     invalidRMMessage = Resources.toString(Resources.getResource("files/input/invalidInstruction.xml"), Charsets.UTF_8);
+    receivedRMMessage = Resources.toString(Resources.getResource("files/input/actionInstruction.xml"), Charsets.UTF_8);
     testOutcomeJson = null;
 
     tmMockUtils.enableRequestRecorder();
@@ -200,5 +208,42 @@ public class CensusSteps {
   @Then("the error is logged via SPLUNK & stored in a queue {string}")
   public void theErrorIsLoggedViaSPLUNKStoredInA(String queueName) {
     assertEquals(1, queueUtils.getMessageCount(queueName));
+  }
+
+  @Given("RM sends a cancel case Household job request with case ID {string}")
+  public void tmHasAnExistingJobWithCaseID(String caseId) throws URISyntaxException, InterruptedException {
+
+    queueUtils.sendToActionFieldQueue(cancelMessage);
+    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, CANONICAL_CANCEL_SENT, 10000L);
+    assertThat(hasBeenTriggered).isTrue();
+  }
+
+  @When("the Gateway sends a Cancel Case request to TM with case ID {string}")
+  public void theGatewaySendsACancelCaseRequestToTM(String caseId) {
+    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, CANONICAL_CANCEL_RECEIVED, 10000L);
+    assertThat(hasBeenTriggered).isTrue();
+  }
+
+  @Then("a pause datetime of {string} will be assigned to the case with id {string}")
+  public void theCaseWithIdOfWillBeCancelled(String until, String caseId) throws InterruptedException {
+
+    Thread.sleep(1000);
+
+    CasePause casePause = tmMockUtils.getPauseCase(caseId);
+    assertEquals(OffsetDateTime.parse(until), casePause.getUntil());
+  }
+
+  @Given("RM sends a cancel case CSS job request with case ID {string}")
+  public void rmSendsACancelCaseCSSJobRequestWithCaseID(String caseId) throws URISyntaxException, InterruptedException {
+    queueUtils.sendToActionFieldQueue(cancelMessageNonHH);
+    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, CANONICAL_CANCEL_FAILED, 10000L);
+    assertThat(hasBeenTriggered).isTrue();
+
+  }
+
+  @Then("the job with case ID {string} will not be passed to TM")
+  public void theJobWithCaseIDWillNotBePassedToTM(String caseId) {
+    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, CANONICAL_CANCEL_RECEIVED, 10000L);
+    assertThat(hasBeenTriggered).isFalse();
   }
 }
