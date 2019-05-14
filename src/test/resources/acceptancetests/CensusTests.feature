@@ -28,3 +28,21 @@ Feature: Census Tests
   Scenario: As Gateway I cannot send a non-HouseHold cancel job request from RM
     Given RM sends a cancel case CSS job request with case ID "81ec8f8e-1dfc-4b96-9bbd-c95f43ea0aa4"
     Then the job with case ID "81ec8f8e-1dfc-4b96-9bbd-c95f43ea0aa4" will not be passed to TM
+
+
+  Scenario Outline: As a system (FWMT Gateway) I can handle fulfilment requests of the following Secondary Outcome:
+    Given TM sends a "<InputMessage>" Census Case Outcome to the Gateway
+    And the response is of a Census Case Outcome format
+    And the response contains the Primary Outcome value of "Contact Made" and Secondary Outcome "<SecondaryOutcome>" and the Case Id of "6c9b1177-3e03-4060-b6db-f6a8456292ef"
+    Then the message will made available for RM to pick up from queue "Gateway.Fulfillment.Request"
+    And the message is in the format RM is expecting from queue "Gateway.Fulfillment.Request"
+
+    Examples:
+    | InputMessage                    | SecondaryOutcome                  |
+    | willComplete                    | Will Complete                     |
+    | haveCompleted                   | Have Completed                    |
+    | collectedCompletedQuestionnaire | Collected completed questionnaire |
+    | callBackAnotherTime             | Call back another time            |
+    | holidayHome                     | Holiday home                      |
+    | secondResidence                 | Second residence                  |
+    | requestedAssistance             | Requested assistance              |

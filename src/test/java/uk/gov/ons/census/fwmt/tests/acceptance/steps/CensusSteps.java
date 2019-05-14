@@ -137,6 +137,34 @@ public class CensusSteps {
       testOutcomeJson = Resources
           .toString(Resources.getResource("files/outcome/contactMadeHardRefusal.txt"), Charsets.UTF_8);
       break;
+    case "willComplete":
+      testOutcomeJson = Resources
+          .toString(Resources.getResource("files/outcome/contactMadeFulfillmentWillComplete.txt"), Charsets.UTF_8);
+      break;
+    case "haveCompleted":
+      testOutcomeJson = Resources
+          .toString(Resources.getResource("files/outcome/contactMadeFulfillmentHaveComplete.txt"), Charsets.UTF_8);
+      break;
+    case "collectedCompletedQuestionnaire":
+      testOutcomeJson = Resources
+          .toString(Resources.getResource("files/outcome/contactMadeFulfillmentCollectedCompletedQuestionnaire.txt"), Charsets.UTF_8);
+      break;
+    case "callBackAnotherTime":
+      testOutcomeJson = Resources
+          .toString(Resources.getResource("files/outcome/contactMadeFulfillmentCallBackAnotherTime.txt"), Charsets.UTF_8);
+      break;
+    case "holidayHome":
+      testOutcomeJson = Resources
+          .toString(Resources.getResource("files/outcome/contactMadeFulfillmentHolidayHome.txt"), Charsets.UTF_8);
+      break;
+    case "secondResidence":
+      testOutcomeJson = Resources
+          .toString(Resources.getResource("files/outcome/contactMadeFulfillmentSecondResidence.txt"), Charsets.UTF_8);
+      break;
+    case "requestedAssistance":
+      testOutcomeJson = Resources
+          .toString(Resources.getResource("files/outcome/contactMadeFulfillmentRequestedAssistance.txt"), Charsets.UTF_8);
+      break;
     }
 
     int response = tmMockUtils.sendTMResponseMessage(testOutcomeJson);
