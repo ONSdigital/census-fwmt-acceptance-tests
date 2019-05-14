@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ins:actionInstruction xmlns:ins="http://ons.gov.uk/ctp/response/action/message/instruction">
+    <actionCancel>
+        <actionId>a133b2cd-ef3f-4755-ad07-616b7298a12a</actionId>
+        <responseRequired>false</responseRequired>
+        <actionPlan>ad3fbcb5-3681-4540-b386-ff719ec93643</actionPlan>
+        <actionType>Cancel</actionType>
+        <reason>HQ case closure</reason>
+        <caseId>81ec8f8e-1dfc-4b96-9bbd-c95f43ea0aa4</caseId>
+        <caseRef>Test123</caseRef>
+        <addressType>CSS</addressType>
+    </actionCancel>
+</ins:actionInstruction>
