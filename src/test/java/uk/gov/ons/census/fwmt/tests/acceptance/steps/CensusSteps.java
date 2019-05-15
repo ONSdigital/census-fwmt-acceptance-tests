@@ -35,7 +35,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.concurrent.TimeoutException;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 @Slf4j
 @PropertySource("classpath:application.properties")
@@ -327,5 +328,21 @@ public class CensusSteps {
   public void theNumberOfMessagesWillMadeAvailableForRMToPickUpFromQueue(String expectedNumberOfMessages, String queueName) {
     long expectedNumber = Long.valueOf(expectedNumberOfMessages);
     assertEquals(expectedNumber, queueUtils.getMessageCount(queueName));
+  }
+
+  @And("the response contains the QuestionnaireId {string} from queue {string}")
+  public void theResponseContainsTheQuestionnaireIdFromQueue(String questionnaireId, String queueName)
+      throws IOException, InterruptedException {
+    JavaTimeModule module = new JavaTimeModule();
+    LocalDateTimeDeserializer localDateTimeDeserializer = new LocalDateTimeDeserializer(
+        DateTimeFormatter.ISO_DATE_TIME);
+    module.addDeserializer(LocalDateTime.class, localDateTimeDeserializer);
+    objectMapper = Jackson2ObjectMapperBuilder.json()
+        .modules(module)
+        .featuresToDisable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+        .build();
+
+    OutcomeEvent outcomeEvent = objectMapper.readValue(queueUtils.getMessage(queueName), OutcomeEvent.class);
+    assertEquals(questionnaireId, outcomeEvent.getPayload().getUac().getQuestionnaireId());
   }
 }

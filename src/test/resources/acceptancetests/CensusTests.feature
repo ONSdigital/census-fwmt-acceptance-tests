@@ -47,6 +47,10 @@ Feature: Census Tests
     | secondResidence                 | Second residence                  |
     | requestedAssistance             | Requested assistance              |
 
+  Scenario: Scenario: As a Gateway I can ensure that Individual paper requests pass on requester details to RM
+    Given TM sends a "holidayHome" Census Case Outcome to the Gateway
+    And the response contains the QuestionnaireId "QuestionnaireID" from queue "Gateway.Fulfillment.Request"
+
   Scenario Outline: As a system (FWMT Gateway) I can handle multiple fulfilment requests for questionnaires by post
     Given TM sends a "<InputMessage>" Census Case Outcome to the Gateway
     And the response is of a Census Case Outcome format
