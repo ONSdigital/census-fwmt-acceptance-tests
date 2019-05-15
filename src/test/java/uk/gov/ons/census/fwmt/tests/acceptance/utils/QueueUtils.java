@@ -57,6 +57,7 @@ public final class QueueUtils {
     clearQueue("Gateway.ActionsDLQ");
     clearQueue("Gateway.Address.Update");
     clearQueue("Gateway.Respondent.Refusal");
+    clearQueue("Gateway.Fulfillment.Request");
     clearQueue("Action.Field");
     clearQueue("Action.FieldDLQ");
   }
