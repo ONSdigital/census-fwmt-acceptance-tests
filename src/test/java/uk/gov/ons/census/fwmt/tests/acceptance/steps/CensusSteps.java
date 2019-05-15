@@ -46,7 +46,7 @@ public class CensusSteps {
   private static final String COMET_CREATE_JOB_REQUEST = "Comet - Create Job Request";
   private static final String CANONICAL_CANCEL_SENT = "Canonical - Action Cancel Sent";
   private static final String CANONICAL_CANCEL_RECEIVED = "Canonical - Cancel Job Received";
-  private static final String CANONICAL_CANCEL_FAILED ="Canonical - Action cancel failed. Address type is not a Household (HH)";
+  private static final String CANONICAL_CANCEL_FAILED = "Canonical - Action cancel failed. Address type is not a Household (HH)";
   private String cancelMessage = null;
   private String cancelMessageNonHH = null;
   private String invalidRMMessage = null;
@@ -71,8 +71,10 @@ public class CensusSteps {
 
   @Before
   public void setup() throws IOException, TimeoutException, URISyntaxException {
-    cancelMessage = Resources.toString(Resources.getResource("files/input/actionCancelInstruction.xml"), Charsets.UTF_8);
-    cancelMessageNonHH = Resources.toString(Resources.getResource("files/input/actionNonHHCancelInstruction.xml"), Charsets.UTF_8);
+    cancelMessage = Resources
+        .toString(Resources.getResource("files/input/actionCancelInstruction.xml"), Charsets.UTF_8);
+    cancelMessageNonHH = Resources
+        .toString(Resources.getResource("files/input/actionNonHHCancelInstruction.xml"), Charsets.UTF_8);
     invalidRMMessage = Resources.toString(Resources.getResource("files/input/invalidInstruction.xml"), Charsets.UTF_8);
     receivedRMMessage = Resources.toString(Resources.getResource("files/input/actionInstruction.xml"), Charsets.UTF_8);
     testOutcomeJson = null;
@@ -147,11 +149,13 @@ public class CensusSteps {
       break;
     case "willComplete":
       testOutcomeJson = Resources
-          .toString(Resources.getResource("files/outcome/fulfillment/contactMadeFulfillmentWillComplete.txt"), Charsets.UTF_8);
+          .toString(Resources.getResource("files/outcome/fulfillment/contactMadeFulfillmentWillComplete.txt"),
+              Charsets.UTF_8);
       break;
     case "haveCompleted":
       testOutcomeJson = Resources
-          .toString(Resources.getResource("files/outcome/fulfillment/contactMadeFulfillmentHaveComplete.txt"), Charsets.UTF_8);
+          .toString(Resources.getResource("files/outcome/fulfillment/contactMadeFulfillmentHaveComplete.txt"),
+              Charsets.UTF_8);
       break;
     case "collectedCompletedQuestionnaire":
       testOutcomeJson = Resources
@@ -160,35 +164,43 @@ public class CensusSteps {
       break;
     case "callBackAnotherTime":
       testOutcomeJson = Resources
-          .toString(Resources.getResource("files/outcome/fulfillment/contactMadeFulfillmentCallBackAnotherTime.txt"), Charsets.UTF_8);
+          .toString(Resources.getResource("files/outcome/fulfillment/contactMadeFulfillmentCallBackAnotherTime.txt"),
+              Charsets.UTF_8);
       break;
     case "holidayHome":
       testOutcomeJson = Resources
-          .toString(Resources.getResource("files/outcome/fulfillment/contactMadeFulfillmentHolidayHome.txt"), Charsets.UTF_8);
+          .toString(Resources.getResource("files/outcome/fulfillment/contactMadeFulfillmentHolidayHome.txt"),
+              Charsets.UTF_8);
       break;
     case "secondResidence":
       testOutcomeJson = Resources
-          .toString(Resources.getResource("files/outcome/fulfillment/contactMadeFulfillmentSecondResidence.txt"), Charsets.UTF_8);
+          .toString(Resources.getResource("files/outcome/fulfillment/contactMadeFulfillmentSecondResidence.txt"),
+              Charsets.UTF_8);
       break;
     case "requestedAssistance":
       testOutcomeJson = Resources
-          .toString(Resources.getResource("files/outcome/fulfillment/contactMadeFulfillmentRequestedAssistance.txt"), Charsets.UTF_8);
+          .toString(Resources.getResource("files/outcome/fulfillment/contactMadeFulfillmentRequestedAssistance.txt"),
+              Charsets.UTF_8);
       break;
     case "householdPaperRequest":
       testOutcomeJson = Resources
-          .toString(Resources.getResource("files/outcome/questionnaireRequests/householdPaperRequest.txt"), Charsets.UTF_8);
+          .toString(Resources.getResource("files/outcome/questionnaireRequests/householdPaperRequest.txt"),
+              Charsets.UTF_8);
       break;
     case "householdContinuationRequest":
       testOutcomeJson = Resources
-          .toString(Resources.getResource("files/outcome/questionnaireRequests/householdContinuationRequest.txt"), Charsets.UTF_8);
+          .toString(Resources.getResource("files/outcome/questionnaireRequests/householdContinuationRequest.txt"),
+              Charsets.UTF_8);
       break;
     case "householdIndividualRequest":
       testOutcomeJson = Resources
-          .toString(Resources.getResource("files/outcome/questionnaireRequests/householdIndividualRequest.txt"), Charsets.UTF_8);
+          .toString(Resources.getResource("files/outcome/questionnaireRequests/householdIndividualRequest.txt"),
+              Charsets.UTF_8);
       break;
     case "multipleQuestionnaireRequest":
       testOutcomeJson = Resources
-          .toString(Resources.getResource("files/outcome/questionnaireRequests/householdMultipleRequest.txt"), Charsets.UTF_8);
+          .toString(Resources.getResource("files/outcome/questionnaireRequests/householdMultipleRequest.txt"),
+              Charsets.UTF_8);
       break;
     case "huacRequiredByText":
       testOutcomeJson = Resources
@@ -306,7 +318,8 @@ public class CensusSteps {
   }
 
   @And("the response contains the Requester Title {string} and Requester Forename {string} and Requester Surname {string} from queue {string}")
-  public void theResponseContainsTheRequesterTitleAndRequesterForenameAndRequesterSurnameFromQueue(String requesterTitle,
+  public void theResponseContainsTheRequesterTitleAndRequesterForenameAndRequesterSurnameFromQueue(
+      String requesterTitle,
       String requesterForename, String requesterSurname, String queueName) throws IOException, InterruptedException {
     JavaTimeModule module = new JavaTimeModule();
     LocalDateTimeDeserializer localDateTimeDeserializer = new LocalDateTimeDeserializer(
@@ -325,7 +338,8 @@ public class CensusSteps {
   }
 
   @Then("the number of messages {string} will made available for RM to pick up from queue {string}")
-  public void theNumberOfMessagesWillMadeAvailableForRMToPickUpFromQueue(String expectedNumberOfMessages, String queueName) {
+  public void theNumberOfMessagesWillMadeAvailableForRMToPickUpFromQueue(String expectedNumberOfMessages,
+      String queueName) {
     long expectedNumber = Long.valueOf(expectedNumberOfMessages);
     assertEquals(expectedNumber, queueUtils.getMessageCount(queueName));
   }

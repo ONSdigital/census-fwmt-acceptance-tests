@@ -38,14 +38,14 @@ Feature: Census Tests
     And the message is in the format RM is expecting from queue "Gateway.Fulfillment.Request"
 
     Examples:
-    | InputMessage                    | SecondaryOutcome                  |
-    | willComplete                    | Will Complete                     |
-    | haveCompleted                   | Have Completed                    |
-    | collectedCompletedQuestionnaire | Collected completed questionnaire |
-    | callBackAnotherTime             | Call back another time            |
-    | holidayHome                     | Holiday home                      |
-    | secondResidence                 | Second residence                  |
-    | requestedAssistance             | Requested assistance              |
+      | InputMessage                    | SecondaryOutcome                  |
+      | willComplete                    | Will Complete                     |
+      | haveCompleted                   | Have Completed                    |
+      | collectedCompletedQuestionnaire | Collected completed questionnaire |
+      | callBackAnotherTime             | Call back another time            |
+      | holidayHome                     | Holiday home                      |
+      | secondResidence                 | Second residence                  |
+      | requestedAssistance             | Requested assistance              |
 
   Scenario: Scenario: As a Gateway I can ensure that Individual paper requests pass on requester details to RM
     Given TM sends a "holidayHome" Census Case Outcome to the Gateway
@@ -59,10 +59,10 @@ Feature: Census Tests
     And the message is in the format RM is expecting from queue "Gateway.Fulfillment.Request"
 
     Examples:
-    | InputMessage                 | SecondaryOutcome |
-    | householdPaperRequest        | Paper H Questionnaire required by post |
-    | householdContinuationRequest | Paper H Questionnaire required by post |
-    | householdIndividualRequest   | Paper H Questionnaire required by post |
+      | InputMessage                 | SecondaryOutcome                       |
+      | householdPaperRequest        | Paper H Questionnaire required by post |
+      | householdContinuationRequest | Paper H Questionnaire required by post |
+      | householdIndividualRequest   | Paper H Questionnaire required by post |
 
   Scenario: As a Gateway I can ensure that Individual paper requests pass on requester details to RM
     Given TM sends a "householdIndividualRequest" Census Case Outcome to the Gateway
