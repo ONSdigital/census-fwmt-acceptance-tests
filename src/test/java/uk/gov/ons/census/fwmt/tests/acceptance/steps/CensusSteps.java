@@ -189,7 +189,18 @@ public class CensusSteps {
       testOutcomeJson = Resources
           .toString(Resources.getResource("files/outcome/questionnaireRequests/householdMultipleRequest.txt"), Charsets.UTF_8);
       break;
+    case "huacRequiredByText":
+      testOutcomeJson = Resources
+          .toString(Resources.getResource("files/outcome/uacRequests/contactMadeHUACRequest.txt"), Charsets.UTF_8);
+      break;
+    case "iuacRequiredByText":
+      testOutcomeJson = Resources
+          .toString(Resources.getResource("files/outcome/uacRequests/contactMadeIUACRequest.txt"), Charsets.UTF_8);
+      break;
     }
+
+    int response = tmMockUtils.sendTMResponseMessage(testOutcomeJson);
+    assertEquals(200, response);
   }
 
   @And("the response is of a Census Case Outcome format")

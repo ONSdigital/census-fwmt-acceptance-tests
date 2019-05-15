@@ -30,7 +30,7 @@ Feature: Census Tests
     Then the job with case ID "81ec8f8e-1dfc-4b96-9bbd-c95f43ea0aa4" will not be passed to TM
 
 
-  Scenario Outline: As a system (FWMT Gateway) I can handle fulfilment requests
+  Scenario Outline: As a system (FWMT Gateway) I can handle fulfilment requests of the following Secondary Outcome:
     Given TM sends a "<InputMessage>" Census Case Outcome to the Gateway
     And the response is of a Census Case Outcome format
     And the response contains the Primary Outcome value of "Contact Made" and Secondary Outcome "<SecondaryOutcome>" and the Case Id of "6c9b1177-3e03-4060-b6db-f6a8456292ef"
@@ -68,10 +68,16 @@ Feature: Census Tests
     Given TM sends a "multipleQuestionnaireRequest" Census Case Outcome to the Gateway
     Then the number of messages "3" will made available for RM to pick up from queue "Gateway.Fulfillment.Request"
 
-  Scenario: As Gateway I can handle UAC fulfillment requests
-    Given A follow-up visit outcome has been sent by COMET with caseId "6c9b1177-3e03-4060-b6db-f6a8456292ef"
-    And the primary visit outcome is "Contact made" for a Household survey
-    When the Secondary Outcome is "HUAC required by text"
+  Scenario: As a system (FWMT Gateway) I can handle fulfilment requests of HUAC required by text:
+    Given TM sends a "huacRequiredByText" Census Case Outcome to the Gateway
+    And the response is of a Census Case Outcome format
+    And the response contains the Primary Outcome value of "Contact Made" and Secondary Outcome "HUAC required by text" and the Case Id of "6c9b1177-3e03-4060-b6db-f6a8456292ef"
+    Then the message will made available for RM to pick up from queue "Gateway.Fulfillment.Request"
+    And the message is in the format RM is expecting from queue "Gateway.Fulfillment.Request"
 
-
-
+  Scenario: As a system (FWMT Gateway) I can handle fulfilment requests of IUAC required by text:
+    Given TM sends a "iuacRequiredByText" Census Case Outcome to the Gateway
+    And the response is of a Census Case Outcome format
+    And the response contains the Primary Outcome value of "Contact Made" and Secondary Outcome "IUAC required by text" and the Case Id of "6c9b1177-3e03-4060-b6db-f6a8456292ef"
+    Then the message will made available for RM to pick up from queue "Gateway.Fulfillment.Request"
+    And the message is in the format RM is expecting from queue "Gateway.Fulfillment.Request"
