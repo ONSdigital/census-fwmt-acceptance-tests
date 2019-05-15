@@ -146,31 +146,32 @@ public class CensusSteps {
       break;
     case "willComplete":
       testOutcomeJson = Resources
-          .toString(Resources.getResource("files/outcome/contactMadeFulfillmentWillComplete.txt"), Charsets.UTF_8);
+          .toString(Resources.getResource("files/outcome/fulfillment/contactMadeFulfillmentWillComplete.txt"), Charsets.UTF_8);
       break;
     case "haveCompleted":
       testOutcomeJson = Resources
-          .toString(Resources.getResource("files/outcome/contactMadeFulfillmentHaveComplete.txt"), Charsets.UTF_8);
+          .toString(Resources.getResource("files/outcome/fulfillment/contactMadeFulfillmentHaveComplete.txt"), Charsets.UTF_8);
       break;
     case "collectedCompletedQuestionnaire":
       testOutcomeJson = Resources
-          .toString(Resources.getResource("files/outcome/contactMadeFulfillmentCollectedCompletedQuestionnaire.txt"), Charsets.UTF_8);
+          .toString(Resources.getResource(
+              "files/outcome/fulfillment/contactMadeFulfillmentCollectedCompletedQuestionnaire.txt"), Charsets.UTF_8);
       break;
     case "callBackAnotherTime":
       testOutcomeJson = Resources
-          .toString(Resources.getResource("files/outcome/contactMadeFulfillmentCallBackAnotherTime.txt"), Charsets.UTF_8);
+          .toString(Resources.getResource("files/outcome/fulfillment/contactMadeFulfillmentCallBackAnotherTime.txt"), Charsets.UTF_8);
       break;
     case "holidayHome":
       testOutcomeJson = Resources
-          .toString(Resources.getResource("files/outcome/contactMadeFulfillmentHolidayHome.txt"), Charsets.UTF_8);
+          .toString(Resources.getResource("files/outcome/fulfillment/contactMadeFulfillmentHolidayHome.txt"), Charsets.UTF_8);
       break;
     case "secondResidence":
       testOutcomeJson = Resources
-          .toString(Resources.getResource("files/outcome/contactMadeFulfillmentSecondResidence.txt"), Charsets.UTF_8);
+          .toString(Resources.getResource("files/outcome/fulfillment/contactMadeFulfillmentSecondResidence.txt"), Charsets.UTF_8);
       break;
     case "requestedAssistance":
       testOutcomeJson = Resources
-          .toString(Resources.getResource("files/outcome/contactMadeFulfillmentRequestedAssistance.txt"), Charsets.UTF_8);
+          .toString(Resources.getResource("files/outcome/fulfillment/contactMadeFulfillmentRequestedAssistance.txt"), Charsets.UTF_8);
       break;
     case "householdPaperRequest":
       testOutcomeJson = Resources

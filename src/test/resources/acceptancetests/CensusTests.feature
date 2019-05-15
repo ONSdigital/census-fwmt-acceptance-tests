@@ -68,7 +68,10 @@ Feature: Census Tests
     Given TM sends a "multipleQuestionnaireRequest" Census Case Outcome to the Gateway
     Then the number of messages "3" will made available for RM to pick up from queue "Gateway.Fulfillment.Request"
 
-
+  Scenario: As Gateway I can handle UAC fulfillment requests
+    Given A follow-up visit outcome has been sent by COMET with caseId "6c9b1177-3e03-4060-b6db-f6a8456292ef"
+    And the primary visit outcome is "Contact made" for a Household survey
+    When the Secondary Outcome is "HUAC required by text"
 
 
 
