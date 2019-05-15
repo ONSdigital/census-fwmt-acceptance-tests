@@ -8,7 +8,7 @@
   "transactionId": "c45de4dc-3c3b-11e9-b210-d663bd873d93",
   "fulfillmentRequests": [
   {
-    "questionnaireID": "QuestionnaireID"
+    "questionnaireId": "QuestionnaireID"
   }
   ]
 }
