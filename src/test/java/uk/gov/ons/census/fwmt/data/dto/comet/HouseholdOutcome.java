@@ -21,7 +21,7 @@ import java.util.UUID;
     "primaryOutcome",
     "secondaryOutcome",
     "ceDetails",
-    "fulfilmentRequests"
+    "fulfillmentRequests"
 })
 @Data
 @AllArgsConstructor
@@ -52,7 +52,7 @@ public class HouseholdOutcome {
   @JsonProperty("ceDetails")
   private CeDetails ceDetails;
 
-  @JsonProperty("fulfilmentRequests")
+  @JsonProperty("fulfillmentRequests")
   private List<FulfillmentRequest> fulfilmentRequests = null;
 
 }
