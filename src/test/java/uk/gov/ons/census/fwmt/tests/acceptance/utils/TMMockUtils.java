@@ -85,7 +85,7 @@ public final class TMMockUtils {
     HttpHeaders headers = createBasicAuthHeaders(outcomeServiceUsername, outcomeServicePassword);
 
     headers.setContentType(MediaType.APPLICATION_JSON);
-    
+
     RestTemplate restTemplate = new RestTemplate();
     String postUrl = outcomeServiceUrl + householdOutcomeEndpoint;
 

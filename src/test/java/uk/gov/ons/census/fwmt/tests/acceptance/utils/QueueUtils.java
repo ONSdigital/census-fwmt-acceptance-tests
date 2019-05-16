@@ -15,7 +15,7 @@ import java.net.URISyntaxException;
 public final class QueueUtils {
   @Value("${service.mocktm.url}")
   private String mockTmURL;
-  
+
   private RestTemplate restTemplate = new RestTemplate();
 
   public long getMessageCount(String qname) {
@@ -51,7 +51,7 @@ public final class QueueUtils {
     URI uri = new URI(mockTmURL + "/queue/?exchange=" + exchangeName + "&routingkey=" + routingKey);
     rt.postForLocation(uri, httpEntity);
   }
-  
+
   public void clearQueues() throws URISyntaxException {
     clearQueue("Gateway.Actions");
     clearQueue("Gateway.ActionsDLQ");
