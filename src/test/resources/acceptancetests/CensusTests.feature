@@ -7,7 +7,7 @@ Feature: Census Tests
     When the Gateway sends a Create Job message to TM
     Then a new case with id of "39bad71c-7de5-4e1b-9a07-d9597737977f" is created in TM
 
-  Scenario Outline: As a system (FWMT Gateway) I can receive final outcome of cases from TM
+  Scenario Outline: As a Gateway I can receive final outcome of cases from TM
     Given TM sends a "<InputMessage>" Census Case Outcome to the Gateway
     And the response is of a Census Case Outcome format
     And the response contains the Primary Outcome value of "<PrimaryOutcome>" and Secondary Outcome "<SecondaryOutcome>" and the Case Id of "6c9b1177-3e03-4060-b6db-f6a8456292ef"
@@ -30,7 +30,7 @@ Feature: Census Tests
     Then the job with case ID "81ec8f8e-1dfc-4b96-9bbd-c95f43ea0aa4" will not be passed to TM
 
 
-  Scenario Outline: As a system (FWMT Gateway) I can handle fulfilment requests of the following Secondary Outcome:
+  Scenario Outline: As a Gateway I can handle fulfilment requests of the following Secondary Outcome:
     Given TM sends a "<InputMessage>" Census Case Outcome to the Gateway
     And the response is of a Census Case Outcome format
     And the response contains the Primary Outcome value of "Contact Made" and Secondary Outcome "<SecondaryOutcome>" and the Case Id of "6c9b1177-3e03-4060-b6db-f6a8456292ef"
@@ -51,7 +51,7 @@ Feature: Census Tests
     Given TM sends a "holidayHome" Census Case Outcome to the Gateway
     And the response contains the QuestionnaireId "QuestionnaireID" from queue "Gateway.Fulfillment.Request"
 
-  Scenario Outline: As a system (FWMT Gateway) I can handle multiple fulfilment requests for questionnaires by post
+  Scenario Outline: As a Gateway I can handle multiple fulfilment requests for questionnaires by post
     Given TM sends a "<InputMessage>" Census Case Outcome to the Gateway
     And the response is of a Census Case Outcome format
     And the response contains the Primary Outcome value of "Contact Made" and Secondary Outcome "<SecondaryOutcome>" and the Case Id of "6c9b1177-3e03-4060-b6db-f6a8456292ef"
@@ -72,20 +72,20 @@ Feature: Census Tests
     Given TM sends a "multipleQuestionnaireRequest" Census Case Outcome to the Gateway
     Then the number of messages "3" will made available for RM to pick up from queue "Gateway.Fulfillment.Request"
 
-  Scenario: As a system (FWMT Gateway) I can handle fulfilment requests of HUAC required by text:
+  Scenario: As a Gateway I can handle fulfilment requests of HUAC required by text:
     Given TM sends a "huacRequiredByText" Census Case Outcome to the Gateway
     And the response is of a Census Case Outcome format
     And the response contains the Primary Outcome value of "Contact Made" and Secondary Outcome "HUAC required by text" and the Case Id of "6c9b1177-3e03-4060-b6db-f6a8456292ef"
     Then the message will made available for RM to pick up from queue "Gateway.Fulfillment.Request"
     And the message is in the format RM is expecting from queue "Gateway.Fulfillment.Request"
 
-  Scenario: As a system (FWMT Gateway) I can handle fulfilment requests of IUAC required by text:
+  Scenario: As a Gateway I can handle fulfilment requests of IUAC required by text:
     Given TM sends a "iuacRequiredByText" Census Case Outcome to the Gateway
     And the response is of a Census Case Outcome format
     And the response contains the Primary Outcome value of "Contact Made" and Secondary Outcome "IUAC required by text" and the Case Id of "6c9b1177-3e03-4060-b6db-f6a8456292ef"
     Then the message will made available for RM to pick up from queue "Gateway.Fulfillment.Request"
     And the message is in the format RM is expecting from queue "Gateway.Fulfillment.Request"
 
-  Scenario: Scenario: As a Gateway I can ensure that the UAC fulfillment requests pass on details to RM
+  Scenario: As a Gateway I can ensure that the UAC fulfillment requests pass on details to RM
     Given TM sends a "iuacRequiredByText" Census Case Outcome to the Gateway
     And the response contains the Requestor Phone Number "07123456789" from queue "Gateway.Fulfillment.Request"
