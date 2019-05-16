@@ -23,6 +23,7 @@ import uk.gov.ons.census.fwmt.common.data.modelcase.CasePause;
 import uk.gov.ons.census.fwmt.common.data.modelcase.ModelCase;
 import uk.gov.ons.census.fwmt.data.dto.comet.HouseholdOutcome;
 import uk.gov.ons.census.fwmt.data.dto.rm.OutcomeEvent;
+import uk.gov.ons.census.fwmt.data.dto.rm.Uac;
 import uk.gov.ons.census.fwmt.events.utils.GatewayEventMonitor;
 import uk.gov.ons.census.fwmt.tests.acceptance.utils.QueueUtils;
 import uk.gov.ons.census.fwmt.tests.acceptance.utils.TMMockUtils;
@@ -358,5 +359,22 @@ public class CensusSteps {
 
     OutcomeEvent outcomeEvent = objectMapper.readValue(queueUtils.getMessage(queueName), OutcomeEvent.class);
     assertEquals(questionnaireId, outcomeEvent.getPayload().getUac().getQuestionnaireId());
+  }
+
+  @And("the response contains the Requestor Phone Number {string} from queue {string}")
+  public void theResponseContainsTheQuestionnaireTypeAndQuestionnaireIDAndRequestorPhoneNumberFromQueue(
+      String requesterPhone, String queueName) throws IOException, InterruptedException {
+    JavaTimeModule module = new JavaTimeModule();
+    LocalDateTimeDeserializer localDateTimeDeserializer = new LocalDateTimeDeserializer(
+        DateTimeFormatter.ISO_DATE_TIME);
+    module.addDeserializer(LocalDateTime.class, localDateTimeDeserializer);
+    objectMapper = Jackson2ObjectMapperBuilder.json()
+        .modules(module)
+        .featuresToDisable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+        .build();
+
+    OutcomeEvent outcomeEvent = objectMapper.readValue(queueUtils.getMessage(queueName), OutcomeEvent.class);
+
+    assertEquals(requesterPhone, outcomeEvent.getPayload().getFulfillment().getContact().getTelNo());
   }
 }

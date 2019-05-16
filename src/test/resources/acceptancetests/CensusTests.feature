@@ -47,7 +47,7 @@ Feature: Census Tests
       | secondResidence                 | Second residence                  |
       | requestedAssistance             | Requested assistance              |
 
-  Scenario: Scenario: As a Gateway I can ensure that Individual paper requests pass on requester details to RM
+  Scenario: Scenario: As a Gateway I can ensure that Secondary fulfillment requests pass on the QID to RM
     Given TM sends a "holidayHome" Census Case Outcome to the Gateway
     And the response contains the QuestionnaireId "QuestionnaireID" from queue "Gateway.Fulfillment.Request"
 
@@ -85,3 +85,7 @@ Feature: Census Tests
     And the response contains the Primary Outcome value of "Contact Made" and Secondary Outcome "IUAC required by text" and the Case Id of "6c9b1177-3e03-4060-b6db-f6a8456292ef"
     Then the message will made available for RM to pick up from queue "Gateway.Fulfillment.Request"
     And the message is in the format RM is expecting from queue "Gateway.Fulfillment.Request"
+
+  Scenario: Scenario: As a Gateway I can ensure that the UAC fulfillment requests pass on details to RM
+    Given TM sends a "iuacRequiredByText" Census Case Outcome to the Gateway
+    And the response contains the Requestor Phone Number "07123456789" from queue "Gateway.Fulfillment.Request"
