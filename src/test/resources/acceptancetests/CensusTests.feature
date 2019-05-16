@@ -47,7 +47,7 @@ Feature: Census Tests
       | secondResidence                 | Second residence                  |
       | requestedAssistance             | Requested assistance              |
 
-  Scenario: Scenario: As a Gateway I can ensure that Secondary fulfillment requests pass on the QID to RM
+  Scenario: As a Gateway I can ensure that Secondary fulfillment requests pass on the QID to RM
     Given TM sends a "holidayHome" Census Case Outcome to the Gateway
     And the response contains the QuestionnaireId "QuestionnaireID" from queue "Gateway.Fulfillment.Request"
 
