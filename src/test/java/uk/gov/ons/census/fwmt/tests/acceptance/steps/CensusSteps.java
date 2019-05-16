@@ -35,7 +35,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.concurrent.TimeoutException;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 @Slf4j
 @PropertySource("classpath:application.properties")
@@ -45,7 +46,7 @@ public class CensusSteps {
   private static final String COMET_CREATE_JOB_REQUEST = "Comet - Create Job Request";
   private static final String CANONICAL_CANCEL_SENT = "Canonical - Action Cancel Sent";
   private static final String CANONICAL_CANCEL_RECEIVED = "Canonical - Cancel Job Received";
-  private static final String CANONICAL_CANCEL_FAILED ="Canonical - Action cancel failed. Address type is not a Household (HH)";
+  private static final String CANONICAL_CANCEL_FAILED = "Canonical - Action cancel failed. Address type is not a Household (HH)";
   private String cancelMessage = null;
   private String cancelMessageNonHH = null;
   private String invalidRMMessage = null;
@@ -70,8 +71,10 @@ public class CensusSteps {
 
   @Before
   public void setup() throws IOException, TimeoutException, URISyntaxException {
-    cancelMessage = Resources.toString(Resources.getResource("files/input/actionCancelInstruction.xml"), Charsets.UTF_8);
-    cancelMessageNonHH = Resources.toString(Resources.getResource("files/input/actionNonHHCancelInstruction.xml"), Charsets.UTF_8);
+    cancelMessage = Resources
+        .toString(Resources.getResource("files/input/actionCancelInstruction.xml"), Charsets.UTF_8);
+    cancelMessageNonHH = Resources
+        .toString(Resources.getResource("files/input/actionNonHHCancelInstruction.xml"), Charsets.UTF_8);
     invalidRMMessage = Resources.toString(Resources.getResource("files/input/invalidInstruction.xml"), Charsets.UTF_8);
     receivedRMMessage = Resources.toString(Resources.getResource("files/input/actionInstruction.xml"), Charsets.UTF_8);
     testOutcomeJson = null;
@@ -124,6 +127,13 @@ public class CensusSteps {
 
   @Given("TM sends a {string} Census Case Outcome to the Gateway")
   public void tmSendsACensusCaseOutcomeToTheGateway(String outcomeType) throws IOException {
+    setTestJson(outcomeType);
+
+    int response = tmMockUtils.sendTMResponseMessage(testOutcomeJson);
+    assertEquals(200, response);
+  }
+
+  private void setTestJson(String outcomeType) throws IOException {
     switch (outcomeType) {
     case "derelict":
       testOutcomeJson = Resources
@@ -137,10 +147,70 @@ public class CensusSteps {
       testOutcomeJson = Resources
           .toString(Resources.getResource("files/outcome/contactMadeHardRefusal.txt"), Charsets.UTF_8);
       break;
+    case "willComplete":
+      testOutcomeJson = Resources
+          .toString(Resources.getResource("files/outcome/fulfillment/contactMadeFulfillmentWillComplete.txt"),
+              Charsets.UTF_8);
+      break;
+    case "haveCompleted":
+      testOutcomeJson = Resources
+          .toString(Resources.getResource("files/outcome/fulfillment/contactMadeFulfillmentHaveComplete.txt"),
+              Charsets.UTF_8);
+      break;
+    case "collectedCompletedQuestionnaire":
+      testOutcomeJson = Resources
+          .toString(Resources.getResource(
+              "files/outcome/fulfillment/contactMadeFulfillmentCollectedCompletedQuestionnaire.txt"), Charsets.UTF_8);
+      break;
+    case "callBackAnotherTime":
+      testOutcomeJson = Resources
+          .toString(Resources.getResource("files/outcome/fulfillment/contactMadeFulfillmentCallBackAnotherTime.txt"),
+              Charsets.UTF_8);
+      break;
+    case "holidayHome":
+      testOutcomeJson = Resources
+          .toString(Resources.getResource("files/outcome/fulfillment/contactMadeFulfillmentHolidayHome.txt"),
+              Charsets.UTF_8);
+      break;
+    case "secondResidence":
+      testOutcomeJson = Resources
+          .toString(Resources.getResource("files/outcome/fulfillment/contactMadeFulfillmentSecondResidence.txt"),
+              Charsets.UTF_8);
+      break;
+    case "requestedAssistance":
+      testOutcomeJson = Resources
+          .toString(Resources.getResource("files/outcome/fulfillment/contactMadeFulfillmentRequestedAssistance.txt"),
+              Charsets.UTF_8);
+      break;
+    case "householdPaperRequest":
+      testOutcomeJson = Resources
+          .toString(Resources.getResource("files/outcome/questionnaireRequests/householdPaperRequest.txt"),
+              Charsets.UTF_8);
+      break;
+    case "householdContinuationRequest":
+      testOutcomeJson = Resources
+          .toString(Resources.getResource("files/outcome/questionnaireRequests/householdContinuationRequest.txt"),
+              Charsets.UTF_8);
+      break;
+    case "householdIndividualRequest":
+      testOutcomeJson = Resources
+          .toString(Resources.getResource("files/outcome/questionnaireRequests/householdIndividualRequest.txt"),
+              Charsets.UTF_8);
+      break;
+    case "multipleQuestionnaireRequest":
+      testOutcomeJson = Resources
+          .toString(Resources.getResource("files/outcome/questionnaireRequests/householdMultipleRequest.txt"),
+              Charsets.UTF_8);
+      break;
+    case "huacRequiredByText":
+      testOutcomeJson = Resources
+          .toString(Resources.getResource("files/outcome/uacRequests/contactMadeHUACRequest.txt"), Charsets.UTF_8);
+      break;
+    case "iuacRequiredByText":
+      testOutcomeJson = Resources
+          .toString(Resources.getResource("files/outcome/uacRequests/contactMadeIUACRequest.txt"), Charsets.UTF_8);
+      break;
     }
-
-    int response = tmMockUtils.sendTMResponseMessage(testOutcomeJson);
-    assertEquals(200, response);
   }
 
   @And("the response is of a Census Case Outcome format")
@@ -245,5 +315,65 @@ public class CensusSteps {
   public void theJobWithCaseIDWillNotBePassedToTM(String caseId) {
     boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, CANONICAL_CANCEL_RECEIVED, 10000L);
     assertThat(hasBeenTriggered).isFalse();
+  }
+
+  @And("the response contains the Requester Title {string} and Requester Forename {string} and Requester Surname {string} from queue {string}")
+  public void theResponseContainsTheRequesterTitleAndRequesterForenameAndRequesterSurnameFromQueue(
+      String requesterTitle,
+      String requesterForename, String requesterSurname, String queueName) throws IOException, InterruptedException {
+    JavaTimeModule module = new JavaTimeModule();
+    LocalDateTimeDeserializer localDateTimeDeserializer = new LocalDateTimeDeserializer(
+        DateTimeFormatter.ISO_DATE_TIME);
+    module.addDeserializer(LocalDateTime.class, localDateTimeDeserializer);
+    objectMapper = Jackson2ObjectMapperBuilder.json()
+        .modules(module)
+        .featuresToDisable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+        .build();
+
+    OutcomeEvent outcomeEvent = objectMapper.readValue(queueUtils.getMessage(queueName), OutcomeEvent.class);
+
+    assertEquals(requesterTitle, outcomeEvent.getPayload().getFulfillment().getContact().getTitle());
+    assertEquals(requesterForename, outcomeEvent.getPayload().getFulfillment().getContact().getForename());
+    assertEquals(requesterSurname, outcomeEvent.getPayload().getFulfillment().getContact().getSurname());
+  }
+
+  @Then("the number of messages {string} will made available for RM to pick up from queue {string}")
+  public void theNumberOfMessagesWillMadeAvailableForRMToPickUpFromQueue(String expectedNumberOfMessages,
+      String queueName) {
+    long expectedNumber = Long.valueOf(expectedNumberOfMessages);
+    assertEquals(expectedNumber, queueUtils.getMessageCount(queueName));
+  }
+
+  @And("the response contains the QuestionnaireId {string} from queue {string}")
+  public void theResponseContainsTheQuestionnaireIdFromQueue(String questionnaireId, String queueName)
+      throws IOException, InterruptedException {
+    JavaTimeModule module = new JavaTimeModule();
+    LocalDateTimeDeserializer localDateTimeDeserializer = new LocalDateTimeDeserializer(
+        DateTimeFormatter.ISO_DATE_TIME);
+    module.addDeserializer(LocalDateTime.class, localDateTimeDeserializer);
+    objectMapper = Jackson2ObjectMapperBuilder.json()
+        .modules(module)
+        .featuresToDisable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+        .build();
+
+    OutcomeEvent outcomeEvent = objectMapper.readValue(queueUtils.getMessage(queueName), OutcomeEvent.class);
+    assertEquals(questionnaireId, outcomeEvent.getPayload().getUac().getQuestionnaireId());
+  }
+
+  @And("the response contains the Requestor Phone Number {string} from queue {string}")
+  public void theResponseContainsTheQuestionnaireTypeAndQuestionnaireIDAndRequestorPhoneNumberFromQueue(
+      String requesterPhone, String queueName) throws IOException, InterruptedException {
+    JavaTimeModule module = new JavaTimeModule();
+    LocalDateTimeDeserializer localDateTimeDeserializer = new LocalDateTimeDeserializer(
+        DateTimeFormatter.ISO_DATE_TIME);
+    module.addDeserializer(LocalDateTime.class, localDateTimeDeserializer);
+    objectMapper = Jackson2ObjectMapperBuilder.json()
+        .modules(module)
+        .featuresToDisable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+        .build();
+
+    OutcomeEvent outcomeEvent = objectMapper.readValue(queueUtils.getMessage(queueName), OutcomeEvent.class);
+
+    assertEquals(requesterPhone, outcomeEvent.getPayload().getFulfillment().getContact().getTelNo());
   }
 }

@@ -1,6 +1,5 @@
 package uk.gov.ons.census.fwmt.data.dto.rm;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -9,22 +8,23 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
+    "transactionId",
     "type",
     "source",
     "channel",
-    "dateTime",
-    "transactionId"
+    "dateTime"
 })
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class Event {
+
+  @JsonProperty("transactionId")
+  private UUID transactionId;
 
   @JsonProperty("type")
   private String type;
@@ -39,9 +39,4 @@ public class Event {
   @JsonProperty("dateTime")
   private LocalDateTime dateTime;
 
-  @JsonProperty("transactionId")
-  private UUID transactionId;
-
-  @JsonIgnore
-  private Map<String, Object> additionalProperties = new HashMap<>();
 }
