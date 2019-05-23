@@ -124,13 +124,12 @@ public class CensusSteps {
     ModelCase modelCase = tmMockUtils.getCaseById(caseId);
     assertEquals(caseId, modelCase.getId().toString());
   }
-
-  @Given("TM sends a {string} Census Case Outcome to the Gateway")
-  public void tmSendsACensusCaseOutcomeToTheGateway(String outcomeType) throws IOException {
+  @Given("TM sends a {string} Census Case Outcome to the Gateway with case ID {string}")
+  public void tmSendsACensusCaseOutcomeToTheGatewayWithCaseID(String outcomeType, String caseId) throws IOException {
     setTestJson(outcomeType);
 
-    int response = tmMockUtils.sendTMResponseMessage(testOutcomeJson);
-    assertEquals(200, response);
+    int response = tmMockUtils.sendTMResponseMessage(testOutcomeJson, caseId);
+    assertEquals(202, response);
   }
 
   private void setTestJson(String outcomeType) throws IOException {
