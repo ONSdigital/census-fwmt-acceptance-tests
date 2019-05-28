@@ -29,6 +29,7 @@ import uk.gov.ons.census.fwmt.tests.acceptance.utils.TMMockUtils;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.nio.charset.Charset;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
@@ -44,14 +45,19 @@ public class CensusSteps {
 
   private static final String RM_REQUEST_RECEIVED = "RM - Request Received";
   private static final String COMET_CREATE_JOB_REQUEST = "Comet - Create Job Request";
-  private static final String CANONICAL_CANCEL_SENT = "Canonical - Action Cancel Sent";
-  private static final String CANONICAL_CANCEL_RECEIVED = "Canonical - Cancel Job Received";
   private static final String CANONICAL_CANCEL_FAILED = "Canonical - Action cancel failed. Address type is not a Household (HH)";
+  private static final String CANONICAL_CANCEL_RECEIVED = "Canonical - Cancel Job Received";
+  private static final String CANONICAL_CANCEL_SENT = "Canonical - Action Cancel Sent";
+  public static final String CANONICAL_UPDATE_FAILED = "Canonical - Action Update Failed";
+  public static final String CANONICAL_UPDATE_RECEIVED = "Canonical - Update Job Received";
+  public static final String CANONICAL_UPDATE_SENT = "Canonical - Action Update Sent";
   private String cancelMessage = null;
   private String cancelMessageNonHH = null;
   private String invalidRMMessage = null;
   private String receivedRMMessage = null;
   private String testOutcomeJson = null;
+  private String updateIncorrectMessage = null;
+  private String updateMessage = null;
 
   @Autowired
   private TMMockUtils tmMockUtils;
@@ -78,6 +84,10 @@ public class CensusSteps {
     invalidRMMessage = Resources.toString(Resources.getResource("files/input/invalidInstruction.xml"), Charsets.UTF_8);
     receivedRMMessage = Resources.toString(Resources.getResource("files/input/actionInstruction.xml"), Charsets.UTF_8);
     testOutcomeJson = null;
+    updateIncorrectMessage = Resources.toString(Resources.getResource("files/input/actionUpdateIncorrectPauseInstruction.xml"),
+        Charsets.UTF_8);
+    updateMessage = Resources.toString(Resources.getResource("files/input/actionUpdatePauseInstruction.xml"), Charsets.UTF_8);
+
 
     tmMockUtils.enableRequestRecorder();
     tmMockUtils.resetMock();
@@ -308,7 +318,6 @@ public class CensusSteps {
     queueUtils.sendToActionFieldQueue(cancelMessageNonHH);
     boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, CANONICAL_CANCEL_FAILED, 10000L);
     assertThat(hasBeenTriggered).isTrue();
-
   }
 
   @Then("the job with case ID {string} will not be passed to TM")
@@ -375,5 +384,32 @@ public class CensusSteps {
     OutcomeEvent outcomeEvent = objectMapper.readValue(queueUtils.getMessage(queueName), OutcomeEvent.class);
 
     assertEquals(requesterPhone, outcomeEvent.getPayload().getFulfillment().getContact().getTelNo());
+  }
+
+  @Given("RM sends an update pause case job request with case ID {string}")
+  public void rmSendsAnUpdatePauseCaseJobRequestWithCaseID(String caseId)
+      throws URISyntaxException, InterruptedException {
+    queueUtils.sendToActionFieldQueue(updateMessage);
+    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, CANONICAL_UPDATE_SENT, 10000L);
+    assertThat(hasBeenTriggered).isTrue();
+  }
+
+  @When("the Gateway sends a Update Case with Pause request to TM with case ID {string}")
+  public void theGatewaySendsAUpdateCaseWithPauseRequestToTMWithCaseID(String caseId) {
+    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, CANONICAL_UPDATE_RECEIVED, 10000L);
+    assertThat(hasBeenTriggered).isTrue();
+  }
+
+  @Given("RM sends an update pause case job request with a missing case ID")
+  public void rmSendsAnUpdatePauseCaseJobRequestWithAMissingCaseID() throws URISyntaxException, InterruptedException {
+    queueUtils.sendToActionFieldQueue(updateIncorrectMessage);
+    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered("00000000-0000-0000-0000-000000000000", CANONICAL_UPDATE_FAILED, 10000L);
+    assertThat(hasBeenTriggered).isTrue();
+  }
+
+  @Then("the job with missing case ID will not be passed to TM")
+  public void theJobWithMissingCaseIDWillNotBePassedToTM() {
+    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered("00000000-0000-0000-0000-000000000000", CANONICAL_UPDATE_RECEIVED, 10000L);
+    assertThat(hasBeenTriggered).isFalse();
   }
 }
