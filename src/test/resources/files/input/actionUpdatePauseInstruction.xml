@@ -11,5 +11,10 @@
             <until>2019-05-27T00:00:00.000+00:00</until>
             <id>8aa6d4fd-add4-4ff5-b927-79fc43b4a0e7</id>
         </pause>
+        <caseId>8aa6d4fd-add4-4ff5-b927-79fc43b4a0e7</caseId>
+        <addressType>HH</addressType>
+        <undeliveredAsAddress>false</undeliveredAsAddress>
+        <blankQreReturned>false</blankQreReturned>
+        <ce1Complete>false</ce1Complete>
     </actionUpdate>
 </ins:actionInstruction>
