@@ -2,7 +2,7 @@
 <ins:actionInstruction xmlns:ins="http://ons.gov.uk/ctp/response/action/message/instruction">
     <actionCancel>
         <actionId>a133b2cd-ef3f-4755-ad07-616b7298a12a</actionId>
-        <responseRequired>false</responseRequired>
+        <responseRequired>true</responseRequired>
         <actionType>Cancel</actionType>
         <reason>HQ case closure</reason>
         <caseId>4d9294f6-8edc-4d32-99ad-1bdb485e3495</caseId>
