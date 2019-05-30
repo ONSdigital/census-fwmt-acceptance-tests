@@ -19,10 +19,10 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.web.client.HttpClientErrorException;
-import uk.gov.ons.census.fwmt.common.data.comet.HouseholdOutcome;
 import uk.gov.ons.census.fwmt.common.data.modelcase.CasePause;
 import uk.gov.ons.census.fwmt.common.data.modelcase.ModelCase;
 import uk.gov.ons.census.fwmt.common.data.rm.OutcomeEvent;
+import uk.gov.ons.census.fwmt.common.error.GatewayException;
 import uk.gov.ons.census.fwmt.events.utils.GatewayEventMonitor;
 import uk.gov.ons.census.fwmt.tests.acceptance.utils.QueueUtils;
 import uk.gov.ons.census.fwmt.tests.acceptance.utils.TMMockUtils;
@@ -35,23 +35,25 @@ import java.time.format.DateTimeFormatter;
 import java.util.concurrent.TimeoutException;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 @Slf4j
 @PropertySource("classpath:application.properties")
-public class CensusSteps {
+public class RequestSteps {
 
   private static final String RM_REQUEST_RECEIVED = "RM - Request Received";
   private static final String COMET_CREATE_JOB_REQUEST = "Comet - Create Job Request";
-  private static final String CANONICAL_CANCEL_SENT = "Canonical - Action Cancel Sent";
   private static final String CANONICAL_CANCEL_RECEIVED = "Canonical - Cancel Job Received";
-  private static final String CANONICAL_CANCEL_FAILED = "Canonical - Action cancel failed. Address type is not a Household (HH)";
+  private static final String CANONICAL_CANCEL_SENT = "Canonical - Action Cancel Sent";
+  public static final String CANONICAL_UPDATE_RECEIVED = "Canonical - Update Job Received";
+  public static final String CANONICAL_UPDATE_SENT = "Canonical - Action Update Sent";
   private String cancelMessage = null;
   private String cancelMessageNonHH = null;
   private String invalidRMMessage = null;
   private String receivedRMMessage = null;
-  private String testOutcomeJson = null;
+  private String updateMessage = null;
 
   @Autowired
   private TMMockUtils tmMockUtils;
@@ -77,7 +79,8 @@ public class CensusSteps {
         .toString(Resources.getResource("files/input/actionNonHHCancelInstruction.xml"), Charsets.UTF_8);
     invalidRMMessage = Resources.toString(Resources.getResource("files/input/invalidInstruction.xml"), Charsets.UTF_8);
     receivedRMMessage = Resources.toString(Resources.getResource("files/input/actionInstruction.xml"), Charsets.UTF_8);
-    testOutcomeJson = null;
+    updateMessage = Resources.toString(Resources.getResource("files/input/actionUpdatePauseInstruction.xml"), Charsets.UTF_8);
+
 
     tmMockUtils.enableRequestRecorder();
     tmMockUtils.resetMock();
@@ -123,136 +126,6 @@ public class CensusSteps {
     Thread.sleep(1000);
     ModelCase modelCase = tmMockUtils.getCaseById(caseId);
     assertEquals(caseId, modelCase.getId().toString());
-  }
-
-  @Given("TM sends a {string} Census Case Outcome to the Gateway")
-  public void tmSendsACensusCaseOutcomeToTheGateway(String outcomeType) throws IOException {
-    setTestJson(outcomeType);
-
-    int response = tmMockUtils.sendTMResponseMessage(testOutcomeJson);
-    assertEquals(200, response);
-  }
-
-  private void setTestJson(String outcomeType) throws IOException {
-    switch (outcomeType) {
-    case "derelict":
-      testOutcomeJson = Resources
-          .toString(Resources.getResource("files/outcome/noValidHouseHoldDerelict.txt"), Charsets.UTF_8);
-      break;
-    case "splitAddress":
-      testOutcomeJson = Resources
-          .toString(Resources.getResource("files/outcome/contactMadeSplitAddress.txt"), Charsets.UTF_8);
-      break;
-    case "hardRefusal":
-      testOutcomeJson = Resources
-          .toString(Resources.getResource("files/outcome/contactMadeHardRefusal.txt"), Charsets.UTF_8);
-      break;
-    case "willComplete":
-      testOutcomeJson = Resources
-          .toString(Resources.getResource("files/outcome/fulfillment/contactMadeFulfillmentWillComplete.txt"),
-              Charsets.UTF_8);
-      break;
-    case "haveCompleted":
-      testOutcomeJson = Resources
-          .toString(Resources.getResource("files/outcome/fulfillment/contactMadeFulfillmentHaveComplete.txt"),
-              Charsets.UTF_8);
-      break;
-    case "collectedCompletedQuestionnaire":
-      testOutcomeJson = Resources
-          .toString(Resources.getResource(
-              "files/outcome/fulfillment/contactMadeFulfillmentCollectedCompletedQuestionnaire.txt"), Charsets.UTF_8);
-      break;
-    case "callBackAnotherTime":
-      testOutcomeJson = Resources
-          .toString(Resources.getResource("files/outcome/fulfillment/contactMadeFulfillmentCallBackAnotherTime.txt"),
-              Charsets.UTF_8);
-      break;
-    case "holidayHome":
-      testOutcomeJson = Resources
-          .toString(Resources.getResource("files/outcome/fulfillment/contactMadeFulfillmentHolidayHome.txt"),
-              Charsets.UTF_8);
-      break;
-    case "secondResidence":
-      testOutcomeJson = Resources
-          .toString(Resources.getResource("files/outcome/fulfillment/contactMadeFulfillmentSecondResidence.txt"),
-              Charsets.UTF_8);
-      break;
-    case "requestedAssistance":
-      testOutcomeJson = Resources
-          .toString(Resources.getResource("files/outcome/fulfillment/contactMadeFulfillmentRequestedAssistance.txt"),
-              Charsets.UTF_8);
-      break;
-    case "householdPaperRequest":
-      testOutcomeJson = Resources
-          .toString(Resources.getResource("files/outcome/questionnaireRequests/householdPaperRequest.txt"),
-              Charsets.UTF_8);
-      break;
-    case "householdContinuationRequest":
-      testOutcomeJson = Resources
-          .toString(Resources.getResource("files/outcome/questionnaireRequests/householdContinuationRequest.txt"),
-              Charsets.UTF_8);
-      break;
-    case "householdIndividualRequest":
-      testOutcomeJson = Resources
-          .toString(Resources.getResource("files/outcome/questionnaireRequests/householdIndividualRequest.txt"),
-              Charsets.UTF_8);
-      break;
-    case "multipleQuestionnaireRequest":
-      testOutcomeJson = Resources
-          .toString(Resources.getResource("files/outcome/questionnaireRequests/householdMultipleRequest.txt"),
-              Charsets.UTF_8);
-      break;
-    case "huacRequiredByText":
-      testOutcomeJson = Resources
-          .toString(Resources.getResource("files/outcome/uacRequests/contactMadeHUACRequest.txt"), Charsets.UTF_8);
-      break;
-    case "iuacRequiredByText":
-      testOutcomeJson = Resources
-          .toString(Resources.getResource("files/outcome/uacRequests/contactMadeIUACRequest.txt"), Charsets.UTF_8);
-      break;
-    }
-  }
-
-  @And("the response is of a Census Case Outcome format")
-  public void theResponseIsOfACensusCaseOutcomeFormat() {
-    JavaTimeModule module = new JavaTimeModule();
-    LocalDateTimeDeserializer localDateTimeDeserializer = new LocalDateTimeDeserializer(
-        DateTimeFormatter.ISO_DATE_TIME);
-    module.addDeserializer(LocalDateTime.class, localDateTimeDeserializer);
-    objectMapper = Jackson2ObjectMapperBuilder.json()
-        .modules(module)
-        .featuresToDisable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-        .build();
-
-    try {
-      objectMapper.readValue(testOutcomeJson.getBytes(), HouseholdOutcome.class);
-    } catch (IOException e) {
-      fail();
-    }
-  }
-
-  @And("the response contains the Primary Outcome value of {string} and Secondary Outcome {string} and the Case Id of {string}")
-  public void theResponseContainsThePrimaryOutcomeValueOfSecondaryOutcomeAndTheCaseIdOf(String primaryOutcome,
-      String secondaryOutcome,
-      String caseId) throws IOException {
-    HouseholdOutcome householdOutcome = objectMapper.readValue(testOutcomeJson.getBytes(), HouseholdOutcome.class);
-    assertEquals(primaryOutcome, householdOutcome.getPrimaryOutcome());
-    assertEquals(secondaryOutcome, householdOutcome.getSecondaryOutcome());
-    assertEquals(caseId, String.valueOf(householdOutcome.getCaseId()));
-  }
-
-  @Then("the message will made available for RM to pick up from queue {string}")
-  public void theMessageWillMadeAvailableForRMToPickUpFromQueue(String queueName) {
-    assertEquals(1, queueUtils.getMessageCount(queueName));
-  }
-
-  @And("the message is in the format RM is expecting from queue {string}")
-  public void theMessageIsInTheFormatRMIsExpectingFromQueue(String queueName) {
-    try {
-      objectMapper.readValue(queueUtils.getMessage(queueName), OutcomeEvent.class);
-    } catch (IOException | InterruptedException e) {
-      fail();
-    }
   }
 
   // Unused steps - should I delete?
@@ -303,12 +176,13 @@ public class CensusSteps {
     assertEquals(OffsetDateTime.parse(until), casePause.getUntil());
   }
 
-  @Given("RM sends a cancel case CSS job request with case ID {string}")
+  @Given("RM sends a cancel case CSS job request with case ID {string} and receives an exception from RM")
   public void rmSendsACancelCaseCSSJobRequestWithCaseID(String caseId) throws URISyntaxException, InterruptedException {
     queueUtils.sendToActionFieldQueue(cancelMessageNonHH);
-    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, CANONICAL_CANCEL_FAILED, 10000L);
-    assertThat(hasBeenTriggered).isTrue();
-
+    assertThatExceptionOfType(GatewayException.class).isThrownBy(() -> {
+      throw new GatewayException(
+          GatewayException.Fault.SYSTEM_ERROR);
+    });
   }
 
   @Then("the job with case ID {string} will not be passed to TM")
@@ -337,29 +211,6 @@ public class CensusSteps {
     assertEquals(requesterSurname, outcomeEvent.getPayload().getFulfillment().getContact().getSurname());
   }
 
-  @Then("the number of messages {string} will made available for RM to pick up from queue {string}")
-  public void theNumberOfMessagesWillMadeAvailableForRMToPickUpFromQueue(String expectedNumberOfMessages,
-      String queueName) {
-    long expectedNumber = Long.valueOf(expectedNumberOfMessages);
-    assertEquals(expectedNumber, queueUtils.getMessageCount(queueName));
-  }
-
-  @And("the response contains the QuestionnaireId {string} from queue {string}")
-  public void theResponseContainsTheQuestionnaireIdFromQueue(String questionnaireId, String queueName)
-      throws IOException, InterruptedException {
-    JavaTimeModule module = new JavaTimeModule();
-    LocalDateTimeDeserializer localDateTimeDeserializer = new LocalDateTimeDeserializer(
-        DateTimeFormatter.ISO_DATE_TIME);
-    module.addDeserializer(LocalDateTime.class, localDateTimeDeserializer);
-    objectMapper = Jackson2ObjectMapperBuilder.json()
-        .modules(module)
-        .featuresToDisable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-        .build();
-
-    OutcomeEvent outcomeEvent = objectMapper.readValue(queueUtils.getMessage(queueName), OutcomeEvent.class);
-    assertEquals(questionnaireId, outcomeEvent.getPayload().getUac().getQuestionnaireId());
-  }
-
   @And("the response contains the Requestor Phone Number {string} from queue {string}")
   public void theResponseContainsTheQuestionnaireTypeAndQuestionnaireIDAndRequestorPhoneNumberFromQueue(
       String requesterPhone, String queueName) throws IOException, InterruptedException {
@@ -375,5 +226,19 @@ public class CensusSteps {
     OutcomeEvent outcomeEvent = objectMapper.readValue(queueUtils.getMessage(queueName), OutcomeEvent.class);
 
     assertEquals(requesterPhone, outcomeEvent.getPayload().getFulfillment().getContact().getTelNo());
+  }
+
+  @Given("RM sends an update pause case job request with case ID {string}")
+  public void rmSendsAnUpdatePauseCaseJobRequestWithCaseID(String caseId)
+      throws URISyntaxException, InterruptedException {
+    queueUtils.sendToActionFieldQueue(updateMessage);
+    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, CANONICAL_UPDATE_SENT, 10000L);
+    assertThat(hasBeenTriggered).isTrue();
+  }
+
+  @When("the Gateway sends a Update Case with Pause request to TM with case ID {string}")
+  public void theGatewaySendsAUpdateCaseWithPauseRequestToTMWithCaseID(String caseId) {
+    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, CANONICAL_UPDATE_RECEIVED, 10000L);
+    assertThat(hasBeenTriggered).isTrue();
   }
 }
