@@ -29,11 +29,6 @@ Feature: Census Tests
     Given RM sends a cancel case CSS job request with case ID "81ec8f8e-1dfc-4b96-9bbd-c95f43ea0aa4" and receives an exception from RM
     Then the job with case ID "81ec8f8e-1dfc-4b96-9bbd-c95f43ea0aa4" will not be passed to TM
 
-  Scenario: As Gateway I can receive a HouseHold update with pause job request from RM
-    Given RM sends an update pause case job request with case ID "8aa6d4fd-add4-4ff5-b927-79fc43b4a0e7"
-    When the Gateway sends a Update Case with Pause request to TM with case ID "8aa6d4fd-add4-4ff5-b927-79fc43b4a0e7"
-    Then a pause datetime of "2019-05-27T00:00+00:00" will be assigned to the case with id "8aa6d4fd-add4-4ff5-b927-79fc43b4a0e7"
-
   Scenario Outline: As a Gateway I can handle fulfilment requests of the following Secondary Outcome:
     Given TM sends a "<InputMessage>" Census Case Outcome to the Gateway with case ID "6c9b1177-3e03-4060-b6db-f6a8456292ef"
     And the response is of a Census Case Outcome format
