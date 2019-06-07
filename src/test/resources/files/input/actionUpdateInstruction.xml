@@ -12,7 +12,7 @@
         <addressLevel></addressLevel>
         <undeliveredAsAddress>false</undeliveredAsAddress>
         <blankQreReturned>false</blankQreReturned>
-        <actionableFrom>2019-06-08T00:00:00.000Z</actionableFrom>
+        <actionableFrom>2019-05-27T00:00:00.000Z</actionableFrom>
         <ce1Complete>false</ce1Complete>
         <ceExpectedResponses>0</ceExpectedResponses>
         <ceActualResponses>0</ceActualResponses>
