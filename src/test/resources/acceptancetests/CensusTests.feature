@@ -15,10 +15,12 @@ Feature: Census Tests
     And the message is in the format RM is expecting from queue "<ExpectedQueue>"
 
     Examples:
-      | InputMessage | PrimaryOutcome     | SecondaryOutcome | ExpectedQueue              |
-      | derelict     | No Valid Household | Derelict         | Gateway.Address.Update     |
-      | hardRefusal  | Contact Made       | Hard Refusal     | Gateway.Respondent.Refusal |
-      | splitAddress | Contact Made       | Split Address    | Gateway.Address.Update     |
+      | InputMessage | PrimaryOutcome     | SecondaryOutcome                    | ExpectedQueue              |
+      | derelict     | No Valid Household | Derelict                            | Gateway.Address.Update     |
+      | ceNoContact  | No Valid Household | Property is a CE - no contact made  | Gateway.Address.Update     |
+      | ceContact    | No Valid Household | Property is a CE - Contact made     | Gateway.Address.Update     |
+      | hardRefusal  | Contact Made       | Hard Refusal                        | Gateway.Respondent.Refusal |
+      | splitAddress | Contact Made       | Split Address                       | Gateway.Address.Update     |
 
   Scenario: As Gateway I can receive a HouseHold cancel job request from RM
     Given RM sends a cancel case Household job request with case ID "4d9294f6-8edc-4d32-99ad-1bdb485e3495"
