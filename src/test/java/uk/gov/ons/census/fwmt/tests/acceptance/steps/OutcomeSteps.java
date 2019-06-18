@@ -92,6 +92,14 @@ public class OutcomeSteps {
       testOutcomeJson = Resources
           .toString(Resources.getResource("files/outcome/contactMadeHardRefusal.txt"), Charsets.UTF_8);
       break;
+    case "ceNoContact":
+      testOutcomeJson = Resources
+          .toString(Resources.getResource("files/outcome/noValidHouseHoldCENoContactMade.txt"), Charsets.UTF_8);
+      break;
+    case "ceContact":
+      testOutcomeJson = Resources
+          .toString(Resources.getResource("files/outcome/noValidHouseHoldCEContactMade.txt"), Charsets.UTF_8);
+      break;
     case "willComplete":
       testOutcomeJson = Resources
           .toString(Resources.getResource("files/outcome/fulfillment/contactMadeFulfillmentWillComplete.txt"),
