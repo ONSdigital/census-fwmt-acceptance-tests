@@ -235,16 +235,13 @@ public class RequestSteps {
   @Given("TM already has an existing job with case ID {string}")
   public void tmAlreadyHasAnExistingJobWithCaseID(String caseId) throws URISyntaxException, InterruptedException {
     queueUtils.sendToActionFieldQueue(receivedRMMessage);
-
-    Thread.sleep(1000);
-    ModelCase modelCase = tmMockUtils.getCaseById(caseId);
-    assertEquals(caseId, modelCase.getId().toString());
+    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, RM_REQUEST_RECEIVED, 10000L);
+    assertThat(hasBeenTriggered).isTrue();
   }
 
   @And("RM sends an update case job request with case ID {string}")
   public void rmSendsAnUpdatePauseCaseJobRequestWithCaseID(String caseId)
       throws URISyntaxException, InterruptedException {
-    Thread.sleep(1000);
     queueUtils.sendToActionFieldQueue(updateMessage);
     boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, CANONICAL_UPDATE_SENT, 10000L);
     assertThat(hasBeenTriggered).isTrue();
@@ -252,7 +249,6 @@ public class RequestSteps {
 
   @When("the Gateway sends a Update Case with Pause request to TM with case ID {string}")
   public void theGatewaySendsAUpdateCaseWithPauseRequestToTMWithCaseID(String caseId) throws InterruptedException {
-    Thread.sleep(1000);
     boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, CANONICAL_UPDATE_RECEIVED, 10000L);
     assertThat(hasBeenTriggered).isTrue();
   }
@@ -262,11 +258,9 @@ public class RequestSteps {
       throws URISyntaxException, InterruptedException {
     queueUtils.sendToActionFieldQueue(receivedRMMessage);
 
-    Thread.sleep(1000);
-    ModelCase modelCase = tmMockUtils.getCaseById(caseId);
-    assertEquals(caseId, modelCase.getId().toString());
+    boolean caseIdPresent = gatewayEventMonitor.hasEventTriggered(caseId, RM_REQUEST_RECEIVED, 10000L);
+    assertThat(caseIdPresent).isTrue();
 
-    Thread.sleep(1000);
     queueUtils.sendToActionFieldQueue(updatePauseMessage);
 
     boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, CANONICAL_UPDATE_SENT, 10000L);
