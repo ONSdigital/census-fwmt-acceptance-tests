@@ -57,6 +57,8 @@ public class RequestSteps {
   private String invalidRMMessage = null;
   private String receivedRMMessage = null;
   private String updateMessage = null;
+  private String updatePauseMessage = null;
+  //private String pauseCaseMessage = null;
 
   @Autowired
   private CSVServiceUtils csvServiceUtils;
@@ -85,7 +87,9 @@ public class RequestSteps {
         .toString(Resources.getResource("files/input/actionNonHHCancelInstruction.xml"), Charsets.UTF_8);
     invalidRMMessage = Resources.toString(Resources.getResource("files/input/invalidInstruction.xml"), Charsets.UTF_8);
     receivedRMMessage = Resources.toString(Resources.getResource("files/input/actionInstruction.xml"), Charsets.UTF_8);
-    updateMessage = Resources.toString(Resources.getResource("files/input/actionUpdatePauseInstruction.xml"), Charsets.UTF_8);
+    updateMessage = Resources.toString(Resources.getResource("files/input/actionUpdateInstruction.xml"), Charsets.UTF_8);
+    updatePauseMessage = Resources.toString(Resources.getResource("files/input/actionUpdatePauseInstruction.xml"), Charsets.UTF_8);
+    //pauseCaseMessage = Resources.toString(Resources.getResource("files/input/actionInstructionWithPause.xml"), Charsets.UTF_8);
 
     tmMockUtils.enableRequestRecorder();
     tmMockUtils.resetMock();
@@ -233,7 +237,14 @@ public class RequestSteps {
     assertEquals(requesterPhone, outcomeEvent.getPayload().getFulfillment().getContact().getTelNo());
   }
 
-  @Given("RM sends an update pause case job request with case ID {string}")
+  @Given("TM already has an existing job with case ID {string}")
+  public void tmAlreadyHasAnExistingJobWithCaseID(String caseId) throws URISyntaxException, InterruptedException {
+    queueUtils.sendToActionFieldQueue(receivedRMMessage);
+    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, RM_REQUEST_RECEIVED, 10000L);
+    assertThat(hasBeenTriggered).isTrue();
+  }
+
+  @And("RM sends an update case job request with case ID {string}")
   public void rmSendsAnUpdatePauseCaseJobRequestWithCaseID(String caseId)
       throws URISyntaxException, InterruptedException {
     queueUtils.sendToActionFieldQueue(updateMessage);
@@ -242,10 +253,11 @@ public class RequestSteps {
   }
 
   @When("the Gateway sends a Update Case with Pause request to TM with case ID {string}")
-  public void theGatewaySendsAUpdateCaseWithPauseRequestToTMWithCaseID(String caseId) {
+  public void theGatewaySendsAUpdateCaseWithPauseRequestToTMWithCaseID(String caseId) throws InterruptedException {
     boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, CANONICAL_UPDATE_RECEIVED, 10000L);
     assertThat(hasBeenTriggered).isTrue();
   }
+
 
   @Given("the Gateway receives a CSV CE with case ID {string}")
   public void theGatewayReceivesACSVCEWithCaseID(String caseId) throws InterruptedException, IOException {
@@ -265,5 +277,36 @@ public class RequestSteps {
   public void tmPicksUpTheCreateJobMessageWithCaseID(String caseId) {
     boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, COMET_CREATE_JOB_REQUEST, 10000L);
     assertThat(hasBeenTriggered).isTrue();
+
+  @Given("TM already has an existing job with case ID {string} with a pause")
+  public void tmAlreadyHasAnExistingJobWithCaseIDWithAPause(String caseId)
+      throws URISyntaxException, InterruptedException {
+    queueUtils.sendToActionFieldQueue(receivedRMMessage);
+
+    boolean caseIdPresent = gatewayEventMonitor.hasEventTriggered(caseId, RM_REQUEST_RECEIVED, 10000L);
+    assertThat(caseIdPresent).isTrue();
+
+    queueUtils.sendToActionFieldQueue(updatePauseMessage);
+
+    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, CANONICAL_UPDATE_SENT, 10000L);
+    assertThat(hasBeenTriggered).isTrue();
+  }
+
+  @When("the Gateway sends a Update Case with a reinstate date case to TM with case ID {string}")
+  public void theGatewaySendsAUpdateCaseWithAReinstateDateCaseToTMWithCaseID(String caseId)
+      throws InterruptedException {
+    Thread.sleep(1000);
+    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, CANONICAL_UPDATE_RECEIVED, 10000L);
+    assertThat(hasBeenTriggered).isTrue();
+  }
+
+  @Then("a pause datetime of {string} with a reason {string} will be assigned to the case with id {string}")
+  public void aPauseDatetimeOfWithAReasonWillBeAssignedToTheCaseWithId(String until, String reason, String caseId)
+      throws InterruptedException {
+    Thread.sleep(1000);
+
+    CasePause casePause = tmMockUtils.getPauseCase(caseId);
+    assertEquals(OffsetDateTime.parse(until), casePause.getUntil());
+    assertEquals(reason, casePause.getReason());
   }
 }
