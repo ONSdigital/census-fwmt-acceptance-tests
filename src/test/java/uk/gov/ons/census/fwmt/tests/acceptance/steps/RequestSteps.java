@@ -58,7 +58,6 @@ public class RequestSteps {
   private String receivedRMMessage = null;
   private String updateMessage = null;
   private String updatePauseMessage = null;
-  //private String pauseCaseMessage = null;
 
   @Autowired
   private CSVServiceUtils csvServiceUtils;
@@ -89,7 +88,6 @@ public class RequestSteps {
     receivedRMMessage = Resources.toString(Resources.getResource("files/input/actionInstruction.xml"), Charsets.UTF_8);
     updateMessage = Resources.toString(Resources.getResource("files/input/actionUpdateInstruction.xml"), Charsets.UTF_8);
     updatePauseMessage = Resources.toString(Resources.getResource("files/input/actionUpdatePauseInstruction.xml"), Charsets.UTF_8);
-    //pauseCaseMessage = Resources.toString(Resources.getResource("files/input/actionInstructionWithPause.xml"), Charsets.UTF_8);
 
     tmMockUtils.enableRequestRecorder();
     tmMockUtils.resetMock();
@@ -277,6 +275,7 @@ public class RequestSteps {
   public void tmPicksUpTheCreateJobMessageWithCaseID(String caseId) {
     boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, COMET_CREATE_JOB_REQUEST, 10000L);
     assertThat(hasBeenTriggered).isTrue();
+  }
 
   @Given("TM already has an existing job with case ID {string} with a pause")
   public void tmAlreadyHasAnExistingJobWithCaseIDWithAPause(String caseId)
