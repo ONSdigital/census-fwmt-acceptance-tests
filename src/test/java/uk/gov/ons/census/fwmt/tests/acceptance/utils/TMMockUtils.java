@@ -10,6 +10,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
+import uk.gov.ons.census.fwmt.common.data.modelcase.CasePause;
 import uk.gov.ons.census.fwmt.common.data.modelcase.ModelCase;
 import uk.gov.ons.census.fwmt.data.dto.MockMessage;
 import uk.gov.ons.census.fwmt.tests.acceptance.exceptions.MockInaccessibleException;
@@ -81,13 +82,21 @@ public final class TMMockUtils {
     return responseEntity.getBody();
   }
 
-  public int sendTMResponseMessage(String data) {
+  public CasePause getPauseCase(String id) {
+    String url = mockTmUrl + "/cases/" + id + "/pause";
+    log.info("getCancelCaseById-mock.url:" + url);
+    ResponseEntity<CasePause> responseEntity;
+    responseEntity = restTemplate.getForEntity(url, CasePause.class);
+    return responseEntity.getBody();
+  }
+
+  public int sendTMResponseMessage(String data, String caseId) {
     HttpHeaders headers = createBasicAuthHeaders(outcomeServiceUsername, outcomeServicePassword);
 
     headers.setContentType(MediaType.APPLICATION_JSON);
-    
+
     RestTemplate restTemplate = new RestTemplate();
-    String postUrl = outcomeServiceUrl + householdOutcomeEndpoint;
+    String postUrl = outcomeServiceUrl + householdOutcomeEndpoint + caseId;
 
     HttpEntity<String> post = new HttpEntity<>(data, headers);
     ResponseEntity<Void> response = restTemplate.exchange(postUrl, HttpMethod.POST, post, Void.class);
