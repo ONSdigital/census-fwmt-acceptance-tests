@@ -45,7 +45,7 @@
         <returnByDate>06/02/2019</returnByDate>
         <addressType>HH</addressType>
         <treatmentId>treatmentId</treatmentId>
-        <coordinatorId>TWH1-HA</coordinatorId>
+        <coordinatorId></coordinatorId>
         <fieldOfficerId>allocatedOfficer</fieldOfficerId>
         <undeliveredAsAddress>false</undeliveredAsAddress>
         <blankQreReturned>false</blankQreReturned>

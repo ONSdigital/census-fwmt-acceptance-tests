@@ -46,7 +46,7 @@
         <addressType>HH</addressType>
         <treatmentId>treatmentId</treatmentId>
         <coordinatorId>TWH1-HA</coordinatorId>
-        <fieldOfficerId>allocatedOfficer</fieldOfficerId>
+        <fieldOfficerId></fieldOfficerId>
         <undeliveredAsAddress>false</undeliveredAsAddress>
         <blankQreReturned>false</blankQreReturned>
     </actionRequest>

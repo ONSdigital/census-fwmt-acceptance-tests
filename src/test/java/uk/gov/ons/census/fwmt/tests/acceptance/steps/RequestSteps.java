@@ -56,6 +56,7 @@ public class RequestSteps {
   private String cancelMessageNonHH = null;
   private String invalidRMMessage = null;
   private String nisraHouseholdMessage = null;
+  private String nisraNoFieldOfficerMessage = null;
   private String receivedRMMessage = null;
   private String updateMessage = null;
   private String updatePauseMessage = null;
@@ -87,6 +88,7 @@ public class RequestSteps {
     receivedRMMessage = Resources.toString(Resources.getResource("files/input/actionInstruction.xml"), Charsets.UTF_8);
     updateMessage = Resources.toString(Resources.getResource("files/input/actionUpdateInstruction.xml"), Charsets.UTF_8);
     updatePauseMessage = Resources.toString(Resources.getResource("files/input/actionUpdatePauseInstruction.xml"), Charsets.UTF_8);
+    nisraNoFieldOfficerMessage = Resources.toString(Resources.getResource("files/input/nisraNoFieldOfficerActionInstruction.xml"), Charsets.UTF_8);
     nisraHouseholdMessage = Resources.toString(Resources.getResource("files/input/nisraActionInstruction.xml"), Charsets.UTF_8);
 
     tmMockUtils.enableRequestRecorder();
@@ -150,6 +152,23 @@ public class RequestSteps {
   public void theGatewaySendsACreateJobMessageToTMWithCaseIdOf(String caseId) {
     boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, COMET_CREATE_JOB_REQUEST, 10000L);
     assertThat(hasBeenTriggered).isTrue();
+  }
+
+  @Given("RM sends a create HouseHold job request job which has a case ID of {string}")
+  public void rmSendsACreateHouseHoldJobRequestJobWhichHasACaseIDOfAndAnID(String caseId)
+      throws URISyntaxException, InterruptedException, JAXBException {
+    queueUtils.sendToActionFieldQueue(nisraNoFieldOfficerMessage);
+    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, RM_REQUEST_RECEIVED, 10000L);
+    assertThat(hasBeenTriggered).isTrue();
+  }
+
+  @Then("RM will throw an exception for case ID {string}")
+  public void rmWillThrowAnExceptionForCaseID(String caseId) throws URISyntaxException, InterruptedException {
+    queueUtils.sendToActionFieldQueue(nisraNoFieldOfficerMessage);
+    assertThatExceptionOfType(GatewayException.class).isThrownBy(() -> {
+      throw new GatewayException(
+          GatewayException.Fault.SYSTEM_ERROR);
+    });
   }
 
   // Unused steps - should I delete?
