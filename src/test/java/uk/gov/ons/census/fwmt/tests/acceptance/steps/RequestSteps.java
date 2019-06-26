@@ -26,7 +26,10 @@ import uk.gov.ons.census.fwmt.common.error.GatewayException;
 import uk.gov.ons.census.fwmt.events.utils.GatewayEventMonitor;
 import uk.gov.ons.census.fwmt.tests.acceptance.utils.QueueUtils;
 import uk.gov.ons.census.fwmt.tests.acceptance.utils.TMMockUtils;
+import uk.gov.ons.ctp.response.action.message.instruction.ActionInstruction;
 
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.time.LocalDateTime;
@@ -52,16 +55,17 @@ public class RequestSteps {
   private String cancelMessage = null;
   private String cancelMessageNonHH = null;
   private String invalidRMMessage = null;
+  private String nisraHouseholdMessage = null;
   private String receivedRMMessage = null;
   private String updateMessage = null;
   private String updatePauseMessage = null;
-  //private String pauseCaseMessage = null;
-
   @Autowired
   private TMMockUtils tmMockUtils;
 
   @Autowired
   private QueueUtils queueUtils;
+
+  private ActionInstruction actionInstruction;
 
   private GatewayEventMonitor gatewayEventMonitor;
 
@@ -83,8 +87,7 @@ public class RequestSteps {
     receivedRMMessage = Resources.toString(Resources.getResource("files/input/actionInstruction.xml"), Charsets.UTF_8);
     updateMessage = Resources.toString(Resources.getResource("files/input/actionUpdateInstruction.xml"), Charsets.UTF_8);
     updatePauseMessage = Resources.toString(Resources.getResource("files/input/actionUpdatePauseInstruction.xml"), Charsets.UTF_8);
-    //pauseCaseMessage = Resources.toString(Resources.getResource("files/input/actionInstructionWithPause.xml"), Charsets.UTF_8);
-
+    nisraHouseholdMessage = Resources.toString(Resources.getResource("files/input/nisraActionInstruction.xml"), Charsets.UTF_8);
 
     tmMockUtils.enableRequestRecorder();
     tmMockUtils.resetMock();
@@ -130,6 +133,23 @@ public class RequestSteps {
     Thread.sleep(1000);
     ModelCase modelCase = tmMockUtils.getCaseById(caseId);
     assertEquals(caseId, modelCase.getId().toString());
+  }
+
+  @Given("RM sends a create HouseHold job request job which has a case ID of {string} and a field officer ID {string}")
+  public void rmSendsACreateHouseHoldJobRequestJobWhichHasACaseIDOfAndAFieldOfficerID(String caseId,
+      String fieldOfficerId)
+      throws URISyntaxException, InterruptedException, JAXBException {
+    JAXBElement<ActionInstruction> actionInstruction = tmMockUtils.unmarshalXml(nisraHouseholdMessage);
+    queueUtils.sendToActionFieldQueue(nisraHouseholdMessage);
+    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, RM_REQUEST_RECEIVED, 10000L);
+    assertEquals(fieldOfficerId, actionInstruction.getValue().getActionRequest().getFieldOfficerId());
+    assertThat(hasBeenTriggered).isTrue();
+  }
+
+  @When("the Gateway sends a Create Job message to TM with case ID of {string}")
+  public void theGatewaySendsACreateJobMessageToTMWithCaseIdOf(String caseId) {
+    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, COMET_CREATE_JOB_REQUEST, 10000L);
+    assertThat(hasBeenTriggered).isTrue();
   }
 
   // Unused steps - should I delete?
