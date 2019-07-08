@@ -7,6 +7,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
+import com.rabbitmq.client.GetResponse;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -39,6 +41,21 @@ public final class QueueUtils {
       Thread.sleep(500);
     }
     return message;
+  }
+
+  public String getMessageOffQueueWithRoutingKey(String qname, String routingKey) throws InterruptedException {
+    RestTemplate restTemplate = new RestTemplate();
+    String messageUrl = mockTmURL + "/queue/messagewithrouting/?qname=" + qname + "&routingKey=" + routingKey;
+    ResponseEntity<String> messageEntity = null;
+    for (int i = 0; i < 10; i++) {
+       messageEntity = restTemplate.getForEntity(messageUrl, String.class);
+
+      if (messageEntity != null) {
+        break;
+      }
+      Thread.sleep(500);
+    }
+    return messageEntity.getBody();
   }
 
   public void sendToActionFieldQueue(String message) throws URISyntaxException, InterruptedException {
