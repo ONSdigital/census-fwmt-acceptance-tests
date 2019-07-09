@@ -1,27 +1,34 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<ns2:actionInstruction xmlns:ns2="http://ons.gov.uk/ctp/response/action/message/instruction">
+<ins:actionInstruction xmlns:ins="http://ons.gov.uk/ctp/response/action/message/instruction">
     <actionRequest>
         <actionId>a133b2cd-ef3f-4755-ad07-616b7298a12a</actionId>
         <responseRequired>false</responseRequired>
         <actionPlan>ad3fbcb5-3681-4540-b386-ff719ec93643</actionPlan>
+        <actionType>Create</actionType>
+        <contact>
+            <title>Mr</title>
+            <forename>John</forename>
+            <surname>Doe</surname>
+            <phoneNumber>12345 67890</phoneNumber>
+            <emailAddress>John.Doe@Email.com</emailAddress>
+        </contact>
         <address>
-            <sampleUnitRef>Blank</sampleUnitRef>
-            <locality></locality>
-            <organisationName></organisationName>
+            <arid>1234567890</arid>
+            <uprn>1234567890</uprn>
+            <type>HH</type>
+            <estabType>Residential</estabType>
+            <locality>E</locality>
             <line1>1 Whalesborough Place</line1>
             <line2></line2>
+            <line3></line3>
             <townName>BUDE</townName>
             <postcode>EX23 8GB</postcode>
-            <longitude>-4.5314548</longitude>
+            <country>N</country>
+            <ladCode>string</ladCode>
             <latitude>50.8299346</latitude>
-            <country>E</country>
+            <longitude>-4.5314548</longitude>
+            <oa>E</oa>
         </address>
-        <contact>
-            <emailAddress>me@here.com</emailAddress>
-            <phoneNumber>01234567890</phoneNumber>
-            <forename>Phil</forename>
-            <surname>Sharland</surname>
-        </contact>
         <legalBasis>Voluntary Not Stated</legalBasis>
         <caseGroupStatus>NOTSTARTED</caseGroupStatus>
         <caseId>39bad71c-7de5-4e1b-9a07-d9597737977f</caseId>
@@ -36,5 +43,11 @@
         <surveyName>Household</surveyName>
         <surveyRef>HH</surveyRef>
         <returnByDate>06/02/2019</returnByDate>
+        <addressType>HH</addressType>
+        <treatmentId>treatmentId</treatmentId>
+        <coordinatorId></coordinatorId>
+        <fieldOfficerId>allocatedOfficer</fieldOfficerId>
+        <undeliveredAsAddress>false</undeliveredAsAddress>
+        <blankQreReturned>false</blankQreReturned>
     </actionRequest>
-</ns2:actionInstruction>
+</ins:actionInstruction>
