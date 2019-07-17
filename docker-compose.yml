@@ -55,6 +55,17 @@ services:
       - RABBITMQ_HOSTNAME=rabbit
     depends_on:
       - rabbit
+  csvservice:
+    container_name: mock
+    image: eu.gcr.io/census-fwmt-ci-233109/census-rm-fwmtcsvservice
+    ports:
+      - "${CSVSERVICE_PORT}:8060"
+    networks:
+      - internal
+    environment:
+      - RABBITMQ_HOST=rabbit
+    depends_on:
+      - rabbit
 networks:
   internal:
     driver: bridge
