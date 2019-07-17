@@ -73,8 +73,7 @@ public class CCSSteps {
 
     @Given("the Gateway receives a CSV CCS")
     public void theGatewayReceivesACSVCCSWithCaseID() throws IOException, InterruptedException, URISyntaxException {
-        Collection<GatewayEventDTO> message = new HashSet<GatewayEventDTO>();
-        int caseIdStart;
+        Collection<GatewayEventDTO> message;
 
         csvSerivceUtils.enableCCSCsvService();
 
