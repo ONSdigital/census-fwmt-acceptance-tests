@@ -55,8 +55,8 @@ services:
       - RABBITMQ_HOSTNAME=rabbit
     depends_on:
       - rabbit
-  csvservice:
-    container_name: mock
+  csvserv:
+    container_name: csvserv
     image: eu.gcr.io/census-fwmt-ci-233109/census-rm-fwmtcsvservice:snapshot
     ports:
       - "${CSVSERV_PORT}:8060"
