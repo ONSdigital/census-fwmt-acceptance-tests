@@ -89,7 +89,6 @@ public class CCSSteps {
 
     @Then("a new case with new case id for job containing postcode {string} is created in TM")
     public void aNewCaseWithNewCaseIdForJobContainingPostcodeIsCreatedInTM(String postcode) throws InterruptedException {
-        Thread.sleep(1000);
         ModelCase modelCase = tmMockUtils.getCaseById(caseId);
         assertEquals(caseId, modelCase.getId().toString());
         assertEquals(postcode, modelCase.getAddress().getPostcode());
