@@ -9,6 +9,8 @@ import org.junit.runner.RunWith;
     features = {"src/test/resources/acceptancetests/CCSTests.feature",
         "src/test/resources/acceptancetests/CensusTests.feature",
         "src/test/resources/acceptancetests/CETests.feature",
+        "src/test/resources/acceptancetests/Outcome-ContactMade.feature",
+        "src/test/resources/acceptancetests/Outcome-NonValidHousehold.feature",
         "src/test/resources/acceptancetests/NISRATests.feature"},
     glue = {"uk.gov.ons.census.fwmt.tests.acceptance.steps"})
 public class CensusTestRunner {
