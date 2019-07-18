@@ -32,7 +32,7 @@ public class CSVSerivceUtils {
     @Value("${service.tm.url}")
     private String tmUrl;
 
-    public int enableCCSCsvService() throws IOException, InterruptedException {
+    public int enableCsvService() throws IOException, InterruptedException {
         HttpHeaders headers = createBasicAuthHeaders(csvServiceUsername, csvServicePassword);
 
         headers.setContentType(MediaType.APPLICATION_JSON);

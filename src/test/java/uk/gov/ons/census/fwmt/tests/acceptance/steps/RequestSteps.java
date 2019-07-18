@@ -65,7 +65,7 @@ public class RequestSteps {
   private String updatePauseMessage = null;
 
   @Autowired
-  private CSVServiceUtils csvServiceUtils;
+  private CSVSerivceUtils csvServiceUtils;
 
   @Autowired
   private TMMockUtils tmMockUtils;

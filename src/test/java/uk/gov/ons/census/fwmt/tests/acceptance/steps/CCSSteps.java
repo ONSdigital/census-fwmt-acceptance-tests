@@ -15,12 +15,9 @@ import uk.gov.ons.census.fwmt.tests.acceptance.utils.CSVSerivceUtils;
 import uk.gov.ons.census.fwmt.tests.acceptance.utils.QueueUtils;
 import uk.gov.ons.census.fwmt.tests.acceptance.utils.TMMockUtils;
 
-import java.awt.*;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
 import java.util.concurrent.TimeoutException;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -75,7 +72,7 @@ public class CCSSteps {
     public void theGatewayReceivesACSVCCSWithCaseID() throws IOException, InterruptedException, URISyntaxException {
         Collection<GatewayEventDTO> message;
 
-        csvSerivceUtils.enableCCSCsvService();
+        csvSerivceUtils.enableCsvService();
 
         message = gatewayEventMonitor.grabEventsTriggered("CSV Service - CCS Request extracted", 1, 10000L);
 
