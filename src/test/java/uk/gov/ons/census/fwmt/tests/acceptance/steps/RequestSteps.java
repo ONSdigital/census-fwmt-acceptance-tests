@@ -24,7 +24,7 @@ import uk.gov.ons.census.fwmt.common.data.modelcase.ModelCase;
 import uk.gov.ons.census.fwmt.common.data.rm.OutcomeEvent;
 import uk.gov.ons.census.fwmt.common.error.GatewayException;
 import uk.gov.ons.census.fwmt.events.utils.GatewayEventMonitor;
-import uk.gov.ons.census.fwmt.tests.acceptance.utils.CSVServiceUtils;
+import uk.gov.ons.census.fwmt.tests.acceptance.utils.CSVSerivceUtils;
 import uk.gov.ons.census.fwmt.tests.acceptance.utils.QueueUtils;
 import uk.gov.ons.census.fwmt.tests.acceptance.utils.TMMockUtils;
 import uk.gov.ons.ctp.response.action.message.instruction.ActionInstruction;
@@ -72,6 +72,9 @@ public class RequestSteps {
 
   @Autowired
   private QueueUtils queueUtils;
+
+  @Autowired
+  private CSVSerivceUtils csvSerivceUtils;
 
   private ActionInstruction actionInstruction;
 
