@@ -35,7 +35,7 @@ services:
       - rabbit
   mock:
     container_name: mock
-    image: eu.gcr.io/census-fwmt-ci-233109/census-rm-fwmttmmock
+    image: eu.gcr.io/census-fwmt-ci-233109/census-rm-fwmttmmock:snapshot
     ports:
       - "${MOCK_PORT}:8000"
     networks:
@@ -53,6 +53,17 @@ services:
       - internal
     environment:
       - RABBITMQ_HOSTNAME=rabbit
+    depends_on:
+      - rabbit
+  csvserv:
+    container_name: csvserv
+    image: eu.gcr.io/census-fwmt-ci-233109/census-rm-fwmtcsvservice:snapshot
+    ports:
+      - "${CSVSERV_PORT}:8060"
+    networks:
+      - internal
+    environment:
+      - RABBITMQ_HOST=rabbit
     depends_on:
       - rabbit
 networks:
