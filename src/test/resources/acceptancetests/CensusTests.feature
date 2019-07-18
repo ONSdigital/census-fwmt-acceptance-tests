@@ -102,3 +102,5 @@ Feature: Census Tests
   Scenario: As a Gateway I can ensure that the UAC fulfillment requests pass on details to RM
     Given TM sends a "iuacRequiredByText" Census Case Outcome to the Gateway with case ID "6c9b1177-3e03-4060-b6db-f6a8456292ef"
     And the response contains the Requestor Phone Number "07123456789" from queue "Gateway.Fulfillment.Request"
+
+

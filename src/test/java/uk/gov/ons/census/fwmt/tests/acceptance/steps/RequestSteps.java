@@ -51,8 +51,10 @@ public class RequestSteps {
   private static final String COMET_CREATE_JOB_REQUEST = "Comet - Create Job Request";
   private static final String CANONICAL_CANCEL_RECEIVED = "Canonical - Cancel Job Received";
   private static final String CANONICAL_CANCEL_SENT = "Canonical - Action Cancel Sent";
+  private static final String CANONICAL_CREATE_SENT = "Canonical - Action Create Sent";
   public static final String CANONICAL_UPDATE_RECEIVED = "Canonical - Update Job Received";
   public static final String CANONICAL_UPDATE_SENT = "Canonical - Action Update Sent";
+  public static final String CSV_REQUEST_EXTRACTED = "CSV Service - Request extracted";
   private String cancelMessage = null;
   private String cancelMessageNonHH = null;
   private String invalidRMMessage = null;
@@ -61,6 +63,9 @@ public class RequestSteps {
   private String receivedRMMessage = null;
   private String updateMessage = null;
   private String updatePauseMessage = null;
+
+  @Autowired
+  private CSVSerivceUtils csvServiceUtils;
 
   @Autowired
   private TMMockUtils tmMockUtils;
@@ -294,6 +299,27 @@ public class RequestSteps {
   @When("the Gateway sends a Update Case with Pause request to TM with case ID {string}")
   public void theGatewaySendsAUpdateCaseWithPauseRequestToTMWithCaseID(String caseId) throws InterruptedException {
     boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, CANONICAL_UPDATE_RECEIVED, 10000L);
+    assertThat(hasBeenTriggered).isTrue();
+  }
+
+
+  @Given("the Gateway receives a CSV CE with case ID {string}")
+  public void theGatewayReceivesACSVCEWithCaseID(String caseId) throws InterruptedException, IOException {
+    csvServiceUtils.enableCsvService();
+    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, CSV_REQUEST_EXTRACTED, 10000L);
+    Thread.sleep(1000);
+    assertThat(hasBeenTriggered).isTrue();
+  }
+
+  @When("the Gateway sends a Create Job message to TM with case ID {string}")
+  public void theGatewaySendsACreateJobMessageToTMWithCaseID(String caseId) {
+    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, CANONICAL_CREATE_SENT, 10000L);
+    assertThat(hasBeenTriggered).isTrue();
+  }
+
+  @And("TM picks up the Create Job message with case ID {string}")
+  public void tmPicksUpTheCreateJobMessageWithCaseID(String caseId) {
+    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, COMET_CREATE_JOB_REQUEST, 10000L);
     assertThat(hasBeenTriggered).isTrue();
   }
 
