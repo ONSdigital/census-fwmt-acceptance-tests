@@ -54,7 +54,6 @@ public class RequestSteps {
   private static final String CANONICAL_CREATE_SENT = "Canonical - Action Create Sent";
   public static final String CANONICAL_UPDATE_RECEIVED = "Canonical - Update Job Received";
   public static final String CANONICAL_UPDATE_SENT = "Canonical - Action Update Sent";
-  public static final String CSV_REQUEST_EXTRACTED = "CSV Service - Request extracted";
   private String cancelMessage = null;
   private String cancelMessageNonHH = null;
   private String invalidRMMessage = null;
@@ -299,15 +298,6 @@ public class RequestSteps {
   @When("the Gateway sends a Update Case with Pause request to TM with case ID {string}")
   public void theGatewaySendsAUpdateCaseWithPauseRequestToTMWithCaseID(String caseId) throws InterruptedException {
     boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, CANONICAL_UPDATE_RECEIVED, 10000L);
-    assertThat(hasBeenTriggered).isTrue();
-  }
-
-
-  @Given("the Gateway receives a CSV CE with case ID {string}")
-  public void theGatewayReceivesACSVCEWithCaseID(String caseId) throws InterruptedException, IOException {
-    csvServiceUtils.enableCsvService();
-    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, CSV_REQUEST_EXTRACTED, 10000L);
-    Thread.sleep(1000);
     assertThat(hasBeenTriggered).isTrue();
   }
 

@@ -20,8 +20,11 @@ import java.net.URL;
 @Slf4j
 @Component
 public class CSVSerivceUtils {
-    @Value("${service.csv.url}")
-    private String csvService;
+    @Value("${service.ccscsv.url}")
+    private String ccsCsvService;
+
+    @Value("${service.cecsv.url}")
+    private String ceCsvService;
 
     @Value("${service.csvservice.username}")
     private String csvServiceUsername;
@@ -32,7 +35,7 @@ public class CSVSerivceUtils {
     @Value("${service.tm.url}")
     private String tmUrl;
 
-    public int enableCsvService() throws IOException, InterruptedException {
+    public int enableCCSCsvService() throws IOException, InterruptedException {
         HttpHeaders headers = createBasicAuthHeaders(csvServiceUsername, csvServicePassword);
 
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -40,7 +43,20 @@ public class CSVSerivceUtils {
         RestTemplate restTemplate = new RestTemplate();
 
         HttpEntity<String> get = new HttpEntity<>(null, headers);
-        ResponseEntity<Void> response = restTemplate.exchange(csvService, HttpMethod.GET, get, Void.class);
+        ResponseEntity<Void> response = restTemplate.exchange(ccsCsvService, HttpMethod.GET, get, Void.class);
+
+        return response.getStatusCode().value();
+    }
+
+    public int enableCECsvService() throws IOException, InterruptedException {
+        HttpHeaders headers = createBasicAuthHeaders(csvServiceUsername, csvServicePassword);
+
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        RestTemplate restTemplate = new RestTemplate();
+
+        HttpEntity<String> get = new HttpEntity<>(null, headers);
+        ResponseEntity<Void> response = restTemplate.exchange(ceCsvService, HttpMethod.GET, get, Void.class);
 
         return response.getStatusCode().value();
     }

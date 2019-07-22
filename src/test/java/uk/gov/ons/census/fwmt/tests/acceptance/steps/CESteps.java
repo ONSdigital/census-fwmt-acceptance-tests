@@ -2,8 +2,10 @@ package uk.gov.ons.census.fwmt.tests.acceptance.steps;
 
 import cucumber.api.java.After;
 import cucumber.api.java.Before;
+import cucumber.api.java.en.And;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
+import cucumber.api.java.en.When;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,15 +24,15 @@ import java.util.concurrent.TimeoutException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 
 @Slf4j
 @PropertySource("classpath:application.properties")
-public class CCSSteps {
+public class CESteps {
 
     private static final String CANONICAL_CREATE_SENT = "Canonical - Action Create Sent";
-    public static final String CSV_CCS_REQUEST_EXTRACTED = "CSV Service - CCS Request extracted";
+    public static final String CSV_CE_REQUEST_EXTRACTED = "CSV Service - CE Request extracted";
+    private static final String COMET_CREATE_JOB_REQUEST = "Comet - Create Job Request";
 
     @Autowired
     private TMMockUtils tmMockUtils;
@@ -68,26 +70,11 @@ public class CCSSteps {
         tmMockUtils.disableRequestRecorder();
     }
 
-    @Given("the Gateway receives a CSV CCS")
-    public void theGatewayReceivesACSVCCSWithCaseID() throws IOException, InterruptedException, URISyntaxException {
-        Collection<GatewayEventDTO> message;
-
-        csvSerivceUtils.enableCCSCsvService();
-
-        message = gatewayEventMonitor.grabEventsTriggered(CSV_CCS_REQUEST_EXTRACTED, 1, 10000L);
-
-        for (GatewayEventDTO retrieveCaseId : message) {
-            caseId = retrieveCaseId.getCaseId();
-        }
-
-        boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, CSV_CCS_REQUEST_EXTRACTED, 10000L);
+    @Given("the Gateway receives a CSV CE with case ID {string}")
+    public void theGatewayReceivesACSVCEWithCaseID(String caseId) throws InterruptedException, IOException {
+        csvSerivceUtils.enableCECsvService();
+        boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, CSV_CE_REQUEST_EXTRACTED, 10000L);
         assertThat(hasBeenTriggered).isTrue();
     }
-
-    @Then("a new case with new case id for job containing postcode {string} is created in TM")
-    public void aNewCaseWithNewCaseIdForJobContainingPostcodeIsCreatedInTM(String postcode) throws InterruptedException {
-        ModelCase modelCase = tmMockUtils.getCaseById(caseId);
-        assertEquals(caseId, modelCase.getId().toString());
-        assertEquals(postcode, modelCase.getAddress().getPostcode());
-    }
 }
+
