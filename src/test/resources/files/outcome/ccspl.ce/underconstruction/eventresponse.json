@@ -1,0 +1,34 @@
+{
+	"event":{
+		"type":"CCS_ADDRESS_LISTED",
+		"source":"FIELDWORK_GATEWAY",
+		"channel":"FIELD",
+		"dateTime":"2011-08-12T20:17:46.384Z",
+		"transactionId":"c45de4dc-3c3b-11e9-b210-d663bd873d93"
+	},
+	"payload":{
+		"CCSProperty":{
+			"collectionCase":{
+				"id":"g68fg4dc-6dcb-33f5-b210-d663bd874x98"
+			},
+			"sampleUnit":{
+				"addressType":"CE",
+				"estabType":"Care home",
+				"addressLevel":"E",
+				"organisationName":"",
+				"addressLine1":"221b Baker St",
+				"addressLine2":"Marylebone",
+				"addressLine3":"",
+				"townName":"London",
+				"postcode":"NW1 6XE",
+				"latitude":"51.5237951",
+				"longitude":"-0.1582785",
+				"fieldcoordinatorId":"CAR1_HA",
+				"fieldofficerId":"CAR1_HA_01"
+			},
+			"invalidAddress":{
+				"reason":"DERELICT"
+			}
+		}
+	}
+}
