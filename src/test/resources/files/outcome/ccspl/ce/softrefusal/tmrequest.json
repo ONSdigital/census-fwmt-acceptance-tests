@@ -4,11 +4,12 @@
 	"username": "CAR1_HA_01",
 	"propertyListingCaseId": "fe200301-12cc-4a58-919a-c4f37d61ef8a",
 	"propertyListingCaseReference": "NW1 6XE",
-	"primaryOutcome": "Household",
-	"secondaryOutcome": "Derelict / uninhabitable",
+	"primaryOutcome": "CE",
+	"secondaryOutcome": "Soft refusal",
 	"address": {
 		"addressLine1": "221b Baker St",
 		"addressLine2": "Marylebone",
+		"addressLine3": "string",
 		"town": "London",
 		"postCode": "NW1 6XE",
 		"location": {
@@ -16,10 +17,12 @@
 			"longitude": -0.1582785
 		}
 	},
+	"cedetails": {
+		"establishmentType": "Care home",
+		"organisationName": "Baskerville House"
+	},
 	"coordinatorCode": "CAR1_HA",
 	"fieldOfficerCode": "CAR1_HA_01",
 	"accessInfo": "Access via side door",
-	"careCodes": [
-		"Access control"
-	]
+	"careCodes": [ "Access control" ]
 }

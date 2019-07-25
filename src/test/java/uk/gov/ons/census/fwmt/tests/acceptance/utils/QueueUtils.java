@@ -7,8 +7,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
-import com.rabbitmq.client.GetResponse;
-
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -73,6 +71,7 @@ public final class QueueUtils {
     clearQueue("Gateway.Actions");
     clearQueue("Gateway.ActionsDLQ");
     clearQueue("Gateway.Address.Update");
+    clearQueue("Gateway.Ccs.Propertylisting");
     clearQueue("Gateway.Respondent.Refusal");
     clearQueue("Gateway.Fulfillment.Request");
     clearQueue("Action.Field");
