@@ -11,14 +11,14 @@ Feature: Non-valid household Outcome Tests
   
     Examples:
       | InputMessage         |  SecondaryOutcome     | CaseEvent              | Topic                     | EventType              |
-      | Derelict             |  Derelict             | Gateway.Address.Update | event.case.address.update | ADDRESS_NOT_VALID      | 
-      | Demolished           |  Demolished           | Gateway.Address.Update | event.case.address.update | ADDRESS_NOT_VALID      | 
-      | Cant find            |  Cant find            | Gateway.Address.Update | event.case.address.update | ADDRESS_NOT_VALID      | 
-      | Unaddressable Object |  Unaddressable Object | Gateway.Address.Update | event.case.address.update | ADDRESS_NOT_VALID      | 
-      | Non-res              |  Non-res              | Gateway.Address.Update | event.case.address.update | ADDRESS_NOT_VALID      | 
-      | Duplicate            |  Duplicate            | Gateway.Address.Update | event.case.address.update | ADDRESS_NOT_VALID      | 
-      | Under Const          |  Under Const          | Gateway.Address.Update | event.case.address.update | ADDRESS_NOT_VALID      | 
-      | CE - No contact      |  CE - No contact      | Gateway.Address.Update | event.case.address.update | ADDRESS_TYPE_CHANGED   | 
-      | CE - Contact made    |  CE - Contact made    | Gateway.Address.Update | event.case.address.update | ADDRESS_TYPE_CHANGED   | 
+      | Derelict             |  Derelict             | Gateway.Address.Update | event.case.address.update | ADDRESS_NOT_VALID      |
+      | Demolished           |  Demolished           | Gateway.Address.Update | event.case.address.update | ADDRESS_NOT_VALID      |
+      | Cant find            |  Cant find            | Gateway.Address.Update | event.case.address.update | ADDRESS_NOT_VALID      |
+      | Unaddressable Object |  Unaddressable Object | Gateway.Address.Update | event.case.address.update | ADDRESS_NOT_VALID      |
+      | Non-res              |  Non-res              | Gateway.Address.Update | event.case.address.update | ADDRESS_NOT_VALID      |
+      | Duplicate            |  Duplicate            | Gateway.Address.Update | event.case.address.update | ADDRESS_NOT_VALID      |
+      | Under Const          |  Under Const          | Gateway.Address.Update | event.case.address.update | ADDRESS_NOT_VALID      |
+      | CE - No contact      |  CE - No contact      | Gateway.Address.Update | event.case.address.update | ADDRESS_TYPE_CHANGED   |
+      | CE - Contact made    |  CE - Contact made    | Gateway.Address.Update | event.case.address.update | ADDRESS_TYPE_CHANGED   |
   
   

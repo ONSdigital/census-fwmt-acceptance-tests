@@ -21,7 +21,7 @@ import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.web.client.HttpClientErrorException;
 import uk.gov.ons.census.fwmt.common.data.modelcase.CasePause;
 import uk.gov.ons.census.fwmt.common.data.modelcase.ModelCase;
-import uk.gov.ons.census.fwmt.common.data.rm.OutcomeEvent;
+//import uk.gov.ons.census.fwmt.common.data.rm.OutcomeEvent;
 import uk.gov.ons.census.fwmt.common.error.GatewayException;
 import uk.gov.ons.census.fwmt.events.utils.GatewayEventMonitor;
 import uk.gov.ons.census.fwmt.tests.acceptance.utils.QueueUtils;
@@ -195,42 +195,42 @@ public class RequestSteps {
     assertThat(hasBeenTriggered).isFalse();
   }
 
-  @And("the response contains the Requester Title {string} and Requester Forename {string} and Requester Surname {string} from queue {string}")
-  public void theResponseContainsTheRequesterTitleAndRequesterForenameAndRequesterSurnameFromQueue(
-      String requesterTitle,
-      String requesterForename, String requesterSurname, String queueName) throws IOException, InterruptedException {
-    JavaTimeModule module = new JavaTimeModule();
-    LocalDateTimeDeserializer localDateTimeDeserializer = new LocalDateTimeDeserializer(
-        DateTimeFormatter.ISO_DATE_TIME);
-    module.addDeserializer(LocalDateTime.class, localDateTimeDeserializer);
-    objectMapper = Jackson2ObjectMapperBuilder.json()
-        .modules(module)
-        .featuresToDisable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-        .build();
+//  @And("the response contains the Requester Title {string} and Requester Forename {string} and Requester Surname {string} from queue {string}")
+//  public void theResponseContainsTheRequesterTitleAndRequesterForenameAndRequesterSurnameFromQueue(
+//      String requesterTitle,
+//      String requesterForename, String requesterSurname, String queueName) throws IOException, InterruptedException {
+//    JavaTimeModule module = new JavaTimeModule();
+//    LocalDateTimeDeserializer localDateTimeDeserializer = new LocalDateTimeDeserializer(
+//        DateTimeFormatter.ISO_DATE_TIME);
+//    module.addDeserializer(LocalDateTime.class, localDateTimeDeserializer);
+//    objectMapper = Jackson2ObjectMapperBuilder.json()
+//        .modules(module)
+//        .featuresToDisable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+//        .build();
+//
+//    OutcomeEvent outcomeEvent = objectMapper.readValue(queueUtils.getMessage(queueName), OutcomeEvent.class);
+//
+//    assertEquals(requesterTitle, outcomeEvent.getPayload().getFulfillment().getContact().getTitle());
+//    assertEquals(requesterForename, outcomeEvent.getPayload().getFulfillment().getContact().getForename());
+//    assertEquals(requesterSurname, outcomeEvent.getPayload().getFulfillment().getContact().getSurname());
+//  }
 
-    OutcomeEvent outcomeEvent = objectMapper.readValue(queueUtils.getMessage(queueName), OutcomeEvent.class);
-
-    assertEquals(requesterTitle, outcomeEvent.getPayload().getFulfillment().getContact().getTitle());
-    assertEquals(requesterForename, outcomeEvent.getPayload().getFulfillment().getContact().getForename());
-    assertEquals(requesterSurname, outcomeEvent.getPayload().getFulfillment().getContact().getSurname());
-  }
-
-  @And("the response contains the Requestor Phone Number {string} from queue {string}")
-  public void theResponseContainsTheQuestionnaireTypeAndQuestionnaireIDAndRequestorPhoneNumberFromQueue(
-      String requesterPhone, String queueName) throws IOException, InterruptedException {
-    JavaTimeModule module = new JavaTimeModule();
-    LocalDateTimeDeserializer localDateTimeDeserializer = new LocalDateTimeDeserializer(
-        DateTimeFormatter.ISO_DATE_TIME);
-    module.addDeserializer(LocalDateTime.class, localDateTimeDeserializer);
-    objectMapper = Jackson2ObjectMapperBuilder.json()
-        .modules(module)
-        .featuresToDisable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-        .build();
-
-    OutcomeEvent outcomeEvent = objectMapper.readValue(queueUtils.getMessage(queueName), OutcomeEvent.class);
-
-    assertEquals(requesterPhone, outcomeEvent.getPayload().getFulfillment().getContact().getTelNo());
-  }
+//  @And("the response contains the Requestor Phone Number {string} from queue {string}")
+//  public void theResponseContainsTheQuestionnaireTypeAndQuestionnaireIDAndRequestorPhoneNumberFromQueue(
+//      String requesterPhone, String queueName) throws IOException, InterruptedException {
+//    JavaTimeModule module = new JavaTimeModule();
+//    LocalDateTimeDeserializer localDateTimeDeserializer = new LocalDateTimeDeserializer(
+//        DateTimeFormatter.ISO_DATE_TIME);
+//    module.addDeserializer(LocalDateTime.class, localDateTimeDeserializer);
+//    objectMapper = Jackson2ObjectMapperBuilder.json()
+//        .modules(module)
+//        .featuresToDisable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+//        .build();
+//
+//    OutcomeEvent outcomeEvent = objectMapper.readValue(queueUtils.getMessage(queueName), OutcomeEvent.class);
+//
+//    assertEquals(requesterPhone, outcomeEvent.getPayload().getFulfillment().getContact().getTelNo());
+//  }
 
   @Given("TM already has an existing job with case ID {string}")
   public void tmAlreadyHasAnExistingJobWithCaseID(String caseId) throws URISyntaxException, InterruptedException {

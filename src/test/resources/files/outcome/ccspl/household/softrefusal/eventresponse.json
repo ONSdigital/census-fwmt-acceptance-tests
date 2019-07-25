@@ -27,7 +27,7 @@
 				            "fieldofficerId": "CAR1_HA_01"         
 			},
 			         "refusal": {
-				            "type": "HARD_REFUSAL"         
+				            "type": "SOFT_REFUSAL"         
 			}      
 		}   
 	}

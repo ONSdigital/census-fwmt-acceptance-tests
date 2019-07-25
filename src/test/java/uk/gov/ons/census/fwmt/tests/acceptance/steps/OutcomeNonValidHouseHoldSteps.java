@@ -4,10 +4,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeoutException;
 
+import cucumber.api.java.en.And;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -68,38 +70,36 @@ public class OutcomeNonValidHouseHoldSteps {
     } catch (IOException | TimeoutException e) {
       throw new RuntimeException("Problem with setting up", e);
     }
+
   }
 
   @After
-  public void after() throws IOException, TimeoutException {
+  public void after() throws IOException, TimeoutException, URISyntaxException {
     gatewayEventMonitor.tearDownGatewayEventMonitor();
   }
   
   @Given("TM sends a {string} Census Case Outcome to the Gateway")
   public void tm_sends_a_Census_Case_Outcome_to_the_Gateway(String inputMessage) {
     this.qIdHasValue = false;  
-    resourcePath = "nonvalidhousehold";
+    resourcePath = "household/nonvalidhousehold";
     readRequest(inputMessage);
   }
 
-  
   @Given("TM sends a {string} Census Case Outcome to the Gateway where {string}")
   public void tm_sends_a_Census_Case_Outcome_to_the_Gateway_where(String inputMessage, String qIdHasValue) {
     this.qIdHasValue = Boolean.valueOf(qIdHasValue);
-    resourcePath = "contactmade";
+    resourcePath = "household/contactmade";
     
     readRequest(inputMessage);
   }
-  
-  
-  
-  @Given("the Primary Outcome is {string}")
+
+  @And("the Primary Outcome is {string}")
   public void the_Primary_Outcome_is(String primaryOutcome) {
     JsonNode node = tmRequestRootNode.path("primaryOutcome");
     assertEquals(primaryOutcome, node.asText());
   }
 
-  @Given("the Secondary Outcome is {string}")
+  @And("the Secondary Outcome is {string}")
   public void the_Secondary_Outcome_is(String secondaryOutcome) {
     JsonNode node = tmRequestRootNode.path("secondaryOutcome");
     assertEquals(secondaryOutcome, node.asText());
