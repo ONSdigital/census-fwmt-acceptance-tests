@@ -85,6 +85,12 @@ public class RequestSteps {
   @Value("${service.rabbit.url}")
   private String rabbitLocation;
 
+  @Value("${service.rabbit.username}")
+  private String rabbitUsername;
+
+  @Value("${service.rabbit.password}")
+  private String rabbitPassword;
+
   private ObjectMapper objectMapper = new ObjectMapper();
 
   @Before
@@ -105,7 +111,7 @@ public class RequestSteps {
     queueUtils.clearQueues();
 
     gatewayEventMonitor = new GatewayEventMonitor();
-    gatewayEventMonitor.enableEventMonitor(rabbitLocation);
+    gatewayEventMonitor.enableEventMonitor(rabbitLocation, rabbitUsername, rabbitPassword);
   }
 
   @After

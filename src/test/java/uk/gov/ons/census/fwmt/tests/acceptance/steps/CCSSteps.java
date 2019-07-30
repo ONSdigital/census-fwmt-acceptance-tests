@@ -49,6 +49,12 @@ public class CCSSteps {
     @Value("${service.rabbit.url}")
     private String rabbitLocation;
 
+    @Value("${service.rabbit.username}")
+    private String rabbitUsername;
+
+    @Value("${service.rabbit.password}")
+    private String rabbitPassword;
+
     private String caseId;
 
     @Before
@@ -59,7 +65,7 @@ public class CCSSteps {
         queueUtils.clearQueues();
 
         gatewayEventMonitor = new GatewayEventMonitor();
-        gatewayEventMonitor.enableEventMonitor(rabbitLocation);
+        gatewayEventMonitor.enableEventMonitor(rabbitLocation, rabbitUsername, rabbitPassword);
     }
 
     @After
