@@ -14,7 +14,6 @@
             <postcode>EX23 8GB</postcode>
             <longitude>-4.5314548</longitude>
             <latitude>50.8299346</latitude>
-            <country>E</country>
         </address>
         <contact>
             <emailAddress>me@here.com</emailAddress>
@@ -33,7 +32,7 @@
         </events>
         <exerciseRef>1</exerciseRef>
         <userDescription>FWMT Comet Test</userDescription>
-        <surveyName>Household</surveyName>
+        <surveyName>CENSUS</surveyName>
         <surveyRef>HH</surveyRef>
         <returnByDate>06/02/2019</returnByDate>
     </actionRequest>

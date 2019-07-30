@@ -27,7 +27,7 @@
             <ladCode>string</ladCode>
             <latitude>50.8299346</latitude>
             <longitude>-4.5314548</longitude>
-            <oa>E</oa>
+            <oa>N00074083</oa>
         </address>
         <legalBasis>Voluntary Not Stated</legalBasis>
         <caseGroupStatus>NOTSTARTED</caseGroupStatus>
@@ -40,7 +40,7 @@
         </events>
         <exerciseRef>1</exerciseRef>
         <userDescription>FWMT Comet Test</userDescription>
-        <surveyName>Household</surveyName>
+        <surveyName>CENSUS</surveyName>
         <surveyRef>HH</surveyRef>
         <returnByDate>06/02/2019</returnByDate>
         <addressType>HH</addressType>
