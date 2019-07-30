@@ -7,8 +7,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
-import com.rabbitmq.client.GetResponse;
-
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -58,11 +56,11 @@ public final class QueueUtils {
     return messageEntity.getBody();
   }
 
-  public void sendToActionFieldQueue(String message) throws URISyntaxException, InterruptedException {
+  public void sendToRMFieldQueue(String message) throws URISyntaxException, InterruptedException {
     // TODO do we need this thread sleep?
     Thread.sleep(3000);
     String exchangeName = "";
-    String routingKey = "Action.Field";
+    String routingKey = "RM.Field";
     RestTemplate rt = new RestTemplate();
     HttpEntity<String> httpEntity = new HttpEntity<>(message);
     URI uri = new URI(mockTmURL + "/queue/?exchange=" + exchangeName + "&routingkey=" + routingKey);
@@ -75,8 +73,8 @@ public final class QueueUtils {
     clearQueue("Gateway.Address.Update");
     clearQueue("Gateway.Respondent.Refusal");
     clearQueue("Gateway.Fulfillment.Request");
-    clearQueue("Action.Field");
-    clearQueue("Action.FieldDLQ");
+    clearQueue("RM.Field");
+    clearQueue("RM.FieldDLQ");
   }
 
   private void clearQueue(String queueName) throws URISyntaxException {
