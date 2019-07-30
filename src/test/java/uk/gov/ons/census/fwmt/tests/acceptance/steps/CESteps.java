@@ -51,6 +51,12 @@ public class CESteps {
     @Value("${service.rabbit.url}")
     private String rabbitLocation;
 
+    @Value("${service.rabbit.username}")
+    private String rabbitUsername;
+
+    @Value("${service.rabbit.password}")
+    private String rabbitPassword;
+
     private String caseId;
 
     @Before
@@ -61,7 +67,7 @@ public class CESteps {
         queueUtils.clearQueues();
 
         gatewayEventMonitor = new GatewayEventMonitor();
-        gatewayEventMonitor.enableEventMonitor(rabbitLocation);
+        gatewayEventMonitor.enableEventMonitor(rabbitLocation, rabbitUsername, rabbitPassword);
     }
 
     @After
