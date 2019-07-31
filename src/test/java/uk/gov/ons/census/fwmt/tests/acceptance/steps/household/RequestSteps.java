@@ -24,9 +24,13 @@ import uk.gov.ons.census.fwmt.common.data.modelcase.ModelCase;
 //import uk.gov.ons.census.fwmt.common.data.rm.OutcomeEvent;
 import uk.gov.ons.census.fwmt.common.error.GatewayException;
 import uk.gov.ons.census.fwmt.events.utils.GatewayEventMonitor;
+import uk.gov.ons.census.fwmt.tests.acceptance.utils.CSVSerivceUtils;
 import uk.gov.ons.census.fwmt.tests.acceptance.utils.QueueUtils;
 import uk.gov.ons.census.fwmt.tests.acceptance.utils.TMMockUtils;
+import uk.gov.ons.ctp.response.action.message.instruction.ActionInstruction;
 
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.time.LocalDateTime;
@@ -47,21 +51,31 @@ public class RequestSteps {
   private static final String COMET_CREATE_JOB_REQUEST = "Comet - Create Job Request";
   private static final String CANONICAL_CANCEL_RECEIVED = "Canonical - Cancel Job Received";
   private static final String CANONICAL_CANCEL_SENT = "Canonical - Action Cancel Sent";
+  private static final String CANONICAL_CREATE_SENT = "Canonical - Action Create Sent";
   public static final String CANONICAL_UPDATE_RECEIVED = "Canonical - Update Job Received";
   public static final String CANONICAL_UPDATE_SENT = "Canonical - Action Update Sent";
   private String cancelMessage = null;
   private String cancelMessageNonHH = null;
   private String invalidRMMessage = null;
+  private String nisraHouseholdMessage = null;
+  private String nisraNoFieldOfficerMessage = null;
   private String receivedRMMessage = null;
   private String updateMessage = null;
   private String updatePauseMessage = null;
-  //private String pauseCaseMessage = null;
+
+  @Autowired
+  private CSVSerivceUtils csvServiceUtils;
 
   @Autowired
   private TMMockUtils tmMockUtils;
 
   @Autowired
   private QueueUtils queueUtils;
+
+  @Autowired
+  private CSVSerivceUtils csvSerivceUtils;
+
+  private ActionInstruction actionInstruction;
 
   private GatewayEventMonitor gatewayEventMonitor;
 
@@ -70,6 +84,12 @@ public class RequestSteps {
 
   @Value("${service.rabbit.url}")
   private String rabbitLocation;
+
+  @Value("${service.rabbit.username}")
+  private String rabbitUsername;
+
+  @Value("${service.rabbit.password}")
+  private String rabbitPassword;
 
   private ObjectMapper objectMapper = new ObjectMapper();
 
@@ -83,8 +103,8 @@ public class RequestSteps {
     receivedRMMessage = Resources.toString(Resources.getResource("files/input/actionInstruction.xml"), Charsets.UTF_8);
     updateMessage = Resources.toString(Resources.getResource("files/input/actionUpdateInstruction.xml"), Charsets.UTF_8);
     updatePauseMessage = Resources.toString(Resources.getResource("files/input/actionUpdatePauseInstruction.xml"), Charsets.UTF_8);
-    //pauseCaseMessage = Resources.toString(Resources.getResource("files/input/actionInstructionWithPause.xml"), Charsets.UTF_8);
-
+    nisraNoFieldOfficerMessage = Resources.toString(Resources.getResource("files/input/nisraNoFieldOfficerActionInstruction.xml"), Charsets.UTF_8);
+    nisraHouseholdMessage = Resources.toString(Resources.getResource("files/input/nisraActionInstruction.xml"), Charsets.UTF_8);
 
     tmMockUtils.enableRequestRecorder();
     tmMockUtils.resetMock();
@@ -92,7 +112,7 @@ public class RequestSteps {
 
 
     gatewayEventMonitor = new GatewayEventMonitor();
-    gatewayEventMonitor.enableEventMonitor(rabbitLocation);
+    gatewayEventMonitor.enableEventMonitor(rabbitLocation, rabbitUsername, rabbitPassword);
   }
 
   @After
@@ -114,7 +134,7 @@ public class RequestSteps {
   @And("RM sends a create HouseHold job request")
   public void rmSendsACreateHouseHoldJobRequest() throws URISyntaxException, InterruptedException {
     String caseId = "39bad71c-7de5-4e1b-9a07-d9597737977f";
-    queueUtils.sendToActionFieldQueue(receivedRMMessage);
+    queueUtils.sendToRMFieldQueue(receivedRMMessage);
     boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, RM_REQUEST_RECEIVED, 10000L);
     assertThat(hasBeenTriggered).isTrue();
   }
@@ -133,10 +153,44 @@ public class RequestSteps {
     assertEquals(caseId, modelCase.getId().toString());
   }
 
+  @Given("RM sends a create HouseHold job request job which has a case ID of {string} and a field officer ID {string}")
+  public void rmSendsACreateHouseHoldJobRequestJobWhichHasACaseIDOfAndAFieldOfficerID(String caseId,
+      String fieldOfficerId)
+      throws URISyntaxException, InterruptedException, JAXBException {
+    JAXBElement<ActionInstruction> actionInstruction = tmMockUtils.unmarshalXml(nisraHouseholdMessage);
+    queueUtils.sendToRMFieldQueue(nisraHouseholdMessage);
+    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, RM_REQUEST_RECEIVED, 10000L);
+    assertEquals(fieldOfficerId, actionInstruction.getValue().getActionRequest().getFieldOfficerId());
+    assertThat(hasBeenTriggered).isTrue();
+  }
+
+  @When("the Gateway sends a Create Job message to TM with case ID of {string}")
+  public void theGatewaySendsACreateJobMessageToTMWithCaseIdOf(String caseId) {
+    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, COMET_CREATE_JOB_REQUEST, 10000L);
+    assertThat(hasBeenTriggered).isTrue();
+  }
+
+  @Given("RM sends a create HouseHold job request job which has a case ID of {string}")
+  public void rmSendsACreateHouseHoldJobRequestJobWhichHasACaseIDOfAndAnID(String caseId)
+      throws URISyntaxException, InterruptedException, JAXBException {
+    queueUtils.sendToRMFieldQueue(nisraNoFieldOfficerMessage);
+    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, RM_REQUEST_RECEIVED, 10000L);
+    assertThat(hasBeenTriggered).isTrue();
+  }
+
+  @Then("RM will throw an exception for case ID {string}")
+  public void rmWillThrowAnExceptionForCaseID(String caseId) throws URISyntaxException, InterruptedException {
+    queueUtils.sendToRMFieldQueue(nisraNoFieldOfficerMessage);
+    assertThatExceptionOfType(GatewayException.class).isThrownBy(() -> {
+      throw new GatewayException(
+          GatewayException.Fault.SYSTEM_ERROR);
+    });
+  }
+
   // Unused steps - should I delete?
   @Given("a message in an invalid format from RM")
   public void aMessageInAnInvalidFormatFromRm() throws URISyntaxException, InterruptedException {
-    queueUtils.sendToActionFieldQueue(invalidRMMessage);
+    queueUtils.sendToRMFieldQueue(invalidRMMessage);
     throw new cucumber.api.PendingException();
   }
 
@@ -161,7 +215,7 @@ public class RequestSteps {
   @Given("RM sends a cancel case Household job request with case ID {string}")
   public void tmHasAnExistingJobWithCaseID(String caseId) throws URISyntaxException, InterruptedException {
 
-    queueUtils.sendToActionFieldQueue(cancelMessage);
+    queueUtils.sendToRMFieldQueue(cancelMessage);
     boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, CANONICAL_CANCEL_SENT, 10000L);
     assertThat(hasBeenTriggered).isTrue();
   }
@@ -183,7 +237,7 @@ public class RequestSteps {
 
   @Given("RM sends a cancel case CSS job request with case ID {string} and receives an exception from RM")
   public void rmSendsACancelCaseCSSJobRequestWithCaseID(String caseId) throws URISyntaxException, InterruptedException {
-    queueUtils.sendToActionFieldQueue(cancelMessageNonHH);
+    queueUtils.sendToRMFieldQueue(cancelMessageNonHH);
     assertThatExceptionOfType(GatewayException.class).isThrownBy(() -> {
       throw new GatewayException(
           GatewayException.Fault.SYSTEM_ERROR);
@@ -235,7 +289,7 @@ public class RequestSteps {
 
   @Given("TM already has an existing job with case ID {string}")
   public void tmAlreadyHasAnExistingJobWithCaseID(String caseId) throws URISyntaxException, InterruptedException {
-    queueUtils.sendToActionFieldQueue(receivedRMMessage);
+    queueUtils.sendToRMFieldQueue(receivedRMMessage);
     boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, RM_REQUEST_RECEIVED, 10000L);
     assertThat(hasBeenTriggered).isTrue();
   }
@@ -243,7 +297,7 @@ public class RequestSteps {
   @And("RM sends an update case job request with case ID {string}")
   public void rmSendsAnUpdatePauseCaseJobRequestWithCaseID(String caseId)
       throws URISyntaxException, InterruptedException {
-    queueUtils.sendToActionFieldQueue(updateMessage);
+    queueUtils.sendToRMFieldQueue(updateMessage);
     boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, CANONICAL_UPDATE_SENT, 10000L);
     assertThat(hasBeenTriggered).isTrue();
   }
@@ -254,15 +308,27 @@ public class RequestSteps {
     assertThat(hasBeenTriggered).isTrue();
   }
 
+  @When("the Gateway sends a Create Job message to TM with case ID {string}")
+  public void theGatewaySendsACreateJobMessageToTMWithCaseID(String caseId) {
+    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, CANONICAL_CREATE_SENT, 10000L);
+    assertThat(hasBeenTriggered).isTrue();
+  }
+
+  @And("TM picks up the Create Job message with case ID {string}")
+  public void tmPicksUpTheCreateJobMessageWithCaseID(String caseId) {
+    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, COMET_CREATE_JOB_REQUEST, 10000L);
+    assertThat(hasBeenTriggered).isTrue();
+  }
+
   @Given("TM already has an existing job with case ID {string} with a pause")
   public void tmAlreadyHasAnExistingJobWithCaseIDWithAPause(String caseId)
       throws URISyntaxException, InterruptedException {
-    queueUtils.sendToActionFieldQueue(receivedRMMessage);
+    queueUtils.sendToRMFieldQueue(receivedRMMessage);
 
     boolean caseIdPresent = gatewayEventMonitor.hasEventTriggered(caseId, RM_REQUEST_RECEIVED, 10000L);
     assertThat(caseIdPresent).isTrue();
 
-    queueUtils.sendToActionFieldQueue(updatePauseMessage);
+    queueUtils.sendToRMFieldQueue(updatePauseMessage);
 
     boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, CANONICAL_UPDATE_SENT, 10000L);
     assertThat(hasBeenTriggered).isTrue();

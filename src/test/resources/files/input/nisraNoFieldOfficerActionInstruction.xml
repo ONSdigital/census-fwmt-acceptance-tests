@@ -26,7 +26,7 @@
             <ladCode>string</ladCode>
             <latitude>50.8299346</latitude>
             <longitude>-4.5314548</longitude>
-            <oa>E00074083</oa>
+            <oa>N00074083</oa>
         </address>
         <legalBasis>Voluntary Not Stated</legalBasis>
         <caseGroupStatus>NOTSTARTED</caseGroupStatus>
@@ -42,10 +42,10 @@
         <surveyName>CENSUS</surveyName>
         <surveyRef>HH</surveyRef>
         <returnByDate>06/02/2019</returnByDate>
-        <sampleUnitRef></sampleUnitRef>
         <addressType>HH</addressType>
         <treatmentId>treatmentId</treatmentId>
         <coordinatorId>TWH1-HA</coordinatorId>
+        <fieldOfficerId></fieldOfficerId>
         <undeliveredAsAddress>false</undeliveredAsAddress>
         <blankQreReturned>false</blankQreReturned>
     </actionRequest>

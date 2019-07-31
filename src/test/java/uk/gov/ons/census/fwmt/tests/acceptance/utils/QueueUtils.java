@@ -56,7 +56,7 @@ public final class QueueUtils {
     return messageEntity.getBody();
   }
 
-  public void sendToActionFieldQueue(String message) throws URISyntaxException, InterruptedException {
+  public void sendToRMFieldQueue(String message) throws URISyntaxException, InterruptedException {
     // TODO do we need this thread sleep?
     //Thread.sleep(3000);
     String exchangeName = "";
@@ -75,8 +75,8 @@ public final class QueueUtils {
     clearQueue("Gateway.Respondent.Refusal");
     clearQueue("Gateway.Fulfillment.Request");
     clearQueue("Gateway.Questionnaire.update");
-    clearQueue("Action.Field");
-    clearQueue("Action.FieldDLQ");
+    clearQueue("RM.Field");
+    clearQueue("RM.FieldDLQ");
   }
 
   private void clearQueue(String queueName) throws URISyntaxException {
