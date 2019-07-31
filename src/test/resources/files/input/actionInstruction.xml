@@ -40,7 +40,7 @@
         </events>
         <exerciseRef>1</exerciseRef>
         <userDescription>FWMT Comet Test</userDescription>
-        <surveyName>Household</surveyName>
+        <surveyName>CENSUS</surveyName>
         <surveyRef>HH</surveyRef>
         <returnByDate>06/02/2019</returnByDate>
         <addressType>HH</addressType>

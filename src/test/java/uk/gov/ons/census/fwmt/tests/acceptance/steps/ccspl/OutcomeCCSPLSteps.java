@@ -1,4 +1,4 @@
-package uk.gov.ons.census.fwmt.tests.acceptance.steps;
+package uk.gov.ons.census.fwmt.tests.acceptance.steps.ccspl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -20,7 +20,6 @@ import uk.gov.ons.census.fwmt.tests.acceptance.utils.TMMockUtils;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeoutException;
 
@@ -28,7 +27,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 @Slf4j
-public class OutcomeCCSHouseHoldPLSteps {
+public class OutcomeCCSPLSteps {
 
   @Autowired
   private TMMockUtils tmMockUtils;
@@ -104,22 +103,22 @@ public class OutcomeCCSHouseHoldPLSteps {
     }
   }
 
-//  private boolean compareCaseEventMessages(String so, String actualMessage) {
-//    try {
-//      String expectedCaseEvent = getExpectedCaseEvent(so);
-//      JsonNode expectedMessageRootNode = jsonObjectMapper.readTree(expectedCaseEvent);
-//      JsonNode actualMessageRootNode = jsonObjectMapper.readTree(actualMessage);
-//
-//      boolean isEqual = expectedMessageRootNode.equals(actualMessageRootNode);
-//      if (!isEqual) {
-//        log.info("expected and actual caseEvents are not the same: \n expected:\n {} \n\n actual: \n {}", expectedCaseEvent, actualMessage);
-//      }
-//      return isEqual;
-//
-//    } catch (IOException e) {
-//      throw new RuntimeException("Problem comparing 2 json files", e);
-//    }
-//  }
+  private boolean compareCaseEventMessages(String so, String actualMessage) {
+    try {
+      String expectedCaseEvent = getExpectedCaseEvent(so);
+      JsonNode expectedMessageRootNode = jsonObjectMapper.readTree(expectedCaseEvent);
+      JsonNode actualMessageRootNode = jsonObjectMapper.readTree(actualMessage);
+
+      boolean isEqual = expectedMessageRootNode.equals(actualMessageRootNode);
+      if (!isEqual) {
+        log.info("expected and actual caseEvents are not the same: \n expected:\n {} \n\n actual: \n {}", expectedCaseEvent, actualMessage);
+      }
+      return isEqual;
+
+    } catch (IOException e) {
+      throw new RuntimeException("Problem comparing 2 json files", e);
+    }
+  }
   
   private void readRequest(String inputMessage) {
     this.tmRequest = getTmRequest(inputMessage);
@@ -160,18 +159,13 @@ public class OutcomeCCSHouseHoldPLSteps {
     assertEquals(202, response);
   }
 
-  @Then("the Outcome Service for the CCS PL should create a valid {string} for the correct {string} and the outcome is of {string}")
-  public void theOutcomeServiceForTheCCSPLShouldCreateAValidForTheCorrect(String caseEvent, String routingKey, String outcome) {
+  @Then("the Outcome Service for the CCS PL should create a valid {string} for the correct {string}")
+  public void theOutcomeServiceForTheCCSPLShouldCreateAValidForTheCorrect(String caseEvent, String routingKey) {
     gatewayEventMonitor.checkForEvent(caseId, OUTCOME_SENT_RM);
     try {
       actualMessage = queueUtils.getMessageOffQueueWithRoutingKey(caseEvent, routingKey);
-      String jsonAsString = "";
-      boolean isPresent;
-      jsonAsString = jsonObjectMapper.writeValueAsString(actualMessage);
-      isPresent = jsonAsString.contains(outcome);
-      assertTrue(isPresent);
-      //assertTrue(compareCaseEventMessages(secondaryOutcome, actualMessage));
-    } catch (InterruptedException | JsonProcessingException e) {
+      assertTrue(compareCaseEventMessages(secondaryOutcome, actualMessage));
+    } catch (InterruptedException e) {
       throw new RuntimeException("Problem getting message", e);
     }
   }

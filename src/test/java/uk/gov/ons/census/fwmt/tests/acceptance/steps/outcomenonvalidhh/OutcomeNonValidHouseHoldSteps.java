@@ -1,4 +1,4 @@
-package uk.gov.ons.census.fwmt.tests.acceptance.steps;
+package uk.gov.ons.census.fwmt.tests.acceptance.steps.outcomenonvalidhh;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -193,7 +193,7 @@ public class OutcomeNonValidHouseHoldSteps {
   public void tm_sends_a_Contact_Made_Census_Case_Outcome_to_the_Gateway() {
     try {
       tmRequest = Resources.toString(
-          Resources.getResource("files/outcome/contactmade/fullfilmentrequests/tmrequest-multiple.json"), Charsets.UTF_8);
+          Resources.getResource("files/outcome/household/contactmade/fullfilmentrequests/tmrequest-multiple.json"), Charsets.UTF_8);
       tmRequestRootNode = jsonObjectMapper.readTree(tmRequest);
     } catch (IOException e) {
       throw new RuntimeException("Problem retrieving resource file", e);
@@ -205,15 +205,15 @@ public class OutcomeNonValidHouseHoldSteps {
   public void the_messages_should_be_correct() throws IOException {
     try {
       String message1 = Resources.toString(
-        Resources.getResource("files/outcome/contactmade/fullfilmentrequests/eventresponse-multiple1.json"), Charsets.UTF_8);
+        Resources.getResource("files/outcome/household/contactmade/fullfilmentrequests/eventresponse-multiple1.json"), Charsets.UTF_8);
       assertTrue(multipleMessages.contains(jsonObjectMapper.readTree(message1)));
       
       String message2 = Resources.toString(
-          Resources.getResource("files/outcome/contactmade/fullfilmentrequests/eventresponse-multiple2.json"), Charsets.UTF_8);
+          Resources.getResource("files/outcome/household/contactmade/fullfilmentrequests/eventresponse-multiple2.json"), Charsets.UTF_8);
       assertTrue(multipleMessages.contains(jsonObjectMapper.readTree(message2)));      
         
       String message3 = Resources.toString(
-        Resources.getResource("files/outcome/contactmade/fullfilmentrequests/eventresponse-multiple3.json"), Charsets.UTF_8);
+        Resources.getResource("files/outcome/household/contactmade/fullfilmentrequests/eventresponse-multiple3.json"), Charsets.UTF_8);
       assertTrue(multipleMessages.contains(jsonObjectMapper.readTree(message3)));      
    } catch (IOException e) {
         throw new RuntimeException("Problem parsing file", e);
@@ -240,7 +240,7 @@ public class OutcomeNonValidHouseHoldSteps {
   public void tm_sends_a_Questionnaire_Linked_Contact_Made_Census_Case_Outcome_to_the_Gateway() {
     try {
       tmRequest = Resources.toString(
-          Resources.getResource("files/outcome/contactmade/fullfilmentrequests/tmrequest-multiple-q.json"), Charsets.UTF_8);
+          Resources.getResource("files/outcome/household/contactmade/fullfilmentrequests/tmrequest-multiple-q.json"), Charsets.UTF_8);
       tmRequestRootNode = jsonObjectMapper.readTree(tmRequest);
     } catch (IOException e) {
       throw new RuntimeException("Problem retrieving resource file", e);
@@ -251,15 +251,15 @@ public class OutcomeNonValidHouseHoldSteps {
   public void the_Questionnaire_Linked_messages_should_be_correct() {
     try {
       String message1 = Resources.toString(
-        Resources.getResource("files/outcome/contactmade/fullfilmentrequests/eventresponse-multiple-q1.json"), Charsets.UTF_8);
+        Resources.getResource("files/outcome/household/contactmade/fullfilmentrequests/eventresponse-multiple-q1.json"), Charsets.UTF_8);
       assertTrue(multipleMessages.contains(jsonObjectMapper.readTree(message1)));
       
       String message2 = Resources.toString(
-          Resources.getResource("files/outcome/contactmade/fullfilmentrequests/eventresponse-multiple-q2.json"), Charsets.UTF_8);
+          Resources.getResource("files/outcome/household/contactmade/fullfilmentrequests/eventresponse-multiple-q2.json"), Charsets.UTF_8);
       assertTrue(multipleMessages.contains(jsonObjectMapper.readTree(message2)));      
         
       String message3 = Resources.toString(
-        Resources.getResource("files/outcome/contactmade/fullfilmentrequests/eventresponse-multiple-q3.json"), Charsets.UTF_8);
+        Resources.getResource("files/outcome/household/contactmade/fullfilmentrequests/eventresponse-multiple-q3.json"), Charsets.UTF_8);
       assertTrue(multipleMessages.contains(jsonObjectMapper.readTree(message3)));      
    } catch (IOException e) {
         throw new RuntimeException("Problem parsing file", e);
@@ -270,7 +270,7 @@ public class OutcomeNonValidHouseHoldSteps {
   public void tm_sends_a_Mixed_Contact_Made_Census_Case_Outcome_to_the_Gateway() {
     try {
       tmRequest = Resources.toString(
-          Resources.getResource("files/outcome/contactmade/fullfilmentrequests/tmrequest-multiple-mixed.json"), Charsets.UTF_8);
+          Resources.getResource("files/outcome/household/contactmade/fullfilmentrequests/tmrequest-multiple-mixed.json"), Charsets.UTF_8);
       tmRequestRootNode = jsonObjectMapper.readTree(tmRequest);
     } catch (IOException e) {
       throw new RuntimeException("Problem retrieving resource file", e);
@@ -281,15 +281,15 @@ public class OutcomeNonValidHouseHoldSteps {
   public void the_Mixed_messages_should_be_correct() {
     try {
       String message1 = Resources.toString(
-        Resources.getResource("files/outcome/contactmade/fullfilmentrequests/eventresponse-multiple-mixed1.json"), Charsets.UTF_8);
+        Resources.getResource("files/outcome/household/contactmade/fullfilmentrequests/eventresponse-multiple-mixed1.json"), Charsets.UTF_8);
       assertTrue(multipleMessages.contains(jsonObjectMapper.readTree(message1)));
       
       String message2 = Resources.toString(
-          Resources.getResource("files/outcome/contactmade/fullfilmentrequests/eventresponse-multiple-mixed2.json"), Charsets.UTF_8);
+          Resources.getResource("files/outcome/household/contactmade/fullfilmentrequests/eventresponse-multiple-mixed2.json"), Charsets.UTF_8);
       assertTrue(multipleMessages.contains(jsonObjectMapper.readTree(message2)));      
         
       String message3 = Resources.toString(
-        Resources.getResource("files/outcome/contactmade/fullfilmentrequests/eventresponse-multiple-mixed3.json"), Charsets.UTF_8);
+        Resources.getResource("files/outcome/household/contactmade/fullfilmentrequests/eventresponse-multiple-mixed3.json"), Charsets.UTF_8);
       assertTrue(multipleMessages.contains(jsonObjectMapper.readTree(message3)));      
    } catch (IOException e) {
         throw new RuntimeException("Problem parsing file", e);

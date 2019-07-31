@@ -1,4 +1,4 @@
-package uk.gov.ons.census.fwmt.tests.acceptance.steps;
+package uk.gov.ons.census.fwmt.tests.acceptance.steps.household;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -89,6 +89,7 @@ public class RequestSteps {
     tmMockUtils.enableRequestRecorder();
     tmMockUtils.resetMock();
     queueUtils.clearQueues();
+
 
     gatewayEventMonitor = new GatewayEventMonitor();
     gatewayEventMonitor.enableEventMonitor(rabbitLocation);
@@ -249,7 +250,7 @@ public class RequestSteps {
 
   @When("the Gateway sends a Update Case with Pause request to TM with case ID {string}")
   public void theGatewaySendsAUpdateCaseWithPauseRequestToTMWithCaseID(String caseId) throws InterruptedException {
-    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, CANONICAL_UPDATE_RECEIVED, 10000L);
+    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, CANONICAL_UPDATE_RECEIVED, 100000L);
     assertThat(hasBeenTriggered).isTrue();
   }
 

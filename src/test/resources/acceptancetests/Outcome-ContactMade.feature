@@ -54,6 +54,6 @@ Feature: Contact made Outcome Tests
     And the message contains "3" fulfilment requests
     When the Outcome Service process the message
     Then the Outcome Service should create "3" messages
-    And the Mixed messages should be correct 
+    And the Mixed messages should be correct
     
     

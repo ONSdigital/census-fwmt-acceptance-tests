@@ -58,9 +58,9 @@ public final class QueueUtils {
 
   public void sendToActionFieldQueue(String message) throws URISyntaxException, InterruptedException {
     // TODO do we need this thread sleep?
-    Thread.sleep(3000);
+    //Thread.sleep(3000);
     String exchangeName = "";
-    String routingKey = "Action.Field";
+    String routingKey = "RM.Field";
     RestTemplate rt = new RestTemplate();
     HttpEntity<String> httpEntity = new HttpEntity<>(message);
     URI uri = new URI(mockTmURL + "/queue/?exchange=" + exchangeName + "&routingkey=" + routingKey);
@@ -74,6 +74,7 @@ public final class QueueUtils {
     clearQueue("Gateway.Ccs.Propertylisting");
     clearQueue("Gateway.Respondent.Refusal");
     clearQueue("Gateway.Fulfillment.Request");
+    clearQueue("Gateway.Questionnaire.update");
     clearQueue("Action.Field");
     clearQueue("Action.FieldDLQ");
   }

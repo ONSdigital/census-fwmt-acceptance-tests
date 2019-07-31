@@ -9,7 +9,6 @@
 	"address": {
 		"addressLine1": "221b Baker St",
 		"addressLine2": "Marylebone",
-		"addressLine3": "string",
 		"town": "London",
 		"postCode": "NW1 6XE",
 		"location": {

@@ -1,4 +1,4 @@
-package uk.gov.ons.census.fwmt.tests.acceptance.steps;
+package uk.gov.ons.census.fwmt.tests.acceptance.steps.outomecontactmade;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -206,13 +206,6 @@ public class OutcomeSteps {
 //      fail();
 //    }
 //  }
-
-  @Then("the number of messages {string} will made available for RM to pick up from queue {string}")
-  public void theNumberOfMessagesWillMadeAvailableForRMToPickUpFromQueue(String expectedNumberOfMessages,
-      String queueName) {
-    long expectedNumber = Long.valueOf(expectedNumberOfMessages);
-    assertEquals(expectedNumber, queueUtils.getMessageCount(queueName));
-  }
 
 //  @And("the response contains the QuestionnaireId {string} from queue {string}")
 //  public void theResponseContainsTheQuestionnaireIdFromQueue(String questionnaireId, String queueName)

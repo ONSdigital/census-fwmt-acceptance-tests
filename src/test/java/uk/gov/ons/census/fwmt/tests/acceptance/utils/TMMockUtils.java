@@ -121,7 +121,7 @@ public final class TMMockUtils {
     headers.setContentType(MediaType.APPLICATION_JSON);
 
     RestTemplate restTemplate = new RestTemplate();
-    String postUrl = outcomeServiceUrl + ccsIntOutcomeEnpoint;
+    String postUrl = outcomeServiceUrl + ccsIntOutcomeEnpoint + caseId;
 
     HttpEntity<String> post = new HttpEntity<>(data, headers);
     ResponseEntity<Void> response = restTemplate.exchange(postUrl, HttpMethod.POST, post, Void.class);
