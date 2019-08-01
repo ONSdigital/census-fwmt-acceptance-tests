@@ -1,5 +1,5 @@
 @Census @Acceptance
-Feature: CCS Tests
+Feature: CCS CSV service Tests
 
   Scenario: As a Gateway I can receive a CSV file for a CCS and can pass the content to TM
     Given the Gateway receives a CSV CCS

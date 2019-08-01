@@ -68,13 +68,15 @@ public final class QueueUtils {
   }
 
   public void clearQueues() throws URISyntaxException {
+    clearQueue("Field.other");
+    clearQueue("Field.refusals");
     clearQueue("Gateway.Actions");
     clearQueue("Gateway.ActionsDLQ");
-    clearQueue("Gateway.Address.Update");
-    clearQueue("Gateway.Ccs.Propertylisting");
-    clearQueue("Gateway.Respondent.Refusal");
-    clearQueue("Gateway.Fulfillment.Request");
-    clearQueue("Gateway.Questionnaire.update");
+//    clearQueue("Gateway.Address.Update");
+//    clearQueue("Gateway.Ccs.Propertylisting");
+//    clearQueue("Gateway.Respondent.Refusal");
+//    clearQueue("Gateway.Fulfillment.Request");
+//    clearQueue("Gateway.Questionnaire.update");
     clearQueue("RM.Field");
     clearQueue("RM.FieldDLQ");
   }

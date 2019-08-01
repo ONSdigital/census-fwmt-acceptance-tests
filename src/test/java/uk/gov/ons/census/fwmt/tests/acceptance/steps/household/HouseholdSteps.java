@@ -33,9 +33,7 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.concurrent.TimeoutException;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -45,7 +43,7 @@ import static org.junit.Assert.fail;
 
 @Slf4j
 @PropertySource("classpath:application.properties")
-public class RequestSteps {
+public class HouseholdSteps {
 
   private static final String RM_REQUEST_RECEIVED = "RM - Request Received";
   private static final String COMET_CREATE_JOB_REQUEST = "Comet - Create Job Request";
@@ -71,11 +69,6 @@ public class RequestSteps {
 
   @Autowired
   private QueueUtils queueUtils;
-
-  @Autowired
-  private CSVSerivceUtils csvSerivceUtils;
-
-  private ActionInstruction actionInstruction;
 
   private GatewayEventMonitor gatewayEventMonitor;
 
@@ -249,43 +242,6 @@ public class RequestSteps {
     boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, CANONICAL_CANCEL_RECEIVED, 10000L);
     assertThat(hasBeenTriggered).isFalse();
   }
-
-//  @And("the response contains the Requester Title {string} and Requester Forename {string} and Requester Surname {string} from queue {string}")
-//  public void theResponseContainsTheRequesterTitleAndRequesterForenameAndRequesterSurnameFromQueue(
-//      String requesterTitle,
-//      String requesterForename, String requesterSurname, String queueName) throws IOException, InterruptedException {
-//    JavaTimeModule module = new JavaTimeModule();
-//    LocalDateTimeDeserializer localDateTimeDeserializer = new LocalDateTimeDeserializer(
-//        DateTimeFormatter.ISO_DATE_TIME);
-//    module.addDeserializer(LocalDateTime.class, localDateTimeDeserializer);
-//    objectMapper = Jackson2ObjectMapperBuilder.json()
-//        .modules(module)
-//        .featuresToDisable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-//        .build();
-//
-//    OutcomeEvent outcomeEvent = objectMapper.readValue(queueUtils.getMessage(queueName), OutcomeEvent.class);
-//
-//    assertEquals(requesterTitle, outcomeEvent.getPayload().getFulfillment().getContact().getTitle());
-//    assertEquals(requesterForename, outcomeEvent.getPayload().getFulfillment().getContact().getForename());
-//    assertEquals(requesterSurname, outcomeEvent.getPayload().getFulfillment().getContact().getSurname());
-//  }
-
-//  @And("the response contains the Requestor Phone Number {string} from queue {string}")
-//  public void theResponseContainsTheQuestionnaireTypeAndQuestionnaireIDAndRequestorPhoneNumberFromQueue(
-//      String requesterPhone, String queueName) throws IOException, InterruptedException {
-//    JavaTimeModule module = new JavaTimeModule();
-//    LocalDateTimeDeserializer localDateTimeDeserializer = new LocalDateTimeDeserializer(
-//        DateTimeFormatter.ISO_DATE_TIME);
-//    module.addDeserializer(LocalDateTime.class, localDateTimeDeserializer);
-//    objectMapper = Jackson2ObjectMapperBuilder.json()
-//        .modules(module)
-//        .featuresToDisable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-//        .build();
-//
-//    OutcomeEvent outcomeEvent = objectMapper.readValue(queueUtils.getMessage(queueName), OutcomeEvent.class);
-//
-//    assertEquals(requesterPhone, outcomeEvent.getPayload().getFulfillment().getContact().getTelNo());
-//  }
 
   @Given("TM already has an existing job with case ID {string}")
   public void tmAlreadyHasAnExistingJobWithCaseID(String caseId) throws URISyntaxException, InterruptedException {

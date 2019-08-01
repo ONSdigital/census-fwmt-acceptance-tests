@@ -19,7 +19,6 @@ import uk.gov.ons.census.fwmt.tests.acceptance.utils.TMMockUtils;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.List;
 import java.util.concurrent.TimeoutException;
 
 import static org.junit.Assert.assertEquals;
@@ -57,12 +56,14 @@ public class OutcomeCCSInterviewSteps {
 
     private String resourcePath;
 
-    private List<JsonNode> multipleMessages;
+    private String password = "guest";
+
+    private String user = "guest";
 
     @Before
     public void before() throws URISyntaxException {
         try {
-            gatewayEventMonitor.enableEventMonitor(rabbitLocation);
+            gatewayEventMonitor.enableEventMonitor(rabbitLocation, user, password);
         } catch (IOException | TimeoutException e) {
             throw new RuntimeException("Problem with setting up", e);
         }

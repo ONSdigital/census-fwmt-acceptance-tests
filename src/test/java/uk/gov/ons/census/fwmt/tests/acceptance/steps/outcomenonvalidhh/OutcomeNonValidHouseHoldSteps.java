@@ -15,7 +15,6 @@ import org.springframework.beans.factory.annotation.Value;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
 
@@ -91,14 +90,6 @@ public class OutcomeNonValidHouseHoldSteps {
     readRequest(inputMessage);
   }
 
-  @Given("TM sends a {string} Census Case Outcome to the Gateway where {string}")
-  public void tm_sends_a_Census_Case_Outcome_to_the_Gateway_where(String inputMessage, String qIdHasValue) {
-    this.qIdHasValue = Boolean.valueOf(qIdHasValue);
-    resourcePath = "household/contactmade";
-    
-    readRequest(inputMessage);
-  }
-
   @And("the Primary Outcome is {string}")
   public void the_Primary_Outcome_is(String primaryOutcome) {
     JsonNode node = tmRequestRootNode.path("primaryOutcome");
@@ -111,7 +102,7 @@ public class OutcomeNonValidHouseHoldSteps {
     assertEquals(secondaryOutcome, node.asText());
   }
 
-  @When("the Outcome Service process the message")
+  @When("the Outcome Service process non-valid household message")
   public void the_Outcome_Service_process_the_message() {
     JsonNode node = tmRequestRootNode.path("caseId");
     caseId = node.asText();
@@ -195,43 +186,6 @@ public class OutcomeNonValidHouseHoldSteps {
     }
   }
 
-  @Given("TM sends a Contact Made Census Case Outcome to the Gateway")
-  public void tm_sends_a_Contact_Made_Census_Case_Outcome_to_the_Gateway() {
-    try {
-      tmRequest = Resources.toString(
-          Resources.getResource("files/outcome/household/contactmade/fullfilmentrequests/tmrequest-multiple.json"), Charsets.UTF_8);
-      tmRequestRootNode = jsonObjectMapper.readTree(tmRequest);
-    } catch (IOException e) {
-      throw new RuntimeException("Problem retrieving resource file", e);
-    }  
-  }
-
-  
-  @Then("the messages should be correct")
-  public void the_messages_should_be_correct() throws IOException {
-    try {
-      String message1 = Resources.toString(
-        Resources.getResource("files/outcome/household/contactmade/fullfilmentrequests/eventresponse-multiple1.json"), Charsets.UTF_8);
-      assertTrue(multipleMessages.contains(jsonObjectMapper.readTree(message1)));
-      
-      String message2 = Resources.toString(
-          Resources.getResource("files/outcome/household/contactmade/fullfilmentrequests/eventresponse-multiple2.json"), Charsets.UTF_8);
-      assertTrue(multipleMessages.contains(jsonObjectMapper.readTree(message2)));      
-        
-      String message3 = Resources.toString(
-        Resources.getResource("files/outcome/household/contactmade/fullfilmentrequests/eventresponse-multiple3.json"), Charsets.UTF_8);
-      assertTrue(multipleMessages.contains(jsonObjectMapper.readTree(message3)));      
-   } catch (IOException e) {
-        throw new RuntimeException("Problem parsing file", e);
-      }
-  }
-
-  @Given("the message contains {string} fulfilment requests")
-  public void the_message_contains_fulfilment_requests(String quantity) {
-    int qty = Integer.parseInt(quantity);
-    int actualSize = tmRequestRootNode.path("fulfillmentRequests").size();
-    assertEquals(qty, actualSize);
-   }
 
   @Then("the Outcome Service should create {string} messages")
   public void the_Outcome_Service_should_create_messages(String quantity) throws InterruptedException, IOException {
@@ -241,68 +195,8 @@ public class OutcomeNonValidHouseHoldSteps {
       multipleMessages.add(jsonObjectMapper.readTree(messsage));
     }
   }
- 
-  @Given("TM sends a Questionnaire Linked Contact Made Census Case Outcome to the Gateway")
-  public void tm_sends_a_Questionnaire_Linked_Contact_Made_Census_Case_Outcome_to_the_Gateway() {
-    try {
-      tmRequest = Resources.toString(
-          Resources.getResource("files/outcome/household/contactmade/fullfilmentrequests/tmrequest-multiple-q.json"), Charsets.UTF_8);
-      tmRequestRootNode = jsonObjectMapper.readTree(tmRequest);
-    } catch (IOException e) {
-      throw new RuntimeException("Problem retrieving resource file", e);
-    }  
-  }
 
-  @Then("the Questionnaire Linked messages should be correct")
-  public void the_Questionnaire_Linked_messages_should_be_correct() {
-    try {
-      String message1 = Resources.toString(
-        Resources.getResource("files/outcome/household/contactmade/fullfilmentrequests/eventresponse-multiple-q1.json"), Charsets.UTF_8);
-      assertTrue(multipleMessages.contains(jsonObjectMapper.readTree(message1)));
-      
-      String message2 = Resources.toString(
-          Resources.getResource("files/outcome/household/contactmade/fullfilmentrequests/eventresponse-multiple-q2.json"), Charsets.UTF_8);
-      assertTrue(multipleMessages.contains(jsonObjectMapper.readTree(message2)));      
-        
-      String message3 = Resources.toString(
-        Resources.getResource("files/outcome/household/contactmade/fullfilmentrequests/eventresponse-multiple-q3.json"), Charsets.UTF_8);
-      assertTrue(multipleMessages.contains(jsonObjectMapper.readTree(message3)));      
-   } catch (IOException e) {
-        throw new RuntimeException("Problem parsing file", e);
-      }
-  }
-  
-  @Given("TM sends a Mixed Contact Made Census Case Outcome to the Gateway")
-  public void tm_sends_a_Mixed_Contact_Made_Census_Case_Outcome_to_the_Gateway() {
-    try {
-      tmRequest = Resources.toString(
-          Resources.getResource("files/outcome/household/contactmade/fullfilmentrequests/tmrequest-multiple-mixed.json"), Charsets.UTF_8);
-      tmRequestRootNode = jsonObjectMapper.readTree(tmRequest);
-    } catch (IOException e) {
-      throw new RuntimeException("Problem retrieving resource file", e);
-    }  
-  }
 
-  @Then("the Mixed messages should be correct")
-  public void the_Mixed_messages_should_be_correct() {
-    try {
-      String message1 = Resources.toString(
-        Resources.getResource("files/outcome/household/contactmade/fullfilmentrequests/eventresponse-multiple-mixed1.json"), Charsets.UTF_8);
-      assertTrue(multipleMessages.contains(jsonObjectMapper.readTree(message1)));
-      
-      String message2 = Resources.toString(
-          Resources.getResource("files/outcome/household/contactmade/fullfilmentrequests/eventresponse-multiple-mixed2.json"), Charsets.UTF_8);
-      assertTrue(multipleMessages.contains(jsonObjectMapper.readTree(message2)));      
-        
-      String message3 = Resources.toString(
-        Resources.getResource("files/outcome/household/contactmade/fullfilmentrequests/eventresponse-multiple-mixed3.json"), Charsets.UTF_8);
-      assertTrue(multipleMessages.contains(jsonObjectMapper.readTree(message3)));      
-   } catch (IOException e) {
-        throw new RuntimeException("Problem parsing file", e);
-      }
-  }
- 
-  
   
   
 }

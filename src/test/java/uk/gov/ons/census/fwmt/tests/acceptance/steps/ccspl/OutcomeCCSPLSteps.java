@@ -1,6 +1,5 @@
 package uk.gov.ons.census.fwmt.tests.acceptance.steps.ccspl;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Charsets;
@@ -20,7 +19,6 @@ import uk.gov.ons.census.fwmt.tests.acceptance.utils.TMMockUtils;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.List;
 import java.util.concurrent.TimeoutException;
 
 import static org.junit.Assert.assertEquals;
@@ -57,13 +55,11 @@ public class OutcomeCCSPLSteps {
   private boolean qIdHasValue;
   
   private String resourcePath;
-
-  private List<JsonNode> multipleMessages;
   
   @Before
   public void before() throws URISyntaxException {
     try {
-      gatewayEventMonitor.enableEventMonitor(rabbitLocation);
+      gatewayEventMonitor.enableEventMonitor();
     } catch (IOException | TimeoutException e) {
       throw new RuntimeException("Problem with setting up", e);
     }

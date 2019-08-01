@@ -11,21 +11,21 @@ Feature: Non-valid household Outcome Tests
 
     Examples:
       | InputMessage                | Primary Outcome            | CaseEvent                   | Topic                     | EventType          |
-      | Complete on paper (full)    | Household                  | Gateway.Ccs.Propertylisting | event.ccs.propertylisting | CCS_ADDRESS_LISTED |
-      | Complete on paper (partial) | Household                  | Gateway.Ccs.Propertylisting | event.ccs.propertylisting | CCS_ADDRESS_LISTED |
-      | Soft refusal                | Household                  | Gateway.Ccs.Propertylisting | event.ccs.propertylisting | CCS_ADDRESS_LISTED |
-      | Hard refusal                | Household                  | Gateway.Ccs.Propertylisting | event.ccs.propertylisting | CCS_ADDRESS_LISTED |
-      | Extraordinary refusal       | Household                  | Gateway.Ccs.Propertylisting | event.ccs.propertylisting | CCS_ADDRESS_LISTED |
-      | Contact not needed          | Household                  | Gateway.Ccs.Propertylisting | event.ccs.propertylisting | CCS_ADDRESS_LISTED |
-      | Derelict / uninhabitable    | Household                  | Gateway.Ccs.Propertylisting | event.ccs.propertylisting | CCS_ADDRESS_LISTED |
-      | Potential Residential       | Household                  | Gateway.Ccs.Propertylisting | event.ccs.propertylisting | CCS_ADDRESS_LISTED |
-      | Under construction          | Household                  | Gateway.Ccs.Propertylisting | event.ccs.propertylisting | CCS_ADDRESS_LISTED |
-      | Soft refusal                | CE                         | Gateway.Ccs.Propertylisting | event.ccs.propertylisting | CCS_ADDRESS_LISTED |
-      | Hard refusal                | CE                         | Gateway.Ccs.Propertylisting | event.ccs.propertylisting | CCS_ADDRESS_LISTED |
-      | Extraordinary refusal       | CE                         | Gateway.Ccs.Propertylisting | event.ccs.propertylisting | CCS_ADDRESS_LISTED |
-      | Collect CE details          | CE                         | Gateway.Ccs.Propertylisting | event.ccs.propertylisting | CCS_ADDRESS_LISTED |
-      | Contact not needed          | CE                         | Gateway.Ccs.Propertylisting | event.ccs.propertylisting | CCS_ADDRESS_LISTED |
-      | Derelict / uninhabitable    | CE                         | Gateway.Ccs.Propertylisting | event.ccs.propertylisting | CCS_ADDRESS_LISTED |
-      | Under construction          | CE                         | Gateway.Ccs.Propertylisting | event.ccs.propertylisting | CCS_ADDRESS_LISTED |
-      | CE Out of scope             | CE                         | Gateway.Ccs.Propertylisting | event.ccs.propertylisting | CCS_ADDRESS_LISTED |
-      | Non residential / business  | Non residential / business | Gateway.Ccs.Propertylisting | event.ccs.propertylisting | CCS_ADDRESS_LISTED |
+      | Complete on paper (full)    | Household                  | Field.other | event.ccs.propertylisting | CCS_ADDRESS_LISTED |
+      | Complete on paper (partial) | Household                  | Field.other | event.ccs.propertylisting | CCS_ADDRESS_LISTED |
+      | Soft refusal                | Household                  | Field.other | event.ccs.propertylisting | CCS_ADDRESS_LISTED |
+      | Hard refusal                | Household                  | Field.other | event.ccs.propertylisting | CCS_ADDRESS_LISTED |
+      | Extraordinary refusal       | Household                  | Field.other | event.ccs.propertylisting | CCS_ADDRESS_LISTED |
+      | Contact not needed          | Household                  | Field.other | event.ccs.propertylisting | CCS_ADDRESS_LISTED |
+      | Derelict / uninhabitable    | Household                  | Field.other | event.ccs.propertylisting | CCS_ADDRESS_LISTED |
+      | Potential Residential       | Household                  | Field.other | event.ccs.propertylisting | CCS_ADDRESS_LISTED |
+      | Under construction          | Household                  | Field.other | event.ccs.propertylisting | CCS_ADDRESS_LISTED |
+      | Soft refusal                | CE                         | Field.other | event.ccs.propertylisting | CCS_ADDRESS_LISTED |
+      | Hard refusal                | CE                         | Field.other | event.ccs.propertylisting | CCS_ADDRESS_LISTED |
+      | Extraordinary refusal       | CE                         | Field.other | event.ccs.propertylisting | CCS_ADDRESS_LISTED |
+      | Collect CE details          | CE                         | Field.other | event.ccs.propertylisting | CCS_ADDRESS_LISTED |
+      | Contact not needed          | CE                         | Field.other | event.ccs.propertylisting | CCS_ADDRESS_LISTED |
+      | Derelict / uninhabitable    | CE                         | Field.other | event.ccs.propertylisting | CCS_ADDRESS_LISTED |
+      | Under construction          | CE                         | Field.other | event.ccs.propertylisting | CCS_ADDRESS_LISTED |
+      | CE Out of scope             | CE                         | Field.other | event.ccs.propertylisting | CCS_ADDRESS_LISTED |
+      | Non residential / business  | Non residential / business | Field.other | event.ccs.propertylisting | CCS_ADDRESS_LISTED |

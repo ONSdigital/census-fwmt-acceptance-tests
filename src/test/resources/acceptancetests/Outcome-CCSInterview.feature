@@ -10,31 +10,31 @@ Feature: Non-valid household Outcome Tests
     And and of the correct CCS interview "<EventType>"
 
     Examples:
-      | InputMessage                      | Primary Outcome | Category | CaseEvent                    | Topic                      | EventType            |
-      | Left questionnaire on final visit | Contact made    | HH       | Gateway.Questionnaire.Update | event.questionnaire.update | QUESTIONNAIRE_LINKED |
-      | Left questionnaire on final visit | No contact      | HH       | Gateway.Questionnaire.Update | event.questionnaire.update | QUESTIONNAIRE_LINKED |
-      | Complete on paper (full)          | Contact made    | CE       | Gateway.Questionnaire.Update | event.questionnaire.update | QUESTIONNAIRE_LINKED |
-      | Complete on paper (full)          | Contact made    | HH       | Gateway.Questionnaire.Update | event.questionnaire.update | QUESTIONNAIRE_LINKED |
-      | Complete on paper (partial)       | Contact made    | CE       | Gateway.Questionnaire.Update | event.questionnaire.update | QUESTIONNAIRE_LINKED |
-      | Complete on paper (partial)       | Contact made    | HH       | Gateway.Questionnaire.Update | event.questionnaire.update | QUESTIONNAIRE_LINKED |
-      | Hard refusal                      | Contact made    | CE       | Gateway.Respondent.Refusal   | event.respondent.refusal   | REFUSAL_RECEIVED     |
-      | Hard refusal                      | Contact made    | HH       | Gateway.Respondent.Refusal   | event.respondent.refusal   | REFUSAL_RECEIVED     |
-      | Extraordinary refusal             | Contact made    | CE       | Gateway.Respondent.Refusal   | event.respondent.refusal   | REFUSAL_RECEIVED     |
-      | Extraordinary refusal             | Contact made    | HH       | Gateway.Respondent.Refusal   | event.respondent.refusal   | REFUSAL_RECEIVED     |
-      | Property not in postcode boundary | Contact made    | HH       | Gateway.Address.Update       | event.case.address.update  | ADDRESS_NOT_VALID    |
-      | Split address                     | Contact made    | HH       | Gateway.Address.Update       | event.case.address.update  | ADDRESS_NOT_VALID    |
-      | Property is a CE                  | Not valid       | HH       | Gateway.Address.Update       | event.case.address.update  | ADDRESS_NOT_VALID    |
-      | Derelict                          | Not valid       | CE       | Gateway.Address.Update       | event.case.address.update  | ADDRESS_NOT_VALID    |
-      | Derelict                          | Not valid       | HH       | Gateway.Address.Update       | event.case.address.update  | ADDRESS_NOT_VALID    |
-      | Non residential or business       | Not valid       | CE       | Gateway.Address.Update       | event.case.address.update  | ADDRESS_NOT_VALID    |
-      | Non residential or business       | Not valid       | HH       | Gateway.Address.Update       | event.case.address.update  | ADDRESS_NOT_VALID    |
-      | Demolished                        | Not valid       | CE       | Gateway.Address.Update       | event.case.address.update  | ADDRESS_NOT_VALID    |
-      | Demolished                        | Not valid       | HH       | Gateway.Address.Update       | event.case.address.update  | ADDRESS_NOT_VALID    |
-      | Duplicate                         | Not valid       | CE       | Gateway.Address.Update       | event.case.address.update  | ADDRESS_NOT_VALID    |
-      | Duplicate                         | Not valid       | HH       | Gateway.Address.Update       | event.case.address.update  | ADDRESS_NOT_VALID    |
-      | Under construction                | Not valid       | CE       | Gateway.Address.Update       | event.case.address.update  | ADDRESS_NOT_VALID    |
-      | Under construction                | Not valid       | HH       | Gateway.Address.Update       | event.case.address.update  | ADDRESS_NOT_VALID    |
-      | Incorrect address                 | Not valid       | CE       | Gateway.Address.Update       | event.case.address.update  | ADDRESS_NOT_VALID    |
-      | Incorrect address                 | Not valid       | HH       | Gateway.Address.Update       | event.case.address.update  | ADDRESS_NOT_VALID    |
-      | Property is a household           | Not valid       | CE       | Gateway.Address.Update       | event.case.address.update  | ADDRESS_NOT_VALID    |
-      | CE out of scope                   | Contact made    | CE       | Gateway.Address.Update       | event.case.address.update  | ADDRESS_NOT_VALID    |
+      | InputMessage                      | Primary Outcome | Category | CaseEvent      | Topic                      | EventType            |
+      | Left questionnaire on final visit | Contact made    | HH       | Field.other    | event.questionnaire.update | QUESTIONNAIRE_LINKED |
+      | Left questionnaire on final visit | No contact      | HH       | Field.other    | event.questionnaire.update | QUESTIONNAIRE_LINKED |
+      | Complete on paper (full)          | Contact made    | CE       | Field.other    | event.questionnaire.update | QUESTIONNAIRE_LINKED |
+      | Complete on paper (full)          | Contact made    | HH       | Field.other    | event.questionnaire.update | QUESTIONNAIRE_LINKED |
+      | Complete on paper (partial)       | Contact made    | CE       | Field.other    | event.questionnaire.update | QUESTIONNAIRE_LINKED |
+      | Complete on paper (partial)       | Contact made    | HH       | Field.other    | event.questionnaire.update | QUESTIONNAIRE_LINKED |
+      | Hard refusal                      | Contact made    | CE       | Field.refusals | event.respondent.refusal   | REFUSAL_RECEIVED     |
+      | Hard refusal                      | Contact made    | HH       | Field.refusals | event.respondent.refusal   | REFUSAL_RECEIVED     |
+      | Extraordinary refusal             | Contact made    | CE       | Field.refusals | event.respondent.refusal   | REFUSAL_RECEIVED     |
+      | Extraordinary refusal             | Contact made    | HH       | Field.refusals | event.respondent.refusal   | REFUSAL_RECEIVED     |
+      | Property not in postcode boundary | Contact made    | HH       | Field.other    | event.case.address.update  | ADDRESS_NOT_VALID    |
+      | Split address                     | Contact made    | HH       | Field.other    | event.case.address.update  | ADDRESS_NOT_VALID    |
+      | Property is a CE                  | Not valid       | HH       | Field.other    | event.case.address.update  | ADDRESS_NOT_VALID    |
+      | Derelict                          | Not valid       | CE       | Field.other    | event.case.address.update  | ADDRESS_NOT_VALID    |
+      | Derelict                          | Not valid       | HH       | Field.other    | event.case.address.update  | ADDRESS_NOT_VALID    |
+      | Non residential or business       | Not valid       | CE       | Field.other    | event.case.address.update  | ADDRESS_NOT_VALID    |
+      | Non residential or business       | Not valid       | HH       | Field.other    | event.case.address.update  | ADDRESS_NOT_VALID    |
+      | Demolished                        | Not valid       | CE       | Field.other    | event.case.address.update  | ADDRESS_NOT_VALID    |
+      | Demolished                        | Not valid       | HH       | Field.other    | event.case.address.update  | ADDRESS_NOT_VALID    |
+      | Duplicate                         | Not valid       | CE       | Field.other    | event.case.address.update  | ADDRESS_NOT_VALID    |
+      | Duplicate                         | Not valid       | HH       | Field.other    | event.case.address.update  | ADDRESS_NOT_VALID    |
+      | Under construction                | Not valid       | CE       | Field.other    | event.case.address.update  | ADDRESS_NOT_VALID    |
+      | Under construction                | Not valid       | HH       | Field.other    | event.case.address.update  | ADDRESS_NOT_VALID    |
+      | Incorrect address                 | Not valid       | CE       | Field.other    | event.case.address.update  | ADDRESS_NOT_VALID    |
+      | Incorrect address                 | Not valid       | HH       | Field.other    | event.case.address.update  | ADDRESS_NOT_VALID    |
+      | Property is a household           | Not valid       | CE       | Field.other    | event.case.address.update  | ADDRESS_NOT_VALID    |
+      | CE out of scope                   | Contact made    | CE       | Field.other    | event.case.address.update  | ADDRESS_NOT_VALID    |
