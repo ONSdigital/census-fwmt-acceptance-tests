@@ -117,7 +117,6 @@ public class NISRASteps {
 
   @Then("a new case with id of {string} is created in TM for NISRA")
   public void aNewCaseIsCreatedInTm(String caseId) throws InterruptedException {
-    Thread.sleep(1000);
     ModelCase modelCase = tmMockUtils.getCaseById(caseId);
     assertEquals(caseId, modelCase.getId().toString());
   }
