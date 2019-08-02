@@ -1,0 +1,17 @@
+{
+  "event" : {
+    "type" : "ADDRESS_NOT_VALID",
+    "source" : "FIELDWORK_GATEWAY",
+    "channel" : "FIELD",
+    "dateTime" : "2019-04-29T14:00:35.960",
+    "transactionId" : "c45de4dc-3c3b-11e9-b210-d663bd873d93"
+  },
+  "payload" : {
+    "invalidAddress" : {
+        "reason": "SPLIT_ADDRESS",
+        "collectionCase" : {
+          "id":"6c9b1177-3e03-4060-b6db-f6a8456292ef"
+        }
+    }
+  }
+}

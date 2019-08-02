@@ -57,8 +57,6 @@ public final class QueueUtils {
   }
 
   public void sendToRMFieldQueue(String message) throws URISyntaxException, InterruptedException {
-    // TODO do we need this thread sleep?
-    Thread.sleep(3000);
     String exchangeName = "";
     String routingKey = "RM.Field";
     RestTemplate rt = new RestTemplate();
@@ -68,11 +66,10 @@ public final class QueueUtils {
   }
 
   public void clearQueues() throws URISyntaxException {
+    clearQueue("Field.other");
+    clearQueue("Field.refusals");
     clearQueue("Gateway.Actions");
     clearQueue("Gateway.ActionsDLQ");
-    clearQueue("Gateway.Address.Update");
-    clearQueue("Gateway.Respondent.Refusal");
-    clearQueue("Gateway.Fulfillment.Request");
     clearQueue("RM.Field");
     clearQueue("RM.FieldDLQ");
   }

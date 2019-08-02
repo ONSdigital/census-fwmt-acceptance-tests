@@ -1,0 +1,23 @@
+{
+	"transactionId": "91b01550-5cf1-4d7b-909e-487825c04f35",
+	"eventDate": "2019-07-17T17:02:30",
+	"username": "CAR1_HA_01",
+	"propertyListingCaseId": "fe200301-12cc-4a58-919a-c4f37d61ef8a",
+	"propertyListingCaseReference": "NW1 6XE",
+	"primaryOutcome": "CE",
+	"secondaryOutcome": "Potential Residential",
+	"address": {
+		"addressLine1": "221b Baker St",
+		"addressLine2": "Marylebone",
+		"town": "London",
+		"postCode": "NW1 6XE",
+		"location": {
+			"latitude": 51.5237951,
+			"longitude": -0.1582785
+		}
+	},
+	"coordinatorCode": "CAR1_HA",
+	"fieldOfficerCode": "CAR1_HA_01",
+	"accessInfo": "Access via side door",
+	"careCodes": [ "Access control" ]
+}

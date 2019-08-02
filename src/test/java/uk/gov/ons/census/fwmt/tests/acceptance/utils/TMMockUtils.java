@@ -42,8 +42,14 @@ public final class TMMockUtils {
   @Value("${service.outcome.url}")
   private String outcomeServiceUrl;
 
-  @Value("${service.outcome.endpoint}")
+  @Value("${service.outcome.household.endpoint}")
   private String householdOutcomeEndpoint;
+
+  @Value("${service.outcome.CCSPL.endpoint}")
+  private String ccsPLOutcomeEnpoint;
+
+  @Value("${service.outcome.CCSInt.endpoint}")
+  private String ccsIntOutcomeEnpoint;
 
   @Value("${service.outcome.username}")
   private String outcomeServiceUsername;
@@ -96,7 +102,35 @@ public final class TMMockUtils {
     headers.setContentType(MediaType.APPLICATION_JSON);
 
     RestTemplate restTemplate = new RestTemplate();
-    String postUrl = outcomeServiceUrl + householdOutcomeEndpoint;
+    String postUrl = outcomeServiceUrl + householdOutcomeEndpoint + caseId;
+
+    HttpEntity<String> post = new HttpEntity<>(data, headers);
+    ResponseEntity<Void> response = restTemplate.exchange(postUrl, HttpMethod.POST, post, Void.class);
+
+    return response.getStatusCode().value();
+  }
+
+  public int sendTMCCSPLResponseMessage(String data, String caseId) {
+    HttpHeaders headers = createBasicAuthHeaders(outcomeServiceUsername, outcomeServicePassword);
+
+    headers.setContentType(MediaType.APPLICATION_JSON);
+
+    RestTemplate restTemplate = new RestTemplate();
+    String postUrl = outcomeServiceUrl + ccsPLOutcomeEnpoint;
+
+    HttpEntity<String> post = new HttpEntity<>(data, headers);
+    ResponseEntity<Void> response = restTemplate.exchange(postUrl, HttpMethod.POST, post, Void.class);
+
+    return response.getStatusCode().value();
+  }
+
+  public int sendTMCCSIntResponseMessage(String data, String caseId) {
+    HttpHeaders headers = createBasicAuthHeaders(outcomeServiceUsername, outcomeServicePassword);
+
+    headers.setContentType(MediaType.APPLICATION_JSON);
+
+    RestTemplate restTemplate = new RestTemplate();
+    String postUrl = outcomeServiceUrl + ccsIntOutcomeEnpoint + caseId;
 
     HttpEntity<String> post = new HttpEntity<>(data, headers);
     ResponseEntity<Void> response = restTemplate.exchange(postUrl, HttpMethod.POST, post, Void.class);

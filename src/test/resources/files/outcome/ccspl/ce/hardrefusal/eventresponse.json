@@ -1,0 +1,33 @@
+{
+  "event": {
+    "type": "CCS_ADDRESS_LISTED",
+    "source": "FIELDWORK_GATEWAY",
+    "channel": "FIELD",
+    "dateTime": "2019-07-17T17:02:30",
+    "transactionId": "91b01550-5cf1-4d7b-909e-487825c04f35"
+  },
+  "payload": {
+    "CCSProperty": {
+      "collectionCase": {
+        "id": "fe200301-12cc-4a58-919a-c4f37d61ef8a"
+      },
+      "sampleUnit": {
+        "addressType": "CE",
+        "estabType": "Care home",
+        "addressLevel": "E",
+        "organisationName": "Baskerville House",
+        "addressLine1": "221b Baker St",
+        "addressLine2": "Marylebone",
+        "townName": "London",
+        "postcode": "NW1 6XE",
+        "latitude": "51.5237951",
+        "longitude": "-0.1582785",
+        "fieldcoordinatorId": "CAR1_HA",
+        "fieldofficerId": "CAR1_HA_01"
+      },
+      "refusal": {
+        "type": "HARD_REFUSAL"
+      }
+    }
+  }
+}
