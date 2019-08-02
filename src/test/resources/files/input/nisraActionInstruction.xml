@@ -42,10 +42,11 @@
         <surveyName>CENSUS</surveyName>
         <surveyRef>HH</surveyRef>
         <returnByDate>06/02/2019</returnByDate>
+        <sampleUnitRef></sampleUnitRef>
         <addressType>HH</addressType>
         <treatmentId>treatmentId</treatmentId>
-        <coordinatorId>TWH1-HA</coordinatorId>
         <fieldOfficerId>allocatedOfficer</fieldOfficerId>
+        <coordinatorId>TWH1-HA</coordinatorId>
         <undeliveredAsAddress>false</undeliveredAsAddress>
         <blankQreReturned>false</blankQreReturned>
     </actionRequest>
