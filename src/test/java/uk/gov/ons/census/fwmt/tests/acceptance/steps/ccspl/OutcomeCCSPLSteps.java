@@ -46,6 +46,12 @@ public class OutcomeCCSPLSteps {
   @Value("${service.rabbit.url}")
   private String rabbitLocation;
 
+  @Value("${service.rabbit.username}")
+  private String rabbitUsername;
+
+  @Value("${service.rabbit.password}")
+  private String rabbitPassword;
+
   private String secondaryOutcome;
   
   public static final String OUTCOME_SENT_RM = "Outcome - Case Outcome Sent";
@@ -59,7 +65,7 @@ public class OutcomeCCSPLSteps {
   @Before
   public void before() throws URISyntaxException {
     try {
-      gatewayEventMonitor.enableEventMonitor();
+      gatewayEventMonitor.enableEventMonitor(rabbitLocation, rabbitUsername, rabbitPassword);
     } catch (IOException | TimeoutException e) {
       throw new RuntimeException("Problem with setting up", e);
     }
