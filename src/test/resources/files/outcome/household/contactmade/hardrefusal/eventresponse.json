@@ -3,16 +3,16 @@
     "type" : "REFUSAL_RECEIVED",
     "source" : "FIELDWORK_GATEWAY",
     "channel" : "FIELD",
-    "dateTime" : "2007-12-03T10:15:30",
+    "dateTime" : "2007-12-03T10:15:30.111Z",
     "transactionId" : "c45de4dc-3c3b-11e9-b210-d663bd873d93"
   },
   "payload" : {
 	"refusal" : {
-        "type":"HARD_REFUSAL"
-      },
+        "type":"HARD_REFUSAL",
       "collectionCase" : {
-  		"id":"6c9b1177-3e03-4060-b6db-f6a8456292ef"
-		}
+        "id":"6c9b1177-3e03-4060-b6db-f6a8456292ef"
+      }
+      }
     }
   }
 }
