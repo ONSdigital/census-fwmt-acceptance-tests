@@ -27,7 +27,7 @@ import static org.junit.Assert.assertEquals;
 @PropertySource("classpath:application.properties")
 public class CCSCSVServiceSteps {
 
-    public static final String CSV_CCS_REQUEST_EXTRACTED = "CSV Service - CCS Request extracted";
+    public static final String CSV_CCS_REQUEST_EXTRACTED = "CSV_CCS_REQUEST_EXTRACTED";
 
     @Autowired
     private TMMockUtils tmMockUtils;

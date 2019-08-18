@@ -34,8 +34,8 @@ import static org.junit.Assert.assertEquals;
 @PropertySource("classpath:application.properties")
 public class NISRASteps {
 
-  private static final String RM_REQUEST_RECEIVED = "RM - Request Received";
-  private static final String COMET_CREATE_JOB_REQUEST = "Comet - Create Job Request";
+  private static final String RM_CREATE_REQUEST_RECEIVED = "RM_CREATE_REQUEST_RECEIVED";
+  private static final String COMET_CREATE_JOB_REQUEST = "COMET_CREATE_JOB_REQUEST";
   private String cancelMessage = null;
   private String cancelMessageNonHH = null;
   private String invalidRMMessage = null;
@@ -104,7 +104,7 @@ public class NISRASteps {
       throws URISyntaxException, InterruptedException, JAXBException {
     JAXBElement<ActionInstruction> actionInstruction = tmMockUtils.unmarshalXml(nisraHouseholdMessage);
     queueUtils.sendToRMFieldQueue(nisraHouseholdMessage);
-    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, RM_REQUEST_RECEIVED, 10000L);
+    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, RM_CREATE_REQUEST_RECEIVED, 10000L);
     assertEquals(fieldOfficerId, actionInstruction.getValue().getActionRequest().getFieldOfficerId());
     assertThat(hasBeenTriggered).isTrue();
   }
@@ -125,7 +125,7 @@ public class NISRASteps {
   public void rmSendsACreateHouseHoldJobRequestJobWhichHasACaseIDOfAndAnID(String caseId)
       throws URISyntaxException, InterruptedException, JAXBException {
     queueUtils.sendToRMFieldQueue(nisraNoFieldOfficerMessage);
-    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, RM_REQUEST_RECEIVED, 10000L);
+    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, RM_CREATE_REQUEST_RECEIVED, 10000L);
     assertThat(hasBeenTriggered).isTrue();
   }
 

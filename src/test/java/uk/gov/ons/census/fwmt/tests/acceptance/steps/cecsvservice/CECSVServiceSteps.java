@@ -28,9 +28,9 @@ import static org.junit.Assert.assertEquals;
 @PropertySource("classpath:application.properties")
 public class CECSVServiceSteps {
 
-    private static final String CANONICAL_CREATE_SENT = "Canonical - Action Create Sent";
-    public static final String CSV_CE_REQUEST_EXTRACTED = "CSV Service - CE Request extracted";
-    private static final String COMET_CREATE_JOB_REQUEST = "Comet - Create Job Request";
+    private static final String CANONICAL_CREATE_SENT = "CANONICAL_CREATE_SENT";
+    public static final String CSV_CE_REQUEST_EXTRACTED = "CSV_CE_REQUEST_EXTRACTED";
+    private static final String COMET_CREATE_JOB_REQUEST = "COMET_CREATE_JOB_REQUEST";
 
     @Autowired
     private TMMockUtils tmMockUtils;

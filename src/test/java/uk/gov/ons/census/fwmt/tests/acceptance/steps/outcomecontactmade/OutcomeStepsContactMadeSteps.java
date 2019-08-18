@@ -1,22 +1,7 @@
 package uk.gov.ons.census.fwmt.tests.acceptance.steps.outcomecontactmade;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Charsets;
-import com.google.common.io.Resources;
-import cucumber.api.java.After;
-import cucumber.api.java.Before;
-import cucumber.api.java.en.And;
-import cucumber.api.java.en.Given;
-import cucumber.api.java.en.Then;
-import cucumber.api.java.en.When;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.PropertySource;
-import uk.gov.ons.census.fwmt.events.utils.GatewayEventMonitor;
-import uk.gov.ons.census.fwmt.tests.acceptance.utils.QueueUtils;
-import uk.gov.ons.census.fwmt.tests.acceptance.utils.TMMockUtils;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -24,8 +9,25 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeoutException;
 
-import static org.junit.Assert.*;
-import static org.junit.Assert.assertTrue;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Charsets;
+import com.google.common.io.Resources;
+
+import cucumber.api.java.After;
+import cucumber.api.java.Before;
+import cucumber.api.java.en.And;
+import cucumber.api.java.en.Given;
+import cucumber.api.java.en.Then;
+import cucumber.api.java.en.When;
+import lombok.extern.slf4j.Slf4j;
+import uk.gov.ons.census.fwmt.events.utils.GatewayEventMonitor;
+import uk.gov.ons.census.fwmt.tests.acceptance.utils.QueueUtils;
+import uk.gov.ons.census.fwmt.tests.acceptance.utils.TMMockUtils;
 
 @Slf4j
 @PropertySource("classpath:application.properties")
@@ -65,7 +67,7 @@ public class OutcomeStepsContactMadeSteps {
 
   private String secondaryOutcome;
 
-  public static final String OUTCOME_SENT_RM = "Outcome - Case Outcome Sent";
+  public static final String HH_OUTCOME_SENT = "HH_OUTCOME_SENT";
 
   private String actualMessage;
 
@@ -227,7 +229,7 @@ public class OutcomeStepsContactMadeSteps {
 
   @Then("a valid {string} for the correct {string}")
   public void the_Outcome_Service_should_create_a_valid_for_the_correct(String caseEvent, String routingKey) {
-    gatewayEventMonitor.checkForEvent(caseId, OUTCOME_SENT_RM);
+    gatewayEventMonitor.checkForEvent(caseId, HH_OUTCOME_SENT);
     try {
       actualMessage = queueUtils.getMessageOffQueueWithRoutingKey(caseEvent, routingKey);
       assertTrue(compareCaseEventMessages(secondaryOutcome, actualMessage));
