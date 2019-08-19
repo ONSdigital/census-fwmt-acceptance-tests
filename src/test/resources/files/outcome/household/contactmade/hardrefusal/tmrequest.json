@@ -5,6 +5,5 @@
   "caseReference": "caseReference",
   "primaryOutcome": "Contact made",
   "secondaryOutcome": "Hard refusal",
-  "outcomeNote": "REFUSAL",
   "transactionId": "c45de4dc-3c3b-11e9-b210-d663bd873d93"
 }
