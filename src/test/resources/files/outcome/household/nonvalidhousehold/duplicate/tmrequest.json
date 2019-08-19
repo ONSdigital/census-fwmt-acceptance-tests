@@ -5,6 +5,5 @@
   "caseReference": "caseReference",
   "primaryOutcome": "Non-valid household",
   "secondaryOutcome": "Duplicate",
-  "outcomeNote": "Property is the same as this one.",
   "transactionId": "c45de4dc-3c3b-11e9-b210-d663bd873d93"
 }

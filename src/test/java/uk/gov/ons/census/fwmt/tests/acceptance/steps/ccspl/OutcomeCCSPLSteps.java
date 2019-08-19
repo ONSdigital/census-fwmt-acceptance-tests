@@ -54,7 +54,7 @@ public class OutcomeCCSPLSteps {
 
   private String secondaryOutcome;
   
-  public static final String OUTCOME_SENT_RM = "Outcome - Case Outcome Sent";
+  public static final String CCSPL_OUTCOME_SENT = "CCSPL_OUTCOME_SENT";
 
   private String actualMessage;
 
@@ -163,7 +163,7 @@ public class OutcomeCCSPLSteps {
 
   @Then("the Outcome Service for the CCS PL should create a valid {string} for the correct {string}")
   public void theOutcomeServiceForTheCCSPLShouldCreateAValidForTheCorrect(String caseEvent, String routingKey) {
-    gatewayEventMonitor.checkForEvent(caseId, OUTCOME_SENT_RM);
+    gatewayEventMonitor.checkForEvent(caseId, CCSPL_OUTCOME_SENT);
     try {
       actualMessage = queueUtils.getMessageOffQueueWithRoutingKey(caseEvent, routingKey);
       assertTrue(compareCaseEventMessages(secondaryOutcome, actualMessage));

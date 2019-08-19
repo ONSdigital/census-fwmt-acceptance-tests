@@ -28,9 +28,9 @@ import static org.junit.Assert.assertEquals;
 @PropertySource("classpath:application.properties")
 public class CECSVServiceSteps {
 
-    private static final String CANONICAL_CREATE_SENT = "Canonical - Action Create Sent";
-    public static final String CSV_CE_REQUEST_EXTRACTED = "CSV Service - CE Request extracted";
-    private static final String COMET_CREATE_JOB_REQUEST = "Comet - Create Job Request";
+    private static final String CANONICAL_CREATE_SENT = "CANONICAL_CREATE_SENT";
+    public static final String CSV_CE_REQUEST_EXTRACTED = "CSV_CE_REQUEST_EXTRACTED";
+    private static final String COMET_CREATE_SENT = "COMET_CREATE_SENT";
 
     @Autowired
     private TMMockUtils tmMockUtils;
@@ -89,7 +89,7 @@ public class CECSVServiceSteps {
 
     @And("TM picks up the CE Create Job message with case ID {string}")
     public void tmPicksUpTheCreateJobMessageWithCaseID(String caseId) {
-        boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, COMET_CREATE_JOB_REQUEST, 10000L);
+        boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, COMET_CREATE_SENT, 10000L);
         assertThat(hasBeenTriggered).isTrue();
     }
 

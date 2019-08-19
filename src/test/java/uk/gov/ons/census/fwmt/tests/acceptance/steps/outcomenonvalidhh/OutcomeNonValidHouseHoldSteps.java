@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeoutException;
 
-import cucumber.api.java.en.And;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -20,6 +19,7 @@ import com.google.common.io.Resources;
 
 import cucumber.api.java.After;
 import cucumber.api.java.Before;
+import cucumber.api.java.en.And;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
@@ -58,7 +58,7 @@ public class OutcomeNonValidHouseHoldSteps {
 
   private String secondaryOutcome;
   
-  public static final String OUTCOME_SENT_RM = "Outcome - Case Outcome Sent";
+  public static final String HH_OUTCOME_SENT = "HH_OUTCOME_SENT";
 
   private String actualMessage;
 
@@ -112,7 +112,7 @@ public class OutcomeNonValidHouseHoldSteps {
 
   @Then("the Outcome Service should create a valid {string} for the correct {string}")
   public void the_Outcome_Service_should_create_a_valid_for_the_correct(String caseEvent, String routingKey) {
-    gatewayEventMonitor.checkForEvent(caseId, OUTCOME_SENT_RM);
+    gatewayEventMonitor.checkForEvent(caseId, HH_OUTCOME_SENT);
     try {
       actualMessage = queueUtils.getMessageOffQueueWithRoutingKey(caseEvent, routingKey);
       assertTrue(compareCaseEventMessages(secondaryOutcome, actualMessage));
