@@ -35,7 +35,7 @@ import static org.junit.Assert.assertEquals;
 public class NISRASteps {
 
   private static final String RM_CREATE_REQUEST_RECEIVED = "RM_CREATE_REQUEST_RECEIVED";
-  private static final String COMET_CREATE_JOB_REQUEST = "COMET_CREATE_JOB_REQUEST";
+  private static final String COMET_CREATE_SENT = "COMET_CREATE_SENT";
   private String cancelMessage = null;
   private String cancelMessageNonHH = null;
   private String invalidRMMessage = null;
@@ -111,7 +111,7 @@ public class NISRASteps {
 
   @When("the Gateway sends a create NISRA Job message to TM with case ID of {string}")
   public void theGatewaySendsACreateJobMessageToTMWithCaseIdOf(String caseId) {
-    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, COMET_CREATE_JOB_REQUEST, 10000L);
+    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, COMET_CREATE_SENT, 10000L);
     assertThat(hasBeenTriggered).isTrue();
   }
 
