@@ -299,7 +299,7 @@ public class OutcomeStepsContactMadeSteps {
   public void the_Outcome_Service_should_create_messages(String quantity) throws InterruptedException, IOException {
     multipleMessages = new ArrayList<>();
     for(int i =0; i<3; i++) {
-      String messsage = queueUtils.getMessageOffQueueWithRoutingKey("Field.other", "event.fulfillment.request");
+      String messsage = queueUtils.getMessageOffQueueWithRoutingKey("Field.other", "event.fulfilment.request");
       multipleMessages.add(jsonObjectMapper.readTree(messsage));
     }
   }
