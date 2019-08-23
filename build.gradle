@@ -96,7 +96,7 @@ task genJaxb {
 dependencies {
 
     compile("uk.gov.ons.census.fwmt:census-fwmt-events:1.0.13-RELEASE")
-    compile('uk.gov.ons.census.fwmt:census-fwmt-common:1.0.22-RELEASE')
+    compile('uk.gov.ons.census.fwmt:census-fwmt-common:1.0.29-RELEASE')
 
     compile("com.google.guava:guava:27.0.1-jre")
 
@@ -110,6 +110,9 @@ dependencies {
     compile("com.sun.xml.bind:jaxb-impl:2.3.1")
     compile("com.sun.xml.bind:jaxb-xjc:2.3.1")
     compile("javax.activation:activation:1.1.1")
+
+    compile ('org.springframework.data:spring-data-redis:2.0.10.RELEASE')
+    compile('redis.clients:jedis:2.9.0')
 
     compile(files((String) genJaxb.classesDir).builtBy(genJaxb))
 

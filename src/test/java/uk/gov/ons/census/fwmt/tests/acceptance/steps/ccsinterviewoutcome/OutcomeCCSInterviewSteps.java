@@ -1,4 +1,4 @@
-package uk.gov.ons.census.fwmt.tests.acceptance.steps.ccsinterview;
+package uk.gov.ons.census.fwmt.tests.acceptance.steps.ccsinterviewoutcome;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;

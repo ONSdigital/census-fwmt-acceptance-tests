@@ -1,5 +1,5 @@
 @Census @Acceptance @Outcome @CCSHouseholdPL
-Feature: Non-valid household Outcome Tests
+Feature: CCS Property Listing Outcome Tests
 
   Scenario Outline: As a Gateway I can receive a CCS PL outcome of cases from TM and create Census Events
     Given TM sends a "<InputMessage>" Census Case CCS PL Outcome to the Gateway with "<Primary Outcome>"

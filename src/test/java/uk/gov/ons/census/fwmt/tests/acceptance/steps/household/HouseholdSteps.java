@@ -42,11 +42,13 @@ import static org.junit.Assert.fail;
 public class HouseholdSteps {
 
   private static final String RM_CREATE_REQUEST_RECEIVED = "RM_CREATE_REQUEST_RECEIVED";
-  private static final String COMET_CREATE_SENT = "COMET_CREATE_SENT";
-  private static final String CANONICAL_CANCEL_RECEIVED = "CANONICAL_CANCEL_RECEIVED";
+  private static final String RM_UPDATE_REQUEST_RECEIVED = "RM_UPDATE_REQUEST_RECEIVED";
+  private static final String RM_CANCEL_REQUEST_RECEIVED = "RM_CANCEL_REQUEST_RECEIVED";
+  private static final String COMET_CREATE_JOB_REQUEST = "Comet - Create Job Request";
+  private static final String CANONICAL_CANCEL_RECEIVED = "Canonical - Cancel Job Received";
   private static final String CANONICAL_CANCEL_SENT = "CANONICAL_CANCEL_SENT";
   private static final String CANONICAL_CREATE_SENT = "CANONICAL_CREATE_SENT";
-  public static final String CANONICAL_UPDATE_RECEIVED = "CANONICAL_UPDATE_RECEIVED";
+  public static final String CANONICAL_UPDATE_RECEIVED = "Canonical - Update Job Received";
   public static final String CANONICAL_UPDATE_SENT = "CANONICAL_UPDATE_SENT";
   private String cancelMessage = null;
   private String cancelMessageNonHH = null;
@@ -56,6 +58,7 @@ public class HouseholdSteps {
   private String receivedRMMessage = null;
   private String updateMessage = null;
   private String updatePauseMessage = null;
+  private String updateMessageWithoutCreate = null;
 
   @Autowired
   private CSVSerivceUtils csvServiceUtils;
@@ -92,7 +95,10 @@ public class HouseholdSteps {
     receivedRMMessage = Resources.toString(Resources.getResource("files/input/actionInstruction.xml"), Charsets.UTF_8);
     updateMessage = Resources.toString(Resources.getResource("files/input/actionUpdateInstruction.xml"), Charsets.UTF_8);
     updatePauseMessage = Resources.toString(Resources.getResource("files/input/actionUpdatePauseInstruction.xml"), Charsets.UTF_8);
-    nisraNoFieldOfficerMessage = Resources.toString(Resources.getResource("files/input/nisraNoFieldOfficerActionInstruction.xml"), Charsets.UTF_8);
+    updateMessageWithoutCreate = Resources
+            .toString(Resources.getResource("files/input/actionUpdateInstructionWithoutCreate.xml"), Charsets.UTF_8);
+    nisraNoFieldOfficerMessage = Resources
+            .toString(Resources.getResource("files/input/nisraNoFieldOfficerActionInstruction.xml"), Charsets.UTF_8);
     nisraHouseholdMessage = Resources.toString(Resources.getResource("files/input/nisraActionInstruction.xml"), Charsets.UTF_8);
 
     tmMockUtils.enableRequestRecorder();
@@ -131,7 +137,7 @@ public class HouseholdSteps {
   @When("the Gateway sends a Create Job message to TM")
   public void theGatewaySendsACreateJobMessageToTM() {
     String caseId = "39bad71c-7de5-4e1b-9a07-d9597737977f";
-    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, COMET_CREATE_SENT, 10000L);
+    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, COMET_CREATE_JOB_REQUEST, 10000L);
     assertThat(hasBeenTriggered).isTrue();
   }
 
@@ -155,7 +161,7 @@ public class HouseholdSteps {
 
   @When("the Gateway sends a Create Job message to TM with case ID of {string}")
   public void theGatewaySendsACreateJobMessageToTMWithCaseIdOf(String caseId) {
-    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, COMET_CREATE_SENT, 10000L);
+    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, COMET_CREATE_JOB_REQUEST, 10000L);
     assertThat(hasBeenTriggered).isTrue();
   }
 
@@ -201,7 +207,7 @@ public class HouseholdSteps {
     assertEquals(1, queueUtils.getMessageCount(queueName));
   }
 
-  @Given("RM sends a cancel case Household job request with case ID {string}")
+  @And("RM sends a cancel case Household job request with case ID {string}")
   public void tmHasAnExistingJobWithCaseID(String caseId) throws URISyntaxException, InterruptedException {
 
     queueUtils.sendToRMFieldQueue(cancelMessage);
@@ -268,7 +274,7 @@ public class HouseholdSteps {
 
   @And("TM picks up the Create Job message with case ID {string}")
   public void tmPicksUpTheCreateJobMessageWithCaseID(String caseId) {
-    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, COMET_CREATE_SENT, 10000L);
+    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, COMET_CREATE_JOB_REQUEST, 10000L);
     assertThat(hasBeenTriggered).isTrue();
   }
 
@@ -302,5 +308,15 @@ public class HouseholdSteps {
     CasePause casePause = tmMockUtils.getPauseCase(caseId);
     assertEquals(OffsetDateTime.parse(until), casePause.getUntil());
     assertEquals(reason, casePause.getReason());
+  }
+
+  @Given("RM sends an update case Household job request with case ID {string} and receives an exception from RM")
+  public void rmSendsACancelCaseHouseholdJobRequestWithCaseIDAndReceivesAnExceptionFromRM(String arg0)
+          throws URISyntaxException, InterruptedException {
+    queueUtils.sendToRMFieldQueue(updateMessageWithoutCreate);
+    assertThatExceptionOfType(GatewayException.class).isThrownBy(() -> {
+      throw new GatewayException(
+              GatewayException.Fault.SYSTEM_ERROR);
+    });
   }
 }
