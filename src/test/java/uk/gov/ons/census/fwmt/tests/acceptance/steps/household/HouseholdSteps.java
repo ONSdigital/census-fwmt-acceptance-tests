@@ -42,13 +42,11 @@ import static org.junit.Assert.fail;
 public class HouseholdSteps {
 
   private static final String RM_CREATE_REQUEST_RECEIVED = "RM_CREATE_REQUEST_RECEIVED";
-  private static final String RM_UPDATE_REQUEST_RECEIVED = "RM_UPDATE_REQUEST_RECEIVED";
-  private static final String RM_CANCEL_REQUEST_RECEIVED = "RM_CANCEL_REQUEST_RECEIVED";
-  private static final String COMET_CREATE_JOB_REQUEST = "Comet - Create Job Request";
-  private static final String CANONICAL_CANCEL_RECEIVED = "Canonical - Cancel Job Received";
+  private static final String COMET_CREATE_SENT = "COMET_CREATE_SENT";
+  private static final String CANONICAL_CANCEL_RECEIVED = "CANONICAL_CANCEL_RECEIVED";
   private static final String CANONICAL_CANCEL_SENT = "CANONICAL_CANCEL_SENT";
   private static final String CANONICAL_CREATE_SENT = "CANONICAL_CREATE_SENT";
-  public static final String CANONICAL_UPDATE_RECEIVED = "Canonical - Update Job Received";
+  public static final String CANONICAL_UPDATE_RECEIVED = "CANONICAL_UPDATE_RECEIVED";
   public static final String CANONICAL_UPDATE_SENT = "CANONICAL_UPDATE_SENT";
   private String cancelMessage = null;
   private String cancelMessageNonHH = null;
@@ -137,7 +135,7 @@ public class HouseholdSteps {
   @When("the Gateway sends a Create Job message to TM")
   public void theGatewaySendsACreateJobMessageToTM() {
     String caseId = "39bad71c-7de5-4e1b-9a07-d9597737977f";
-    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, COMET_CREATE_JOB_REQUEST, 10000L);
+    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, COMET_CREATE_SENT, 10000L);
     assertThat(hasBeenTriggered).isTrue();
   }
 
@@ -161,7 +159,7 @@ public class HouseholdSteps {
 
   @When("the Gateway sends a Create Job message to TM with case ID of {string}")
   public void theGatewaySendsACreateJobMessageToTMWithCaseIdOf(String caseId) {
-    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, COMET_CREATE_JOB_REQUEST, 10000L);
+    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, COMET_CREATE_SENT, 10000L);
     assertThat(hasBeenTriggered).isTrue();
   }
 
@@ -274,7 +272,7 @@ public class HouseholdSteps {
 
   @And("TM picks up the Create Job message with case ID {string}")
   public void tmPicksUpTheCreateJobMessageWithCaseID(String caseId) {
-    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, COMET_CREATE_JOB_REQUEST, 10000L);
+    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, COMET_CREATE_SENT, 10000L);
     assertThat(hasBeenTriggered).isTrue();
   }
 
