@@ -2,7 +2,7 @@
   "transactionId": "91b01550-5cf1-4d7b-909e-487825c04f35",
   "eventDate": "2019-07-17T17:02:30",
   "username": "CAR1_HA_01",
-  "propertyListingCaseId": "fe200301-12cc-4a58-919a-c4f37d61ef8a",
+  "propertyListingCaseId": "e6e3e714-2f26-4909-a564-b8d4d0c8ba49",
   "propertyListingCaseReference": "NW1 6XE",
   "primaryOutcome": "Household",
   "secondaryOutcome": "Complete on paper (full)",
@@ -20,7 +20,7 @@
   "fieldOfficerCode": "CAR1_HA_01",
   "accessInfo": "Access via side door",
   "careCodes": [ "Access control", "Aggressive animal", "Caution required" ],
-  "fulfillmentRequest": {
+  "fulfilmentRequest": {
     "questionnaireId": "2420000002405886"
    }
 }

@@ -5,7 +5,7 @@
         <responseRequired>true</responseRequired>
         <actionType>Cancel</actionType>
         <reason>HQ case closure</reason>
-        <caseId>4d9294f6-8edc-4d32-99ad-1bdb485e3495</caseId>
+        <caseId>39bad71c-7de5-4e1b-9a07-d9597737977f</caseId>
         <caseRef>Test123</caseRef>
         <addressType>HH</addressType>
     </actionCancel>

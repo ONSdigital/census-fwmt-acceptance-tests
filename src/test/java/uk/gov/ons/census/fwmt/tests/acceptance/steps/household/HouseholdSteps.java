@@ -56,6 +56,7 @@ public class HouseholdSteps {
   private String receivedRMMessage = null;
   private String updateMessage = null;
   private String updatePauseMessage = null;
+  private String updateMessageWithoutCreate = null;
 
   @Autowired
   private CSVSerivceUtils csvServiceUtils;
@@ -92,7 +93,10 @@ public class HouseholdSteps {
     receivedRMMessage = Resources.toString(Resources.getResource("files/input/actionInstruction.xml"), Charsets.UTF_8);
     updateMessage = Resources.toString(Resources.getResource("files/input/actionUpdateInstruction.xml"), Charsets.UTF_8);
     updatePauseMessage = Resources.toString(Resources.getResource("files/input/actionUpdatePauseInstruction.xml"), Charsets.UTF_8);
-    nisraNoFieldOfficerMessage = Resources.toString(Resources.getResource("files/input/nisraNoFieldOfficerActionInstruction.xml"), Charsets.UTF_8);
+    updateMessageWithoutCreate = Resources
+            .toString(Resources.getResource("files/input/actionUpdateInstructionWithoutCreate.xml"), Charsets.UTF_8);
+    nisraNoFieldOfficerMessage = Resources
+            .toString(Resources.getResource("files/input/nisraNoFieldOfficerActionInstruction.xml"), Charsets.UTF_8);
     nisraHouseholdMessage = Resources.toString(Resources.getResource("files/input/nisraActionInstruction.xml"), Charsets.UTF_8);
 
     tmMockUtils.enableRequestRecorder();
@@ -201,7 +205,7 @@ public class HouseholdSteps {
     assertEquals(1, queueUtils.getMessageCount(queueName));
   }
 
-  @Given("RM sends a cancel case Household job request with case ID {string}")
+  @And("RM sends a cancel case Household job request with case ID {string}")
   public void tmHasAnExistingJobWithCaseID(String caseId) throws URISyntaxException, InterruptedException {
 
     queueUtils.sendToRMFieldQueue(cancelMessage);
@@ -302,5 +306,15 @@ public class HouseholdSteps {
     CasePause casePause = tmMockUtils.getPauseCase(caseId);
     assertEquals(OffsetDateTime.parse(until), casePause.getUntil());
     assertEquals(reason, casePause.getReason());
+  }
+
+  @Given("RM sends an update case Household job request with case ID {string} and receives an exception from RM")
+  public void rmSendsACancelCaseHouseholdJobRequestWithCaseIDAndReceivesAnExceptionFromRM(String arg0)
+          throws URISyntaxException, InterruptedException {
+    queueUtils.sendToRMFieldQueue(updateMessageWithoutCreate);
+    assertThatExceptionOfType(GatewayException.class).isThrownBy(() -> {
+      throw new GatewayException(
+              GatewayException.Fault.SYSTEM_ERROR);
+    });
   }
 }

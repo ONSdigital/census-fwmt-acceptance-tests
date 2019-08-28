@@ -35,7 +35,7 @@ import static org.junit.Assert.assertEquals;
 public class NISRASteps {
 
   private static final String RM_CREATE_REQUEST_RECEIVED = "RM_CREATE_REQUEST_RECEIVED";
-  private static final String COMET_CREATE_SENT = "COMET_CREATE_SENT";
+  private static final String COMET_CREATE_SENT = "Comet - Create Job Request";
   private String cancelMessage = null;
   private String cancelMessageNonHH = null;
   private String invalidRMMessage = null;

@@ -6,7 +6,7 @@
   "primaryOutcome": "Contact made",
   "secondaryOutcome": "Paper H Questionnaire required by post",
   "transactionId": "c45de4dc-3c3b-11e9-b210-d663bd873d93",
-  "fulfillmentRequests": [
+  "fulfilmentRequests": [
   {
     "questionnaireType": "H1"
   },
