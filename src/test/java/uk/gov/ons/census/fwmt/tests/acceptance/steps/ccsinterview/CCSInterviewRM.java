@@ -35,7 +35,7 @@ import static org.junit.Assert.fail;
 public class CCSInterviewRM {
 
   private static final String RM_CREATE_REQUEST_RECEIVED = "RM_CREATE_REQUEST_RECEIVED";
-  private static final String COMET_CREATE_JOB_REQUEST = "Comet - Create Job Request";
+  private static final String COMET_CREATE_JOB_REQUEST = "COMET_CREATE_SENT";
   private String receivedRMMessage = null;
   private boolean qIdHasValue;
   private String tmRequest = null;
