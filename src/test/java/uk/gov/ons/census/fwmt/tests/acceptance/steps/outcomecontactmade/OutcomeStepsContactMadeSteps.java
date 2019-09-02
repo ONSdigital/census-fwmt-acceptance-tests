@@ -1,23 +1,9 @@
 package uk.gov.ons.census.fwmt.tests.acceptance.steps.outcomecontactmade;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.TimeoutException;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.PropertySource;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
-
 import cucumber.api.java.After;
 import cucumber.api.java.Before;
 import cucumber.api.java.en.And;
@@ -25,9 +11,22 @@ import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.http.ResponseEntity;
 import uk.gov.ons.census.fwmt.events.utils.GatewayEventMonitor;
 import uk.gov.ons.census.fwmt.tests.acceptance.utils.QueueUtils;
 import uk.gov.ons.census.fwmt.tests.acceptance.utils.TMMockUtils;
+
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.TimeoutException;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 @Slf4j
 @PropertySource("classpath:application.properties")
@@ -231,7 +230,8 @@ public class OutcomeStepsContactMadeSteps {
   public void the_Outcome_Service_should_create_a_valid_for_the_correct(String caseEvent, String routingKey) {
     gatewayEventMonitor.checkForEvent(caseId, HH_OUTCOME_SENT);
     try {
-      actualMessage = queueUtils.getMessageOffQueueWithRoutingKey(caseEvent, routingKey);
+      ResponseEntity<String> message = queueUtils.getMessageOffQueueWithRoutingKey(caseEvent, routingKey);
+      actualMessage = message.getBody();
       assertTrue(compareCaseEventMessages(secondaryOutcome, actualMessage));
     } catch (InterruptedException e) {
       throw new RuntimeException("Problem getting message", e);
@@ -297,11 +297,13 @@ public class OutcomeStepsContactMadeSteps {
 
   @Then("the service should create {string} messages")
   public void the_Outcome_Service_should_create_messages(String quantity) throws InterruptedException, IOException {
+    int expectedMessageCount = Integer.parseInt(quantity);
     multipleMessages = new ArrayList<>();
-    for(int i =0; i<3; i++) {
-      String messsage = queueUtils.getMessageOffQueueWithRoutingKey("Field.other", "event.fulfilment.request");
-      multipleMessages.add(jsonObjectMapper.readTree(messsage));
+
+    for (int i = 0; i < expectedMessageCount; i++) {
+      String message = queueUtils
+          .getMessage("Field.other");
+      multipleMessages.add(jsonObjectMapper.readTree(message));
     }
   }
-
 }

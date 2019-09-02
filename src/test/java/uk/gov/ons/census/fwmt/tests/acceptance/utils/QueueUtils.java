@@ -32,7 +32,6 @@ public final class QueueUtils {
     for (int i = 0; i < 10; i++) {
       ResponseEntity<String> messageEntity = restTemplate.getForEntity(messageUrl, String.class);
       message = messageEntity.getBody();
-
       if (message != null) {
         break;
       }
@@ -41,22 +40,23 @@ public final class QueueUtils {
     return message;
   }
 
-  public String getMessageOffQueueWithRoutingKey(String qname, String routingKey) throws InterruptedException {
+  public ResponseEntity<String> getMessageOffQueueWithRoutingKey(String qname, String routingKey)
+      throws InterruptedException {
     RestTemplate restTemplate = new RestTemplate();
     String messageUrl = mockTmURL + "/queue/messagewithrouting/?qname=" + qname + "&routingKey=" + routingKey;
     ResponseEntity<String> messageEntity = null;
     for (int i = 0; i < 10; i++) {
-       messageEntity = restTemplate.getForEntity(messageUrl, String.class);
-
-      if (messageEntity != null) {
+      try {
+        messageEntity = restTemplate.getForEntity(messageUrl, String.class);
+      } catch (Exception e) {
         break;
       }
       Thread.sleep(500);
     }
-    return messageEntity.getBody();
+    return messageEntity;
   }
 
-  public void sendToRMFieldQueue(String message) throws URISyntaxException, InterruptedException {
+  public void sendToRMFieldQueue(String message) throws URISyntaxException {
     String exchangeName = "";
     String routingKey = "RM.Field";
     RestTemplate rt = new RestTemplate();

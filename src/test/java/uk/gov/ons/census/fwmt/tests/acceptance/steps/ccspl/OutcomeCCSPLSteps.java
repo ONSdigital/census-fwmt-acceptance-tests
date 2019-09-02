@@ -13,6 +13,7 @@ import cucumber.api.java.en.When;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import uk.gov.ons.census.fwmt.events.utils.GatewayEventMonitor;
 import uk.gov.ons.census.fwmt.tests.acceptance.utils.QueueUtils;
 import uk.gov.ons.census.fwmt.tests.acceptance.utils.TMMockUtils;
@@ -165,7 +166,8 @@ public class OutcomeCCSPLSteps {
   public void theOutcomeServiceForTheCCSPLShouldCreateAValidForTheCorrect(String caseEvent, String routingKey) {
     gatewayEventMonitor.checkForEvent(caseId, CCSPL_OUTCOME_SENT);
     try {
-      actualMessage = queueUtils.getMessageOffQueueWithRoutingKey(caseEvent, routingKey);
+      ResponseEntity<String> result = queueUtils.getMessageOffQueueWithRoutingKey(caseEvent, routingKey);
+      actualMessage = result.getBody();
       assertTrue(compareCaseEventMessages(secondaryOutcome, actualMessage));
     } catch (InterruptedException e) {
       throw new RuntimeException("Problem getting message", e);
