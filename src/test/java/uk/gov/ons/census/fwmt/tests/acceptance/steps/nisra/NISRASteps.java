@@ -5,6 +5,7 @@ import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
 import cucumber.api.java.After;
 import cucumber.api.java.Before;
+import cucumber.api.java.en.And;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
@@ -36,17 +37,8 @@ public class NISRASteps {
 
   private static final String RM_CREATE_REQUEST_RECEIVED = "RM_CREATE_REQUEST_RECEIVED";
   private static final String COMET_CREATE_SENT = "COMET_CREATE_SENT";
-  private String cancelMessage = null;
-  private String cancelMessageNonHH = null;
-  private String invalidRMMessage = null;
   private String nisraHouseholdMessage = null;
   private String nisraNoFieldOfficerMessage = null;
-  private String receivedRMMessage = null;
-  private String updateMessage = null;
-  private String updatePauseMessage = null;
-
-  @Autowired
-  private CSVSerivceUtils csvServiceUtils;
 
   @Autowired
   private TMMockUtils tmMockUtils;
@@ -68,18 +60,8 @@ public class NISRASteps {
   @Value("${service.rabbit.password}")
   private String rabbitPassword;
 
-  private ObjectMapper objectMapper = new ObjectMapper();
-
   @Before
   public void setup() throws IOException, TimeoutException, URISyntaxException {
-    cancelMessage = Resources
-        .toString(Resources.getResource("files/input/actionCancelInstruction.xml"), Charsets.UTF_8);
-    cancelMessageNonHH = Resources
-        .toString(Resources.getResource("files/input/actionNonHHCancelInstruction.xml"), Charsets.UTF_8);
-    invalidRMMessage = Resources.toString(Resources.getResource("files/input/invalidInstruction.xml"), Charsets.UTF_8);
-    receivedRMMessage = Resources.toString(Resources.getResource("files/input/actionInstruction.xml"), Charsets.UTF_8);
-    updateMessage = Resources.toString(Resources.getResource("files/input/actionUpdateInstruction.xml"), Charsets.UTF_8);
-    updatePauseMessage = Resources.toString(Resources.getResource("files/input/actionUpdatePauseInstruction.xml"), Charsets.UTF_8);
     nisraNoFieldOfficerMessage = Resources.toString(Resources.getResource("files/input/nisraNoFieldOfficerActionInstruction.xml"), Charsets.UTF_8);
     nisraHouseholdMessage = Resources.toString(Resources.getResource("files/input/nisraActionInstruction.xml"), Charsets.UTF_8);
 
@@ -109,7 +91,7 @@ public class NISRASteps {
     assertThat(hasBeenTriggered).isTrue();
   }
 
-  @When("the Gateway sends a create NISRA Job message to TM with case ID of {string}")
+  @And("the Gateway sends a create NISRA Job message to TM with case ID of {string}")
   public void theGatewaySendsACreateJobMessageToTMWithCaseIdOf(String caseId) {
     boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, COMET_CREATE_SENT, 10000L);
     assertThat(hasBeenTriggered).isTrue();

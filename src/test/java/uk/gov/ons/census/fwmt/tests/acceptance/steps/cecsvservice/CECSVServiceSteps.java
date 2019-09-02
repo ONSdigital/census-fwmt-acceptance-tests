@@ -69,7 +69,7 @@ public class CECSVServiceSteps {
     }
 
     @After
-    public void tearDownGatewayEventMonitor() throws IOException, TimeoutException {
+    public void tearDownGatewayEventMonitor() throws IOException {
         gatewayEventMonitor.tearDownGatewayEventMonitor();
         tmMockUtils.disableRequestRecorder();
     }
