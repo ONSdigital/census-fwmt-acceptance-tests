@@ -13,6 +13,9 @@
 			"address": {
 			},
 			"contact": {
+				"title": null,
+				"forename": null,
+				"surname": null,
 				"telNo": "01010"
 			}
 		}
