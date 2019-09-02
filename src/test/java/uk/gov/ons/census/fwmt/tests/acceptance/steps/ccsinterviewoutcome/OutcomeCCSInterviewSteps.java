@@ -159,7 +159,7 @@ public class OutcomeCCSInterviewSteps {
         JsonNode node = tmRequestRootNode.path("caseId");
         caseId = node.asText();
         int response = tmMockUtils.sendTMCCSIntResponseMessage(tmRequest, caseId);
-        assertEquals(200, response);
+        assertEquals(202, response);
     }
 
     @Then("the Outcome Service for the CCS interview should create a valid {string} for the correct {string}")
