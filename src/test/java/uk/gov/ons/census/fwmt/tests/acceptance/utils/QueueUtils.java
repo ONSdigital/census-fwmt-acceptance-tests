@@ -27,11 +27,11 @@ public final class QueueUtils {
     }
 
     public String getMessage(String queueName) throws InterruptedException {
-        return getMessage(queueName, 5000, 500);
+        return getMessage(queueName, 10000, 1000);
     }
 
     public String getMessage(String queueName, int msTimeout) throws InterruptedException {
-        return getMessage(queueName, msTimeout, 500);
+        return getMessage(queueName, msTimeout, 1000);
     }
 
     public String getMessage(String queueName, int msTimeout, int msInterval) throws InterruptedException {
@@ -52,12 +52,12 @@ public final class QueueUtils {
 
     public ResponseEntity<String> getMessageOffQueueWithRoutingKey(String queueName, String routingKey)
             throws InterruptedException {
-        return getMessageOffQueueWithRoutingKey(queueName, routingKey, 5000, 500);
+        return getMessageOffQueueWithRoutingKey(queueName, routingKey, 10000, 1000);
     }
 
     public ResponseEntity<String> getMessageOffQueueWithRoutingKey(String queueName, String routingKey, int msTimeout)
             throws InterruptedException {
-        return getMessageOffQueueWithRoutingKey(queueName, routingKey, msTimeout, 500);
+        return getMessageOffQueueWithRoutingKey(queueName, routingKey, msTimeout, 1000);
     }
 
     public ResponseEntity<String> getMessageOffQueueWithRoutingKey(String queueName, String routingKey, int msTimeout, int msInterval)
