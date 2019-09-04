@@ -163,11 +163,11 @@ public class OutcomeCCSInterviewSteps {
         assertEquals(202, response);
     }
 
-    @Then("the Outcome Service for the CCS interview should create a valid {string} for the correct {string}")
-    public void theOutcomeServiceForTheCCSPLShouldCreateAValidForTheCorrect(String caseEvent, String routingKey) {
+    @Then("the Outcome Service for the CCS interview should create a valid {string}")
+    public void theOutcomeServiceForTheCCSPLShouldCreateAValidForTheCorrect(String caseEvent) {
         gatewayEventMonitor.checkForEvent(caseId, CCSI_OUTCOME_SENT);
         try {
-          ResponseEntity<String> message = queueUtils.getMessageOffQueueWithRoutingKey(caseEvent, routingKey);
+          ResponseEntity<String> message = queueUtils.getMessageEntity(caseEvent);
           actualMessage = message.getBody();
             assertTrue(compareCaseEventMessages(secondaryOutcome, actualMessage));
         } catch (InterruptedException e) {

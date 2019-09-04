@@ -109,11 +109,11 @@ public class OutcomeNonValidHouseHoldSteps {
     assertEquals(202, response);
   }
 
-  @Then("the Outcome Service should create a valid {string} for the correct {string}")
-  public void the_Outcome_Service_should_create_a_valid_for_the_correct(String caseEvent, String routingKey) {
+  @Then("the Outcome Service should create a valid {string}")
+  public void the_Outcome_Service_should_create_a_valid_for_the_correct(String caseEvent) {
     gatewayEventMonitor.checkForEvent(caseId, HH_OUTCOME_SENT);
     try {
-      ResponseEntity<String> result = queueUtils.getMessageOffQueueWithRoutingKey(caseEvent, routingKey);
+      ResponseEntity<String> result = queueUtils.getMessageEntity(caseEvent);
       actualMessage = result.getBody();
       assertTrue(compareCaseEventMessages(secondaryOutcome, actualMessage));
     } catch (InterruptedException e) {
@@ -191,7 +191,7 @@ public class OutcomeNonValidHouseHoldSteps {
     multipleMessages = new ArrayList<>();
     for(int i =0; i<3; i++) {
       ResponseEntity<String> result = queueUtils
-          .getMessageOffQueueWithRoutingKey("Gateway.Fulfillment.Request", "event.fulfillment.request");
+          .getMessageEntity("Gateway.Fulfillment.Request");
       String message = result.getBody();
       multipleMessages.add(jsonObjectMapper.readTree(message));
     }

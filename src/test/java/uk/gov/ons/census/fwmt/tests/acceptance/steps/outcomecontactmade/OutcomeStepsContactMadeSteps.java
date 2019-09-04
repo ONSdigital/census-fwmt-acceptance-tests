@@ -226,11 +226,11 @@ public class OutcomeStepsContactMadeSteps {
     assertEquals(202, response);
   }
 
-  @Then("a valid {string} for the correct {string}")
-  public void the_Outcome_Service_should_create_a_valid_for_the_correct(String caseEvent, String routingKey) {
+  @Then("a valid {string}")
+  public void the_Outcome_Service_should_create_a_valid_for_the_correct(String caseEvent) {
     gatewayEventMonitor.checkForEvent(caseId, HH_OUTCOME_SENT);
     try {
-      ResponseEntity<String> message = queueUtils.getMessageOffQueueWithRoutingKey(caseEvent, routingKey);
+      ResponseEntity<String> message = queueUtils.getMessageEntity(caseEvent);
       actualMessage = message.getBody();
       assertTrue(compareCaseEventMessages(secondaryOutcome, actualMessage));
     } catch (InterruptedException e) {
