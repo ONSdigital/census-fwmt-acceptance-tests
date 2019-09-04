@@ -214,7 +214,7 @@ public class OutcomeStepsContactMadeSteps {
   @And("the message contains {string} fulfilment requests")
   public void the_message_contains_fulfilment_requests(String quantity) {
     int qty = Integer.parseInt(quantity);
-    int actualSize = tmRequestRootNode.path("fulfilmentRequests").size();
+    int actualSize = tmRequestRootNode.path("fulfillmentRequests").size();
     assertEquals(qty, actualSize);
   }
 
