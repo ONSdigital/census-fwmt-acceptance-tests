@@ -27,11 +27,11 @@ public final class QueueUtils {
     }
 
     public String getMessage(String queueName) throws InterruptedException {
-        return getMessage(queueName, 10000, 1000);
+        return getMessage(queueName, 10000, 10);
     }
 
     public String getMessage(String queueName, int msTimeout) throws InterruptedException {
-        return getMessage(queueName, msTimeout, 1000);
+        return getMessage(queueName, msTimeout, 10);
     }
 
     public String getMessage(String queueName, int msTimeout, int msInterval) throws InterruptedException {
@@ -93,6 +93,10 @@ public final class QueueUtils {
         clearQueue("Gateway.ActionsDLQ");
         clearQueue("RM.Field");
         clearQueue("RM.FieldDLQ");
+        clearQueue("Outcome.Preprocessing");
+        clearQueue("Outcome.PreprocessingDLQ");
+        clearQueue("Field.other");
+        clearQueue("Field.refusals");
     }
 
     private void clearQueue(String queueName) throws URISyntaxException {
