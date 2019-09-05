@@ -162,11 +162,11 @@ public class OutcomeCCSPLSteps {
     assertEquals(202, response);
   }
 
-  @Then("the Outcome Service for the CCS PL should create a valid {string} for the correct {string}")
-  public void theOutcomeServiceForTheCCSPLShouldCreateAValidForTheCorrect(String caseEvent, String routingKey) {
+  @Then("the Outcome Service for the CCS PL should create a valid {string}")
+  public void theOutcomeServiceForTheCCSPLShouldCreateAValidForTheCorrect(String caseEvent) {
     gatewayEventMonitor.checkForEvent(caseId, CCSPL_OUTCOME_SENT);
     try {
-      ResponseEntity<String> result = queueUtils.getMessageOffQueueWithRoutingKey(caseEvent, routingKey);
+      ResponseEntity<String> result = queueUtils.getMessageEntity(caseEvent);
       actualMessage = result.getBody();
       assertTrue(compareCaseEventMessages(secondaryOutcome, actualMessage));
     } catch (InterruptedException e) {

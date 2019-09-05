@@ -35,46 +35,31 @@ public final class QueueUtils {
     }
 
     public String getMessage(String queueName, int msTimeout, int msInterval) throws InterruptedException {
-        RestTemplate restTemplate = new RestTemplate();
-        String messageUrl = mockTmURL + "/queue/message/?qname=" + queueName;
-        String message = null;
-        int iterations = (msTimeout + msInterval - 1) / msInterval; // division rounding up
-        for (int i = 0; i < iterations; i++) {
-            ResponseEntity<String> messageEntity = restTemplate.getForEntity(messageUrl, String.class);
-            message = messageEntity.getBody();
-            if (message != null) {
-                break;
-            }
-            Thread.sleep(msInterval);
+        ResponseEntity<String> messageEntity = getMessageEntity(queueName, msTimeout, msInterval);
+        return messageEntity.getBody();
+    }
+    
+    public ResponseEntity<String>  getMessageEntity(String queueName) throws InterruptedException {
+      return getMessageEntity(queueName, 10000, 1000);
+  }
+
+  public ResponseEntity<String>  getMessageEntity(String queueName, int msTimeout) throws InterruptedException {
+      return getMessageEntity(queueName, msTimeout, 1000);
+  }
+   public ResponseEntity<String> getMessageEntity(String queueName, int msTimeout, int msInterval) throws InterruptedException {
+      RestTemplate restTemplate = new RestTemplate();
+      String messageUrl = mockTmURL + "/queue/message/?qname=" + queueName;
+      ResponseEntity<String> messageEntity = null;
+      int iterations = (msTimeout + msInterval - 1) / msInterval; // division rounding up
+      for (int i = 0; i < iterations; i++) {
+        messageEntity = restTemplate.getForEntity(messageUrl, String.class);
+        String message = messageEntity.getBody();
+        if (message != null) {
+          break; 
         }
-        return message;
-    }
-
-    public ResponseEntity<String> getMessageOffQueueWithRoutingKey(String queueName, String routingKey)
-            throws InterruptedException {
-        return getMessageOffQueueWithRoutingKey(queueName, routingKey, 10000, 1000);
-    }
-
-    public ResponseEntity<String> getMessageOffQueueWithRoutingKey(String queueName, String routingKey, int msTimeout)
-            throws InterruptedException {
-        return getMessageOffQueueWithRoutingKey(queueName, routingKey, msTimeout, 1000);
-    }
-
-    public ResponseEntity<String> getMessageOffQueueWithRoutingKey(String queueName, String routingKey, int msTimeout, int msInterval)
-            throws InterruptedException {
-        RestTemplate restTemplate = new RestTemplate();
-        String messageUrl = mockTmURL + "/queue/messagewithrouting/?qname=" + queueName + "&routingKey=" + routingKey;
-        ResponseEntity<String> messageEntity = null;
-        int iterations = (msTimeout + msInterval - 1) / msInterval; // division rounding up
-        for (int i = 0; i < iterations; i++) {
-            try {
-                messageEntity = restTemplate.getForEntity(messageUrl, String.class);
-            } catch (RestClientException e) {
-                break;
-            }
-            Thread.sleep(msInterval);
-        }
-        return messageEntity;
+        Thread.sleep(msInterval);
+      }
+      return messageEntity;
     }
 
     public void sendToRMFieldQueue(String message) throws URISyntaxException {
