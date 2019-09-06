@@ -16,7 +16,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.ResponseEntity;
 import uk.gov.ons.census.fwmt.events.utils.GatewayEventMonitor;
-import uk.gov.ons.census.fwmt.tests.acceptance.utils.QueueUtils;
+import uk.gov.ons.census.fwmt.tests.acceptance.utils.QueueClient;
 import uk.gov.ons.census.fwmt.tests.acceptance.utils.TMMockUtils;
 
 import java.io.IOException;
@@ -38,7 +38,7 @@ public class OutcomeStepsContactMadeSteps {
   private TMMockUtils tmMockUtils;
 
   @Autowired
-  private QueueUtils queueUtils;
+  private QueueClient queueUtils;
 
   private GatewayEventMonitor gatewayEventMonitor;
 
@@ -230,8 +230,7 @@ public class OutcomeStepsContactMadeSteps {
   public void the_Outcome_Service_should_create_a_valid_for_the_correct(String caseEvent) {
     gatewayEventMonitor.checkForEvent(caseId, HH_OUTCOME_SENT);
     try {
-      ResponseEntity<String> message = queueUtils.getMessageEntity(caseEvent);
-      actualMessage = message.getBody();
+      actualMessage = queueUtils.getMessage(caseEvent);
       assertTrue(compareCaseEventMessages(secondaryOutcome, actualMessage));
     } catch (InterruptedException e) {
       throw new RuntimeException("Problem getting message", e);
