@@ -127,11 +127,12 @@ dependencies {
     testCompile("org.springframework:spring-aop:5.1.2.RELEASE")
 
     compile("org.json:json:20180813")
-
+	compile('org.freemarker:freemarker:2.3.28')
+	
     testCompile("com.fasterxml.jackson.core:jackson-databind:2.9.7")
     testCompile("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.9.7")
 
-    testCompile("org.apache.httpcomponents:httpclient:4.5.6")
+    compile("org.apache.httpcomponents:httpclient:4.5.6")
 
 
     testCompile("org.springframework:spring-test:5.1.2.RELEASE")

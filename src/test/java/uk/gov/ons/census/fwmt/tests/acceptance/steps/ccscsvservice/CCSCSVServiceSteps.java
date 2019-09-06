@@ -12,7 +12,7 @@ import uk.gov.ons.census.fwmt.common.data.modelcase.ModelCase;
 import uk.gov.ons.census.fwmt.events.data.GatewayEventDTO;
 import uk.gov.ons.census.fwmt.events.utils.GatewayEventMonitor;
 import uk.gov.ons.census.fwmt.tests.acceptance.utils.CSVSerivceUtils;
-import uk.gov.ons.census.fwmt.tests.acceptance.utils.QueueUtils;
+import uk.gov.ons.census.fwmt.tests.acceptance.utils.QueueClient;
 import uk.gov.ons.census.fwmt.tests.acceptance.utils.TMMockUtils;
 
 import java.io.IOException;
@@ -33,7 +33,7 @@ public class CCSCSVServiceSteps {
     private TMMockUtils tmMockUtils;
 
     @Autowired
-    private QueueUtils queueUtils;
+    private QueueClient queueUtils;
 
     @Autowired
     private CSVSerivceUtils csvSerivceUtils;

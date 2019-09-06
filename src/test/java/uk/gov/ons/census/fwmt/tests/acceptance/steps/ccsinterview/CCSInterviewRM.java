@@ -1,9 +1,24 @@
 package uk.gov.ons.census.fwmt.tests.acceptance.steps.ccsinterview;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.util.concurrent.TimeoutException;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.client.HttpClientErrorException;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
+
 import cucumber.api.java.After;
 import cucumber.api.java.Before;
 import cucumber.api.java.en.And;
@@ -11,24 +26,10 @@ import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.client.HttpClientErrorException;
 import uk.gov.ons.census.fwmt.common.data.modelcase.ModelCase;
 import uk.gov.ons.census.fwmt.events.utils.GatewayEventMonitor;
-import uk.gov.ons.census.fwmt.tests.acceptance.utils.CSVSerivceUtils;
-import uk.gov.ons.census.fwmt.tests.acceptance.utils.QueueUtils;
+import uk.gov.ons.census.fwmt.tests.acceptance.utils.QueueClient;
 import uk.gov.ons.census.fwmt.tests.acceptance.utils.TMMockUtils;
-
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.util.concurrent.TimeoutException;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 @Slf4j
 @PropertySource("classpath:application.properties")
@@ -43,16 +44,12 @@ public class CCSInterviewRM {
   private String resourcePath;
   private ObjectMapper jsonObjectMapper = new ObjectMapper();
   private String caseId;
-  private String secondaryOutcome;
-
-  @Autowired
-  private CSVSerivceUtils csvServiceUtils;
 
   @Autowired
   private TMMockUtils tmMockUtils;
 
   @Autowired
-  private QueueUtils queueUtils;
+  private QueueClient queueClient;
 
   private GatewayEventMonitor gatewayEventMonitor;
 
@@ -68,15 +65,13 @@ public class CCSInterviewRM {
   @Value("${service.rabbit.password}")
   private String rabbitPassword;
 
-  private ObjectMapper objectMapper = new ObjectMapper();
-
   @Before
   public void setup() throws IOException, TimeoutException, URISyntaxException {
     receivedRMMessage = Resources.toString(Resources.getResource("files/input/actionInstructionCCSIV.xml"), Charsets.UTF_8);
 
     tmMockUtils.enableRequestRecorder();
     tmMockUtils.resetMock();
-    queueUtils.clearQueues();
+    queueClient.clearQueues();
 
 
     gatewayEventMonitor = new GatewayEventMonitor();
@@ -102,7 +97,7 @@ public class CCSInterviewRM {
   @And("RM sends a create CCS Interview job request")
   public void rmSendsACreateHouseHoldJobRequest() throws URISyntaxException, InterruptedException {
     String caseId = "e6e3e714-2f26-4909-a564-b8d4d0c8ba49";
-    queueUtils.sendToRMFieldQueue(receivedRMMessage);
+    queueClient.sendToRMFieldQueue(receivedRMMessage);
     boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, RM_CREATE_REQUEST_RECEIVED, 10000L);
     assertThat(hasBeenTriggered).isTrue();
   }
@@ -140,7 +135,6 @@ public class CCSInterviewRM {
 
   private void readRequest(String inputMessage) {
     this.tmRequest = getTmRequest(inputMessage);
-    this.secondaryOutcome = inputMessage;
     try {
       tmRequestRootNode = jsonObjectMapper.readTree(tmRequest);
     } catch (IOException e) {
