@@ -18,19 +18,19 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 public class QueueUtils {
 
-  @Value("${rabbitmq.host}")
+  @Value("${service.rabbit.url}")
   private String rabbitmqHost;
 
-  @Value("${rabbitmq.username}")
+  @Value("${service.rabbit.username}")
   private String rabbitmqUsername;
 
-  @Value("${rabbitmq.password}")
+  @Value("${service.rabbit.password}")
   private String rabbitmqPassword;
 
-  @Value("${rabbitmq.port}")
+  @Value("${service.rabbit.port:5672}")
   private int rabbitmqPort;
 
-  @Value("${rabbitmq.virtualHost}")
+  @Value("${service.rabbit.virtualHost:/}")
   private String rabbitmqVirtualHost;
 
   public String getMessageOffQueue(String qname) {
