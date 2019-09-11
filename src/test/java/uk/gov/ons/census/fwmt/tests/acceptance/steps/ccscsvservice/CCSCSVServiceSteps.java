@@ -27,7 +27,8 @@ import static org.junit.Assert.assertEquals;
 @PropertySource("classpath:application.properties")
 public class CCSCSVServiceSteps {
 
-    public static final String CSV_CCS_REQUEST_EXTRACTED = "CSV_CCS_REQUEST_EXTRACTED";
+  public static final String CSV_CCS_REQUEST_EXTRACTED = "CSV_CCS_REQUEST_EXTRACTED";
+  public static final String COMET_CREATE_ACK = "COMET_CREATE_ACK";
 
     @Autowired
     private TMMockUtils tmMockUtils;
@@ -89,7 +90,10 @@ public class CCSCSVServiceSteps {
 
     @Then("a new case with new case id for job containing postcode {string} is created in TM")
     public void aNewCaseWithNewCaseIdForJobContainingPostcodeIsCreatedInTM(String postcode) throws InterruptedException {
-        ModelCase modelCase = tmMockUtils.getCaseById(caseId);
+      boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, COMET_CREATE_ACK, 10000L);
+      assertThat(hasBeenTriggered).isTrue();
+      
+      ModelCase modelCase = tmMockUtils.getCaseById(caseId);
         assertEquals(caseId, modelCase.getId().toString());
         assertEquals(postcode, modelCase.getAddress().getPostcode());
     }
