@@ -36,7 +36,7 @@ import uk.gov.ons.census.fwmt.tests.acceptance.utils.TMMockUtils;
 public class CCSInterviewRM {
 
   private static final String RM_CREATE_REQUEST_RECEIVED = "RM_CREATE_REQUEST_RECEIVED";
-  private static final String COMET_CREATE_JOB_REQUEST = "COMET_CREATE_SENT";
+  private static final String COMET_CREATE_ACK = "COMET_CREATE_ACK";
   private String receivedRMMessage = null;
   private boolean qIdHasValue;
   private String tmRequest = null;
@@ -105,7 +105,7 @@ public class CCSInterviewRM {
   @When("the Gateway sends a Create CCS Interview Job message to TM")
   public void theGatewaySendsACreateJobMessageToTM() {
     String caseId = "e6e3e714-2f26-4909-a564-b8d4d0c8ba49";
-    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, COMET_CREATE_JOB_REQUEST, 10000L);
+    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, COMET_CREATE_ACK, 10000L);
     assertThat(hasBeenTriggered).isTrue();
   }
 

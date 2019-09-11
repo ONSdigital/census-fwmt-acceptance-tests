@@ -1,42 +1,42 @@
 package uk.gov.ons.census.fwmt.tests.acceptance.steps.nisra;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.junit.Assert.assertEquals;
+
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.util.concurrent.TimeoutException;
+
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
+
 import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
+
 import cucumber.api.java.After;
 import cucumber.api.java.Before;
 import cucumber.api.java.en.And;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
-import cucumber.api.java.en.When;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.PropertySource;
 import uk.gov.ons.census.fwmt.common.data.modelcase.ModelCase;
 import uk.gov.ons.census.fwmt.common.error.GatewayException;
 import uk.gov.ons.census.fwmt.events.utils.GatewayEventMonitor;
-import uk.gov.ons.census.fwmt.tests.acceptance.utils.CSVSerivceUtils;
 import uk.gov.ons.census.fwmt.tests.acceptance.utils.QueueClient;
 import uk.gov.ons.census.fwmt.tests.acceptance.utils.TMMockUtils;
 import uk.gov.ons.ctp.response.action.message.instruction.ActionInstruction;
-
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.util.concurrent.TimeoutException;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.junit.Assert.assertEquals;
 
 @Slf4j
 @PropertySource("classpath:application.properties")
 public class NISRASteps {
 
   private static final String RM_CREATE_REQUEST_RECEIVED = "RM_CREATE_REQUEST_RECEIVED";
-  private static final String COMET_CREATE_SENT = "COMET_CREATE_SENT";
+  private static final String COMET_CREATE_ACK = "COMET_CREATE_ACK";
   private String nisraHouseholdMessage = null;
   private String nisraNoFieldOfficerMessage = null;
 
@@ -93,7 +93,7 @@ public class NISRASteps {
 
   @And("the Gateway sends a create NISRA Job message to TM with case ID of {string}")
   public void theGatewaySendsACreateJobMessageToTMWithCaseIdOf(String caseId) {
-    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, COMET_CREATE_SENT, 10000L);
+    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, COMET_CREATE_ACK, 10000L);
     assertThat(hasBeenTriggered).isTrue();
   }
 
