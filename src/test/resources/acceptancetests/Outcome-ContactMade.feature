@@ -55,5 +55,9 @@ Feature: Contact made Outcome Tests
     When the Outcome Service process the message
     Then the service should create "3" messages
     And the Mixed messages should be correct
+
+  Scenario: As Gateway I cannot receive final Contact Made outcome with no fulfilment request
+    Given TM sends a blank fulfillment request and receives an error from Outcome Service
+
     
     
