@@ -13,7 +13,6 @@ import cucumber.api.java.en.When;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
 import uk.gov.ons.census.fwmt.events.utils.GatewayEventMonitor;
 import uk.gov.ons.census.fwmt.tests.acceptance.utils.QueueClient;
 import uk.gov.ons.census.fwmt.tests.acceptance.utils.TMMockUtils;
@@ -34,7 +33,7 @@ public class OutcomeNonValidHouseHoldSteps {
   private TMMockUtils tmMockUtils;
   
   @Autowired
-  private QueueClient queueUtils;
+  private QueueClient queueClient;
 
   private GatewayEventMonitor gatewayEventMonitor = new GatewayEventMonitor();
 
@@ -70,8 +69,9 @@ public class OutcomeNonValidHouseHoldSteps {
   @Before
   public void before() {
     try {
+      queueClient.createQueue();
       gatewayEventMonitor.enableEventMonitor(rabbitLocation, rabbitUsername, rabbitPassword);
-    } catch (IOException | TimeoutException e) {
+    } catch (IOException | TimeoutException | InterruptedException e) {
       throw new RuntimeException("Problem with setting up", e);
     }
 
@@ -113,7 +113,7 @@ public class OutcomeNonValidHouseHoldSteps {
   public void the_Outcome_Service_should_create_a_valid_for_the_correct(String caseEvent) {
     gatewayEventMonitor.checkForEvent(caseId, HH_OUTCOME_SENT);
     try {
-      actualMessage = queueUtils.getMessage(caseEvent);
+      actualMessage = queueClient.getMessage(caseEvent);
       assertTrue(compareCaseEventMessages(secondaryOutcome, actualMessage));
     } catch (InterruptedException e) {
       throw new RuntimeException("Problem getting message", e);
@@ -189,7 +189,7 @@ public class OutcomeNonValidHouseHoldSteps {
   public void the_Outcome_Service_should_create_messages(String quantity) throws InterruptedException, IOException {
     multipleMessages = new ArrayList<>();
     for(int i =0; i<3; i++) {
-      String message = queueUtils
+      String message = queueClient
           .getMessage("Gateway.Fulfillment.Request");
       multipleMessages.add(jsonObjectMapper.readTree(message));
     }
