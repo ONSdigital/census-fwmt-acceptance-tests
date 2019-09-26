@@ -56,8 +56,6 @@ public class QueueUtils {
   public static final String GATEWAY_CASE_UPDATE_ROUTING_KEY = "event.case.update";
   public static final String GATEWAY_SAMPLEUNIT_UPDATE_ROUTING_KEY = "event.sampleunit.update";
 
-
-
   public String getMessageOffQueue(String qname) {
     Connection connection = null;
     Channel channel = null;
