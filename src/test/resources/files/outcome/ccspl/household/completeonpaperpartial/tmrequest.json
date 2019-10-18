@@ -20,7 +20,7 @@
   "fieldOfficerCode": "CAR1_HA_01",
   "accessInfo": "Access via side door",
   "careCodes": [ "Access control" ],
-  "fulfillmentRequest": {
+  "fulfillmentRequests": {
     "questionnaireId": "1110000009"
    }
 }
