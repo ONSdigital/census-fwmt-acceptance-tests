@@ -22,7 +22,7 @@
   "careCodes": [ "Access control" ],
   "fulfillmentRequests": [
     {
-        "questionnaireId": "1110000009"
+        "questionnaireID": "1110000009"
     }
   ]
 }
