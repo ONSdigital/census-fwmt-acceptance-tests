@@ -8,7 +8,7 @@
   "secondaryOutcome": "Complete on paper (full)",
   "fulfillmentRequests": [
     {
-      "questionnaireId": "1110000009"
+      "questionnaireID": "1110000009"
     }
     ],
   "caseId": "bbd55984-0dbf-4499-bfa7-0aa4228700e9"
