@@ -10,16 +10,20 @@ import cucumber.api.java.en.And;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
+import gherkin.deps.com.google.gson.JsonObject;
 import lombok.extern.slf4j.Slf4j;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import uk.gov.ons.census.fwmt.events.data.GatewayEventDTO;
 import uk.gov.ons.census.fwmt.events.utils.GatewayEventMonitor;
 import uk.gov.ons.census.fwmt.tests.acceptance.utils.QueueClient;
 import uk.gov.ons.census.fwmt.tests.acceptance.utils.TMMockUtils;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.Collection;
 import java.util.concurrent.TimeoutException;
 
 import static org.junit.Assert.assertEquals;
@@ -62,7 +66,8 @@ public class OutcomeCCSPLSteps {
   private boolean qIdHasValue;
   
   private String resourcePath;
-  
+
+
   @Before
   public void before() throws URISyntaxException {
     try {
@@ -104,17 +109,29 @@ public class OutcomeCCSPLSteps {
     } catch (IOException e) {
       throw new RuntimeException("Problem retrieving resource file", e);
     }
+
   }
 
-  private boolean compareCaseEventMessages(String so, String actualMessage) {
+  private String addNewCaseId(String expectedMessage, String newCaseId) {
+    JSONObject wholeMessage = new JSONObject(expectedMessage);
+    JSONObject payloadNode = wholeMessage.getJSONObject("payload");
+    JSONObject ccsPropertyNode = payloadNode.getJSONObject("CCSProperty");
+    JSONObject collectionCaseNode = ccsPropertyNode.getJSONObject("collectionCase");
+    collectionCaseNode.put("id", newCaseId);
+
+    return wholeMessage.toString();
+  }
+
+  private boolean compareCaseEventMessages(String so, String actualMessage, String caseId) {
     try {
       String expectedCaseEvent = getExpectedCaseEvent(so);
-      JsonNode expectedMessageRootNode = jsonObjectMapper.readTree(expectedCaseEvent);
+      String updateExpectedCaseEvent = addNewCaseId(expectedCaseEvent, caseId);
+      JsonNode expectedMessageRootNode = jsonObjectMapper.readTree(updateExpectedCaseEvent);
       JsonNode actualMessageRootNode = jsonObjectMapper.readTree(actualMessage);
 
       boolean isEqual = expectedMessageRootNode.equals(actualMessageRootNode);
       if (!isEqual) {
-        log.info("expected and actual caseEvents are not the same: \n expected:\n {} \n\n actual: \n {}", expectedCaseEvent, actualMessage);
+        log.info("expected and actual caseEvents are not the same: \n expected:\n {} \n\n actual: \n {}", updateExpectedCaseEvent, actualMessage);
       }
       return isEqual;
 
@@ -164,10 +181,18 @@ public class OutcomeCCSPLSteps {
 
   @Then("the Outcome Service for the CCS PL should create a valid {string}")
   public void theOutcomeServiceForTheCCSPLShouldCreateAValidForTheCorrect(String caseEvent) {
+    Collection<GatewayEventDTO> message;
+    message = gatewayEventMonitor.grabEventsTriggered(CCSPL_OUTCOME_SENT, 1, 10000L);
+
+    for (GatewayEventDTO retrieveCaseId : message) {
+      caseId = retrieveCaseId.getCaseId();
+    }
+
     gatewayEventMonitor.checkForEvent(caseId, CCSPL_OUTCOME_SENT);
+
     try {
       actualMessage = queueUtils.getMessage(caseEvent);
-      assertTrue(compareCaseEventMessages(secondaryOutcome, actualMessage));
+      assertTrue(compareCaseEventMessages(secondaryOutcome, actualMessage, caseId));
     } catch (InterruptedException e) {
       throw new RuntimeException("Problem getting message", e);
     }
