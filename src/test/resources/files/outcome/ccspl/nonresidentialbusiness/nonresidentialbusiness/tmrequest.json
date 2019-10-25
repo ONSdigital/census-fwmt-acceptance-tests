@@ -4,8 +4,8 @@
 	"username": "CAR1_HA_01",
 	"propertyListingCaseId": "fe200301-12cc-4a58-919a-c4f37d61ef8a",
 	"propertyListingCaseReference": "NW1 6XE",
-	"primaryOutcome": "Non residential / business",
-	"secondaryOutcome": "Non residential / business",
+	"primaryOutcome": "Non residential or business",
+	"secondaryOutcome": "Non-residential or business",
 	"address": {
 		"addressLine1": "221b Baker St",
 		"addressLine2": "Marylebone",
