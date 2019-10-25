@@ -128,7 +128,7 @@ dependencies {
 
     compile("org.json:json:20180813")
 	compile('org.freemarker:freemarker:2.3.28')
-	
+
     testCompile("com.fasterxml.jackson.core:jackson-databind:2.9.7")
     testCompile("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.9.7")
 

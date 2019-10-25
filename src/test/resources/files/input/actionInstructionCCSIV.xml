@@ -1,23 +1,49 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<ins:actionInstruction xmlns:ins="http://ons.gov.uk/ctp/response/action/message/instruction">
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><ins:actionInstruction xmlns:ins="http://ons.gov.uk/ctp/response/action/message/instruction">
     <actionRequest>
         <actionId>a133b2cd-ef3f-4755-ad07-616b7298a12a</actionId>
+        <responseRequired>false</responseRequired>
         <actionPlan>ad3fbcb5-3681-4540-b386-ff719ec93643</actionPlan>
         <actionType>Create</actionType>
+        <contact>
+            <title>Mr</title>
+            <forename>John</forename>
+            <surname>Doe</surname>
+            <phoneNumber>12345 67890</phoneNumber>
+            <emailAddress>John.Doe@Email.com</emailAddress>
+        </contact>
         <address>
+            <arid>1234567890</arid>
+            <uprn>1234567890</uprn>
+            <type>HH</type>
             <estabType>Residential</estabType>
+            <locality>E</locality>
             <line1>1 Whalesborough Place</line1>
-            <line2></line2>
-            <line3></line3>
+            <line2/>
+            <line3/>
             <townName>BUDE</townName>
             <postcode>EX23 8GB</postcode>
+            <ladCode>E00074083</ladCode>
             <latitude>50.8299346</latitude>
             <longitude>-4.5314548</longitude>
+            <oa>E00074083</oa>
         </address>
-        <caseId>e6e3e714-2f26-4909-a564-b8d4d0c8ba49</caseId>
+        <legalBasis>Voluntary Not Stated</legalBasis>
+        <caseGroupStatus>NOTSTARTED</caseGroupStatus>
+        <caseId>8148b605-5629-40b1-88ff-4eaac589570a</caseId>
+        <priority>medium</priority>
         <caseRef>02e52571-95c0-46ba-aab3-3e9f4c7555f7</caseRef>
+        <iac>9wbmjwt557p3</iac>
+        <events>
+            <event>CASE_CREATED : null : SYSTEM : Case created when Initial creation of case</event>
+        </events>
+        <exerciseRef>1</exerciseRef>
+        <userDescription>FWMT Comet Test</userDescription>
         <surveyName>CCS</surveyName>
+        <surveyRef>HH</surveyRef>
+        <returnByDate>06/02/2019</returnByDate>
+        <sampleUnitRef/>
         <addressType>HH</addressType>
+        <treatmentId>treatmentId</treatmentId>
         <coordinatorId>TWH1-HA</coordinatorId>
         <undeliveredAsAddress>false</undeliveredAsAddress>
         <blankQreReturned>false</blankQreReturned>
