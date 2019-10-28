@@ -53,7 +53,6 @@ public class CCSInterviewRM {
   private boolean qIdHasValue;
   private String tmRequest = null;
   private JsonNode tmRequestRootNode;
-  private String resourcePath;
   private ObjectMapper jsonObjectMapper = new ObjectMapper();
   private String caseId;
   private String newCaseId;
@@ -194,7 +193,7 @@ public class CCSInterviewRM {
 
       return updatedMessage;
     } catch (Exception e){
-      String error = "Errored";
+      log.error("Unable to process action request XML");
     }
     return null;
   }
