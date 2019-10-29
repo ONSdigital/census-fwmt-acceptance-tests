@@ -23,6 +23,7 @@ Feature: CCS Interview Outcome Tests
       | Extraordinary refusal             | Contact made    | HH       | Field.refusals | REFUSAL_RECEIVED     |
       | Property not in postcode boundary | Contact made    | HH       | Field.other    | ADDRESS_NOT_VALID    |
       | Split address                     | Contact made    | HH       | Field.other    | ADDRESS_NOT_VALID    |
+      | CE out of scope                   | Contact made    | CE       | Field.other    | ADDRESS_NOT_VALID    |
       | Property is a CE                  | Not Valid       | HH       | Field.other    | ADDRESS_NOT_VALID    |
       | Derelict                          | Not Valid       | CE       | Field.other    | ADDRESS_NOT_VALID    |
       | Derelict                          | Not Valid       | HH       | Field.other    | ADDRESS_NOT_VALID    |
@@ -37,4 +38,3 @@ Feature: CCS Interview Outcome Tests
       | Incorrect address                 | Not Valid       | CE       | Field.other    | ADDRESS_NOT_VALID    |
       | Incorrect address                 | Not Valid       | HH       | Field.other    | ADDRESS_NOT_VALID    |
       | Property is a household           | Not Valid       | CE       | Field.other    | ADDRESS_NOT_VALID    |
-      | CE out of scope                   | Contact made    | CE       | Field.other    | ADDRESS_NOT_VALID    |
