@@ -27,8 +27,8 @@ Feature: CCS Interview Outcome Tests
       | Property is a CE                  | Not Valid       | HH       | Field.other    | ADDRESS_NOT_VALID    |
       | Derelict                          | Not Valid       | CE       | Field.other    | ADDRESS_NOT_VALID    |
       | Derelict                          | Not Valid       | HH       | Field.other    | ADDRESS_NOT_VALID    |
-      | Non residential or business       | Not Valid       | CE       | Field.other    | ADDRESS_NOT_VALID    |
-      | Non residential or business       | Not Valid       | HH       | Field.other    | ADDRESS_NOT_VALID    |
+      | Non-residential or business       | Not Valid       | CE       | Field.other    | ADDRESS_NOT_VALID    |
+      | Non-residential or business       | Not Valid       | HH       | Field.other    | ADDRESS_NOT_VALID    |
       | Demolished                        | Not Valid       | CE       | Field.other    | ADDRESS_NOT_VALID    |
       | Demolished                        | Not Valid       | HH       | Field.other    | ADDRESS_NOT_VALID    |
       | Duplicate                         | Not Valid       | CE       | Field.other    | ADDRESS_NOT_VALID    |
