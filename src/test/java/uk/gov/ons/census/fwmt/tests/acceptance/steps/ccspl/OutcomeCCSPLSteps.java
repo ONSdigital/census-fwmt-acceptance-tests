@@ -85,14 +85,7 @@ public class OutcomeCCSPLSteps {
   }
 
   private String createPathnameFromOutcomeName(String outcomeName) {
-    String pathname;
-
-    if (outcomeName == "Not Valid") {
-        pathname = outcomeName.replaceAll("[^A-Za-z]+", "").toLowerCase();
-    } else {
-        pathname = outcomeName.replaceAll("[^A-Za-z]+", "").toLowerCase();
-    }
-
+    String pathname = outcomeName.replaceAll("[^A-Za-z]+", "").toLowerCase();
     return pathname;
   }
 
