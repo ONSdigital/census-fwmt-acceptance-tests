@@ -6,8 +6,10 @@
   "category": "HH",
   "primaryOutcome": "Contact made",
   "secondaryOutcome": "Complete on paper (partial)",
-  "fulfilmentRequest": {
-    "questionnaireId": "1110000009"
-  },
+  "fulfillmentRequests": [
+    {
+      "questionnaireID": "1110000009"
+    }
+    ],
   "caseId": "bbd55984-0dbf-4499-bfa7-0aa4228700e9"
 }

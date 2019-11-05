@@ -6,7 +6,7 @@
   "primaryOutcome": "Contact made",
   "secondaryOutcome": "Collect completed questionnaire",
   "transactionId": "c45de4dc-3c3b-11e9-b210-d663bd873d93",
-  "fulfilmentRequests": [
+  "fulfillmentRequests": [
   {
     "questionnaireType": "H1",
     "requesterPhone": "01010"

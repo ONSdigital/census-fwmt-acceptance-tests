@@ -15,8 +15,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.ResponseEntity;
+import uk.gov.ons.census.fwmt.common.error.GatewayException;
 import uk.gov.ons.census.fwmt.events.utils.GatewayEventMonitor;
-import uk.gov.ons.census.fwmt.tests.acceptance.utils.QueueUtils;
+import uk.gov.ons.census.fwmt.tests.acceptance.utils.QueueClient;
 import uk.gov.ons.census.fwmt.tests.acceptance.utils.TMMockUtils;
 
 import java.io.IOException;
@@ -25,6 +26,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeoutException;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -38,7 +41,7 @@ public class OutcomeStepsContactMadeSteps {
   private TMMockUtils tmMockUtils;
 
   @Autowired
-  private QueueUtils queueUtils;
+  private QueueClient queueUtils;
 
   private GatewayEventMonitor gatewayEventMonitor;
 
@@ -214,7 +217,7 @@ public class OutcomeStepsContactMadeSteps {
   @And("the message contains {string} fulfilment requests")
   public void the_message_contains_fulfilment_requests(String quantity) {
     int qty = Integer.parseInt(quantity);
-    int actualSize = tmRequestRootNode.path("fulfilmentRequests").size();
+    int actualSize = tmRequestRootNode.path("fulfillmentRequests").size();
     assertEquals(qty, actualSize);
   }
 
@@ -226,12 +229,11 @@ public class OutcomeStepsContactMadeSteps {
     assertEquals(202, response);
   }
 
-  @Then("a valid {string} for the correct {string}")
-  public void the_Outcome_Service_should_create_a_valid_for_the_correct(String caseEvent, String routingKey) {
+  @Then("a valid {string}")
+  public void the_Outcome_Service_should_create_a_valid_for_the_correct(String caseEvent) {
     gatewayEventMonitor.checkForEvent(caseId, HH_OUTCOME_SENT);
     try {
-      ResponseEntity<String> message = queueUtils.getMessageOffQueueWithRoutingKey(caseEvent, routingKey);
-      actualMessage = message.getBody();
+      actualMessage = queueUtils.getMessage(caseEvent);
       assertTrue(compareCaseEventMessages(secondaryOutcome, actualMessage));
     } catch (InterruptedException e) {
       throw new RuntimeException("Problem getting message", e);
@@ -305,5 +307,25 @@ public class OutcomeStepsContactMadeSteps {
           .getMessage("Field.other");
       multipleMessages.add(jsonObjectMapper.readTree(message));
     }
+  }
+
+  @Given("TM sends a blank fulfillment request and receives an error from Outcome Service")
+  public void tmSendsABlankFulfillmentRequestAndReceivesAnErrorFromOutcomeService() {
+    try {
+      tmRequest = Resources.toString(
+              Resources.getResource("files/outcome/household/contactmade/missingfulfilment/tmrequest.json"), Charsets.UTF_8);
+      tmRequestRootNode = jsonObjectMapper.readTree(tmRequest);
+    } catch (IOException e) {
+      throw new RuntimeException("Problem retrieving resource file", e);
+    }
+
+    JsonNode node = tmRequestRootNode.path("caseId");
+    caseId = node.asText();
+    int response = tmMockUtils.sendTMResponseMessage(tmRequest, caseId);
+
+    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, "HH_OUTCOME_SENT", 10000L);
+    assertThat(hasBeenTriggered).isFalse();
+
+
   }
 }

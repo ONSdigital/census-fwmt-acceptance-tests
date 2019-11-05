@@ -13,7 +13,7 @@ import org.springframework.context.annotation.PropertySource;
 import uk.gov.ons.census.fwmt.common.data.modelcase.ModelCase;
 import uk.gov.ons.census.fwmt.events.utils.GatewayEventMonitor;
 import uk.gov.ons.census.fwmt.tests.acceptance.utils.CSVSerivceUtils;
-import uk.gov.ons.census.fwmt.tests.acceptance.utils.QueueUtils;
+import uk.gov.ons.census.fwmt.tests.acceptance.utils.QueueClient;
 import uk.gov.ons.census.fwmt.tests.acceptance.utils.TMMockUtils;
 
 import java.io.IOException;
@@ -30,13 +30,13 @@ public class CECSVServiceSteps {
 
     private static final String CANONICAL_CREATE_SENT = "CANONICAL_CREATE_SENT";
     public static final String CSV_CE_REQUEST_EXTRACTED = "CSV_CE_REQUEST_EXTRACTED";
-    private static final String COMET_CREATE_SENT = "COMET_CREATE_SENT";
+    private static final String COMET_CREATE_ACK = "COMET_CREATE_ACK";
 
     @Autowired
     private TMMockUtils tmMockUtils;
 
     @Autowired
-    private QueueUtils queueUtils;
+    private QueueClient queueUtils;
 
     @Autowired
     private CSVSerivceUtils csvSerivceUtils;
@@ -89,7 +89,7 @@ public class CECSVServiceSteps {
 
     @And("TM picks up the CE Create Job message with case ID {string}")
     public void tmPicksUpTheCreateJobMessageWithCaseID(String caseId) {
-        boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, COMET_CREATE_SENT, 10000L);
+        boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, COMET_CREATE_ACK, 10000L);
         assertThat(hasBeenTriggered).isTrue();
     }
 
