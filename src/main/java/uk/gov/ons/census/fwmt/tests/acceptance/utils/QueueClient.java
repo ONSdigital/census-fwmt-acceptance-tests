@@ -1,7 +1,9 @@
 package uk.gov.ons.census.fwmt.tests.acceptance.utils;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.concurrent.TimeoutException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
@@ -63,6 +65,9 @@ public final class QueueClient {
         clearQueue("Field.refusals");
     }
 
+    public void createQueue() throws IOException, TimeoutException, InterruptedException {
+      queueUtils.createOutcomeQueues();
+    }
     private void clearQueue(String queueName) throws URISyntaxException {
        queueUtils.deleteMessage(queueName);
     }
