@@ -7,12 +7,11 @@
 		"transactionId":"79d3fbfc-53ec-4fcb-916d-109bdf0cd0ec"
 	},
 	"payload":{
-		"invalidAddress": {
-			"reason": "DERELICT"
-		},
+		"invalidAddress":{
 			"collectionCase":{
 				"id":"bbd55984-0dbf-4499-bfa7-0aa4228700e9"
-			}
+			},
+			"reason":"DERELICT"
 		}
 	}
 }

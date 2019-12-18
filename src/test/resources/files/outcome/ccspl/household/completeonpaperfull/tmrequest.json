@@ -20,7 +20,9 @@
   "fieldOfficerCode": "CAR1_HA_01",
   "accessInfo": "Access via side door",
   "careCodes": [ "Access control", "Aggressive animal", "Caution required" ],
-  "fulfillmentRequest": {
-    "questionnaireId": "2420000002405886"
-   }
+  "fulfillmentRequests": [
+    {
+        "questionnaireID": "2420000002405886"
+    }
+  ]
 }

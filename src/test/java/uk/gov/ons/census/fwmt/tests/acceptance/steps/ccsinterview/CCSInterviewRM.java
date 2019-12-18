@@ -4,8 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-import java.io.IOException;
+import java.io.*;
 import java.net.URISyntaxException;
+import java.util.Collection;
 import java.util.concurrent.TimeoutException;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,24 +27,35 @@ import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
 import lombok.extern.slf4j.Slf4j;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
 import uk.gov.ons.census.fwmt.common.data.modelcase.ModelCase;
+import uk.gov.ons.census.fwmt.events.data.GatewayEventDTO;
 import uk.gov.ons.census.fwmt.events.utils.GatewayEventMonitor;
 import uk.gov.ons.census.fwmt.tests.acceptance.utils.QueueClient;
 import uk.gov.ons.census.fwmt.tests.acceptance.utils.TMMockUtils;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 @Slf4j
 @PropertySource("classpath:application.properties")
 public class CCSInterviewRM {
 
+  public static final String CCSPL_OUTCOME_SENT = "CCSPL_OUTCOME_SENT";
   private static final String RM_CREATE_REQUEST_RECEIVED = "RM_CREATE_REQUEST_RECEIVED";
   private static final String COMET_CREATE_ACK = "COMET_CREATE_ACK";
   private String receivedRMMessage = null;
   private boolean qIdHasValue;
   private String tmRequest = null;
   private JsonNode tmRequestRootNode;
-  private String resourcePath;
   private ObjectMapper jsonObjectMapper = new ObjectMapper();
   private String caseId;
+  private String newCaseId;
 
   @Autowired
   private TMMockUtils tmMockUtils;
@@ -96,31 +108,35 @@ public class CCSInterviewRM {
 
   @And("RM sends a create CCS Interview job request")
   public void rmSendsACreateHouseHoldJobRequest() throws URISyntaxException, InterruptedException {
-    String caseId = "e6e3e714-2f26-4909-a564-b8d4d0c8ba49";
-    queueClient.sendToRMFieldQueue(receivedRMMessage);
-    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, RM_CREATE_REQUEST_RECEIVED, 10000L);
+    Collection<GatewayEventDTO> message;
+    message = gatewayEventMonitor.grabEventsTriggered(CCSPL_OUTCOME_SENT, 1, 10000L);
+
+    for (GatewayEventDTO retrieveCaseId : message) {
+      newCaseId = retrieveCaseId.getCaseId();
+    }
+    String updatedRmMessage = updateActionInstructionWithNewCaseId();
+    queueClient.sendToRMFieldQueue(updatedRmMessage);
+    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(newCaseId, RM_CREATE_REQUEST_RECEIVED, 10000L);
     assertThat(hasBeenTriggered).isTrue();
   }
 
   @When("the Gateway sends a Create CCS Interview Job message to TM")
   public void theGatewaySendsACreateJobMessageToTM() {
-    String caseId = "e6e3e714-2f26-4909-a564-b8d4d0c8ba49";
-    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, COMET_CREATE_ACK, 10000L);
+    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(newCaseId, COMET_CREATE_ACK, 10000L);
     assertThat(hasBeenTriggered).isTrue();
   }
 
-  @Then("a new CCS Interview case with id of {string} is created in TM")
-  public void aNewCaseIsCreatedInTm(String caseId) throws InterruptedException {
+  @Then("a new CCS Interview case with a new case id is created in TM")
+  public void aNewCaseIsCreatedInTm() throws InterruptedException {
     Thread.sleep(1000);
-    ModelCase modelCase = tmMockUtils.getCaseById(caseId);
-    assertEquals(caseId, modelCase.getId().toString());
+    ModelCase modelCase = tmMockUtils.getCaseById(newCaseId);
+    assertEquals(newCaseId, modelCase.getId().toString());
   }
 
   @And("TM sends a CCS PL Outcome to the gateway with case ID {string}")
   public void tmSendsACCSPLOutcomeToTheGatewayWithCaseID(String caseId) {
     String fileLocation = "";
     this.qIdHasValue = false;
-    resourcePath = "ccspl/household/";
     readRequest("Complete on paper (full)");
   }
 
@@ -131,7 +147,6 @@ public class CCSInterviewRM {
     int response = tmMockUtils.sendTMCCSPLResponseMessage(tmRequest, caseId);
     assertEquals(202, response);
   }
-
 
   private void readRequest(String inputMessage) {
     this.tmRequest = getTmRequest(inputMessage);
@@ -146,7 +161,7 @@ public class CCSInterviewRM {
     try {
       String pathname = createPathnameFromOutcomeName(inputMessage);
       String message = Resources.toString(
-              Resources.getResource("files/outcome/" + resourcePath + "/" + pathname + "/tmrequest" + (qIdHasValue?"-q":"") + ".json"), Charsets.UTF_8);
+              Resources.getResource("files/input/ccsInterviewE2E.json"), Charsets.UTF_8);
       return message;
     } catch (IOException e) {
       throw new RuntimeException("Problem retrieving resource file", e);
@@ -156,4 +171,31 @@ public class CCSInterviewRM {
     String pathname = outcomeName.replaceAll("[^A-Za-z]+", "").toLowerCase();
     return pathname;
   }
+
+  private String updateActionInstructionWithNewCaseId () {
+    try {
+      File file = new File("src/test/resources/files/input/actionInstructionCCSIV.xml");
+
+      DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+      DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
+      Document document = documentBuilder.parse(file);
+
+      Node updateCaseId = document.getElementsByTagName("caseId").item(0);
+      updateCaseId.setTextContent(newCaseId);
+
+      TransformerFactory transformerFactory = TransformerFactory.newInstance();
+      Transformer transformer = transformerFactory.newTransformer();
+      DOMSource domSource = new DOMSource(document);
+      StreamResult streamResult = new StreamResult(new StringWriter());
+      transformer.transform(domSource, streamResult);
+
+      String updatedMessage = streamResult.getWriter().toString();
+
+      return updatedMessage;
+    } catch (Exception e){
+      log.error("Unable to process action request XML");
+    }
+    return null;
+  }
+
 }

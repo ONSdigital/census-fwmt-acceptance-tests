@@ -23,18 +23,18 @@ Feature: CCS Interview Outcome Tests
       | Extraordinary refusal             | Contact made    | HH       | Field.refusals | REFUSAL_RECEIVED     |
       | Property not in postcode boundary | Contact made    | HH       | Field.other    | ADDRESS_NOT_VALID    |
       | Split address                     | Contact made    | HH       | Field.other    | ADDRESS_NOT_VALID    |
-      | Property is a CE                  | Not valid       | HH       | Field.other    | ADDRESS_NOT_VALID    |
-      | Derelict                          | Not valid       | CE       | Field.other    | ADDRESS_NOT_VALID    |
-      | Derelict                          | Not valid       | HH       | Field.other    | ADDRESS_NOT_VALID    |
-      | Non residential or business       | Not valid       | CE       | Field.other    | ADDRESS_NOT_VALID    |
-      | Non residential or business       | Not valid       | HH       | Field.other    | ADDRESS_NOT_VALID    |
-      | Demolished                        | Not valid       | CE       | Field.other    | ADDRESS_NOT_VALID    |
-      | Demolished                        | Not valid       | HH       | Field.other    | ADDRESS_NOT_VALID    |
-      | Duplicate                         | Not valid       | CE       | Field.other    | ADDRESS_NOT_VALID    |
-      | Duplicate                         | Not valid       | HH       | Field.other    | ADDRESS_NOT_VALID    |
-      | Under construction                | Not valid       | CE       | Field.other    | ADDRESS_NOT_VALID    |
-      | Under construction                | Not valid       | HH       | Field.other    | ADDRESS_NOT_VALID    |
-      | Incorrect address                 | Not valid       | CE       | Field.other    | ADDRESS_NOT_VALID    |
-      | Incorrect address                 | Not valid       | HH       | Field.other    | ADDRESS_NOT_VALID    |
-      | Property is a household           | Not valid       | CE       | Field.other    | ADDRESS_NOT_VALID    |
       | CE out of scope                   | Contact made    | CE       | Field.other    | ADDRESS_NOT_VALID    |
+      | Property is a CE                  | Not Valid       | HH       | Field.other    | ADDRESS_NOT_VALID    |
+      | Derelict                          | Not Valid       | CE       | Field.other    | ADDRESS_NOT_VALID    |
+      | Derelict                          | Not Valid       | HH       | Field.other    | ADDRESS_NOT_VALID    |
+      | Non-residential or business       | Not Valid       | CE       | Field.other    | ADDRESS_NOT_VALID    |
+      | Non-residential or business       | Not Valid       | HH       | Field.other    | ADDRESS_NOT_VALID    |
+      | Demolished                        | Not Valid       | CE       | Field.other    | ADDRESS_NOT_VALID    |
+      | Demolished                        | Not Valid       | HH       | Field.other    | ADDRESS_NOT_VALID    |
+      | Duplicate                         | Not Valid       | CE       | Field.other    | ADDRESS_NOT_VALID    |
+      | Duplicate                         | Not Valid       | HH       | Field.other    | ADDRESS_NOT_VALID    |
+      | Under construction                | Not Valid       | CE       | Field.other    | ADDRESS_NOT_VALID    |
+      | Under construction                | Not Valid       | HH       | Field.other    | ADDRESS_NOT_VALID    |
+      | Incorrect address                 | Not Valid       | CE       | Field.other    | ADDRESS_NOT_VALID    |
+      | Incorrect address                 | Not Valid       | HH       | Field.other    | ADDRESS_NOT_VALID    |
+      | Property is a household           | Not Valid       | CE       | Field.other    | ADDRESS_NOT_VALID    |

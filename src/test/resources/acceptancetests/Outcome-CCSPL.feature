@@ -17,15 +17,15 @@ Feature: CCS Property Listing Outcome Tests
       | Hard refusal                | Household                  | Field.other | CCS_ADDRESS_LISTED |
       | Extraordinary refusal       | Household                  | Field.other | CCS_ADDRESS_LISTED |
       | Contact not needed          | Household                  | Field.other | CCS_ADDRESS_LISTED |
-      | Derelict / uninhabitable    | Household                  | Field.other | CCS_ADDRESS_LISTED |
-      | Potential Residential       | Household                  | Field.other | CCS_ADDRESS_LISTED |
+      | Derelict / Uninhabitable    | Household                  | Field.other | CCS_ADDRESS_LISTED |
+      | Potential residential       | Household                  | Field.other | CCS_ADDRESS_LISTED |
       | Under construction          | Household                  | Field.other | CCS_ADDRESS_LISTED |
       | Soft refusal                | CE                         | Field.other | CCS_ADDRESS_LISTED |
       | Hard refusal                | CE                         | Field.other | CCS_ADDRESS_LISTED |
       | Extraordinary refusal       | CE                         | Field.other | CCS_ADDRESS_LISTED |
       | Collect CE details          | CE                         | Field.other | CCS_ADDRESS_LISTED |
       | Contact not needed          | CE                         | Field.other | CCS_ADDRESS_LISTED |
-      | Derelict / uninhabitable    | CE                         | Field.other | CCS_ADDRESS_LISTED |
+      | Derelict / Uninhabitable    | CE                         | Field.other | CCS_ADDRESS_LISTED |
       | Under construction          | CE                         | Field.other | CCS_ADDRESS_LISTED |
       | CE Out of scope             | CE                         | Field.other | CCS_ADDRESS_LISTED |
-      | Non residential / business  | Non residential / business | Field.other | CCS_ADDRESS_LISTED |
+      | Non-residential or business  | Non residential or business | Field.other | CCS_ADDRESS_LISTED |

@@ -24,9 +24,6 @@
 				"longitude":"-0.1582785",
 				"fieldcoordinatorId":"CAR1_HA",
 				"fieldofficerId":"CAR1_HA_01"
-			},
-			"refusal": {
-				"type": "SOFT_REFUSAL"
 			}
 		}
 	}
