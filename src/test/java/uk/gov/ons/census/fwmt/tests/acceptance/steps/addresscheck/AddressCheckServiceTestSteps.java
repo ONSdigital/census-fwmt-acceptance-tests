@@ -1,4 +1,4 @@
-package uk.gov.ons.census.fwmt.tests.acceptance.steps.ccscsvservice;
+package uk.gov.ons.census.fwmt.tests.acceptance.steps.addresscheck;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
@@ -6,9 +6,7 @@ import cucumber.api.java.After;
 import cucumber.api.java.Before;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import uk.gov.ons.census.fwmt.common.data.modelcase.ModelCase;
@@ -25,12 +23,11 @@ import java.util.concurrent.TimeoutException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
+import static uk.gov.ons.census.fwmt.tests.acceptance.steps.ccscsvservice.CCSCSVServiceSteps.COMET_CREATE_ACK;
 
-@Slf4j
-@PropertySource("classpath:application.properties")
-public class CCSCSVServiceSteps {
+public class AddressCheckServiceTestSteps {
 
-  public static final String CSV_CCS_REQUEST_EXTRACTED = "CSV_CCS_REQUEST_EXTRACTED";
+  public static final String CSV_ADDRESS_CHECK_REQUEST_EXTRACTED = "CSV_ADDRESS_CHECK_REQUEST_EXTRACTED";
   public static final String COMET_CREATE_ACK = "COMET_CREATE_ACK";
 
   @Autowired
@@ -43,9 +40,6 @@ public class CCSCSVServiceSteps {
   private CSVSerivceUtils csvSerivceUtils;
 
   private GatewayEventMonitor gatewayEventMonitor;
-
-  @Value("${service.mocktm.url}")
-  private String mockTmUrl;
 
   @Value("${service.rabbit.url}")
   private String rabbitLocation;
@@ -63,15 +57,12 @@ public class CCSCSVServiceSteps {
 
   @Before
   public void setup() throws IOException, TimeoutException, URISyntaxException {
-    String csvData = Resources.toString(Resources.getResource("files/testCCSCSV.csv"), Charsets.UTF_8);
-
     tmMockUtils.enableRequestRecorder();
     tmMockUtils.resetMock();
     queueUtils.clearQueues();
 
     gatewayEventMonitor = new GatewayEventMonitor();
     gatewayEventMonitor.enableEventMonitor(rabbitLocation, rabbitUsername, rabbitPassword);
-//    putCSVInBucket(csvData);
   }
 
   @After
@@ -80,24 +71,24 @@ public class CCSCSVServiceSteps {
     tmMockUtils.disableRequestRecorder();
   }
 
-  @Given("the Gateway receives a CSV CCS")
-  public void theGatewayReceivesACSVCCSWithCaseID() throws IOException, InterruptedException {
+  @Given("the Gateway receives a CSV Address Check")
+  public void theGatewayReceivesACSVAddressCheck() throws IOException, InterruptedException {
     Collection<GatewayEventDTO> message;
 
-    csvSerivceUtils.enableCCSCsvService();
+    csvSerivceUtils.enableAddressCheckCsvService();
 
-    message = gatewayEventMonitor.grabEventsTriggered(CSV_CCS_REQUEST_EXTRACTED, 1, 10000L);
+    message = gatewayEventMonitor.grabEventsTriggered(CSV_ADDRESS_CHECK_REQUEST_EXTRACTED, 1, 10000L);
 
     for (GatewayEventDTO retrieveCaseId : message) {
       caseId = retrieveCaseId.getCaseId();
     }
 
-    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, CSV_CCS_REQUEST_EXTRACTED, 10000L);
+    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, CSV_ADDRESS_CHECK_REQUEST_EXTRACTED, 10000L);
     assertThat(hasBeenTriggered).isTrue();
   }
 
-  @Then("a new case with new case id for job containing postcode {string} is created in TM")
-  public void aNewCaseWithNewCaseIdForJobContainingPostcodeIsCreatedInTM(String postcode) throws InterruptedException {
+  @Then("a new case id for job containing postcode {string} is created in TM")
+  public void aNewCaseIdForJobContainingPostcodeIsCreatedInTM(String postcode) {
     boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, COMET_CREATE_ACK, 10000L);
     assertThat(hasBeenTriggered).isTrue();
 
@@ -105,12 +96,4 @@ public class CCSCSVServiceSteps {
     assertEquals(caseId, modelCase.getId().toString());
     assertEquals(postcode, modelCase.getAddress().getPostcode());
   }
-
-//  private void putCSVInBucket(String CSV) throws IOException {
-//    String fileName = "testCCSCSV.csv";
-//
-//    try (OutputStream os = ((WritableResource) resource.createRelative(fileName)).getOutputStream()) {
-//      os.write(CSV.getBytes());
-//    }
-//  }
 }

@@ -26,6 +26,9 @@ public class CSVSerivceUtils {
     @Value("${service.cecsv.url}")
     private String ceCsvService;
 
+    @Value("${service.addresscheckcsv.url}")
+    private String addressCheckCsvService;
+
     @Value("${service.csvservice.username}")
     private String csvServiceUsername;
 
@@ -57,6 +60,19 @@ public class CSVSerivceUtils {
 
         HttpEntity<String> get = new HttpEntity<>(null, headers);
         ResponseEntity<Void> response = restTemplate.exchange(ceCsvService, HttpMethod.GET, get, Void.class);
+
+        return response.getStatusCode().value();
+    }
+
+    public int enableAddressCheckCsvService() throws IOException, InterruptedException {
+        HttpHeaders headers = createBasicAuthHeaders(csvServiceUsername, csvServicePassword);
+
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        RestTemplate restTemplate = new RestTemplate();
+
+        HttpEntity<String> get = new HttpEntity<>(null, headers);
+        ResponseEntity<Void> response = restTemplate.exchange(addressCheckCsvService, HttpMethod.GET, get, Void.class);
 
         return response.getStatusCode().value();
     }

@@ -96,7 +96,7 @@ task genJaxb {
 dependencies {
 
     compile("uk.gov.ons.census.fwmt:census-fwmt-events:1.0.17-RELEASE")
-    compile('uk.gov.ons.census.fwmt:census-fwmt-common:1.0.41-RELEASE')
+    compile('uk.gov.ons.census.fwmt:census-fwmt-common:1.0.46-RELEASE')
 
     compile("com.google.guava:guava:27.0.1-jre")
 
