@@ -41,7 +41,7 @@ public class OutcomeStepsContactMadeSteps {
   private TMMockUtils tmMockUtils;
 
   @Autowired
-  private QueueClient queueUtils;
+  private QueueClient queueClient;
 
   private GatewayEventMonitor gatewayEventMonitor;
 
@@ -80,11 +80,12 @@ public class OutcomeStepsContactMadeSteps {
   private List<JsonNode> multipleMessages;
 
   @Before
-  public void setup() throws IOException, TimeoutException, URISyntaxException {
+  public void setup() throws IOException, TimeoutException, URISyntaxException, InterruptedException {
     testOutcomeJson = null;
+    queueClient.createQueue();
     tmMockUtils.enableRequestRecorder();
     tmMockUtils.resetMock();
-    queueUtils.clearQueues();
+    queueClient.clearQueues();
 
     gatewayEventMonitor = new GatewayEventMonitor();
     gatewayEventMonitor.enableEventMonitor(rabbitLocation, rabbitUsername, rabbitPassword);
@@ -233,7 +234,7 @@ public class OutcomeStepsContactMadeSteps {
   public void the_Outcome_Service_should_create_a_valid_for_the_correct(String caseEvent) {
     gatewayEventMonitor.checkForEvent(caseId, HH_OUTCOME_SENT);
     try {
-      actualMessage = queueUtils.getMessage(caseEvent);
+      actualMessage = queueClient.getMessage(caseEvent);
       assertTrue(compareCaseEventMessages(secondaryOutcome, actualMessage));
     } catch (InterruptedException e) {
       throw new RuntimeException("Problem getting message", e);
@@ -303,7 +304,7 @@ public class OutcomeStepsContactMadeSteps {
     multipleMessages = new ArrayList<>();
 
     for (int i = 0; i < expectedMessageCount; i++) {
-      String message = queueUtils
+      String message = queueClient
           .getMessage("Field.other");
       multipleMessages.add(jsonObjectMapper.readTree(message));
     }
