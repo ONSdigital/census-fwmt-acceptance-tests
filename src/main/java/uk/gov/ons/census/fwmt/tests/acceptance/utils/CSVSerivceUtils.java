@@ -11,12 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
-import java.net.URL;
-
 @Slf4j
 @Component
 public class CSVSerivceUtils {
@@ -29,42 +23,32 @@ public class CSVSerivceUtils {
     @Value("${service.addresscheckcsv.url}")
     private String addressCheckCsvService;
 
+    @Value("${service.addressfileload.url}")
+    private String addressFileLoadService;
+
     @Value("${service.csvservice.username}")
     private String csvServiceUsername;
 
     @Value("${service.csvservice.password}")
     private String csvServicePassword;
 
-    @Value("${service.tm.url}")
-    private String tmUrl;
-
-    public int enableCCSCsvService() throws IOException, InterruptedException {
-        HttpHeaders headers = createBasicAuthHeaders(csvServiceUsername, csvServicePassword);
-
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
-        RestTemplate restTemplate = new RestTemplate();
-
-        HttpEntity<String> get = new HttpEntity<>(null, headers);
-        ResponseEntity<Void> response = restTemplate.exchange(ccsCsvService, HttpMethod.GET, get, Void.class);
-
-        return response.getStatusCode().value();
+    public int enableCCSCsvService() {
+        return sendRequest(ccsCsvService);
     }
 
-    public int enableCECsvService() throws IOException, InterruptedException {
-        HttpHeaders headers = createBasicAuthHeaders(csvServiceUsername, csvServicePassword);
-
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
-        RestTemplate restTemplate = new RestTemplate();
-
-        HttpEntity<String> get = new HttpEntity<>(null, headers);
-        ResponseEntity<Void> response = restTemplate.exchange(ceCsvService, HttpMethod.GET, get, Void.class);
-
-        return response.getStatusCode().value();
+    public int enableCECsvService() {
+        return sendRequest(ceCsvService);
     }
 
-    public int enableAddressCheckCsvService() throws IOException, InterruptedException {
+    public int enableAddressCheckCsvService() {
+        return sendRequest(addressCheckCsvService);
+    }
+
+    public int ingestAddressCheckFile() {
+        return sendRequest(addressFileLoadService);
+    }
+
+    private int sendRequest(String url) {
         HttpHeaders headers = createBasicAuthHeaders(csvServiceUsername, csvServicePassword);
 
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -72,7 +56,7 @@ public class CSVSerivceUtils {
         RestTemplate restTemplate = new RestTemplate();
 
         HttpEntity<String> get = new HttpEntity<>(null, headers);
-        ResponseEntity<Void> response = restTemplate.exchange(addressCheckCsvService, HttpMethod.GET, get, Void.class);
+        ResponseEntity<Void> response = restTemplate.exchange(url, HttpMethod.GET, get, Void.class);
 
         return response.getStatusCode().value();
     }

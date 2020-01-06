@@ -1,14 +1,11 @@
 package uk.gov.ons.census.fwmt.tests.acceptance.steps.addresscheck;
 
-import com.google.common.base.Charsets;
-import com.google.common.io.Resources;
 import cucumber.api.java.After;
 import cucumber.api.java.Before;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.Resource;
 import uk.gov.ons.census.fwmt.common.data.modelcase.ModelCase;
 import uk.gov.ons.census.fwmt.events.data.GatewayEventDTO;
 import uk.gov.ons.census.fwmt.events.utils.GatewayEventMonitor;
@@ -23,7 +20,6 @@ import java.util.concurrent.TimeoutException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
-import static uk.gov.ons.census.fwmt.tests.acceptance.steps.ccscsvservice.CCSCSVServiceSteps.COMET_CREATE_ACK;
 
 public class AddressCheckServiceTestSteps {
 
@@ -50,9 +46,6 @@ public class AddressCheckServiceTestSteps {
   @Value("${service.rabbit.password}")
   private String rabbitPassword;
 
-  @Value("${service.csvservice.gcpBucket.ccslocation}")
-  private Resource resource;
-
   private String caseId;
 
   @Before
@@ -72,7 +65,9 @@ public class AddressCheckServiceTestSteps {
   }
 
   @Given("the Gateway receives a CSV Address Check")
-  public void theGatewayReceivesACSVAddressCheck() throws IOException, InterruptedException {
+  public void theGatewayReceivesACSVAddressCheck() {
+    csvSerivceUtils.ingestAddressCheckFile();
+
     Collection<GatewayEventDTO> message;
 
     csvSerivceUtils.enableAddressCheckCsvService();
