@@ -6,6 +6,7 @@ import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 import uk.gov.ons.census.fwmt.common.data.modelcase.ModelCase;
 import uk.gov.ons.census.fwmt.events.data.GatewayEventDTO;
 import uk.gov.ons.census.fwmt.events.utils.GatewayEventMonitor;
@@ -35,6 +36,7 @@ public class AddressCheckServiceTestSteps {
   @Autowired
   private CSVSerivceUtils csvSerivceUtils;
 
+  @Autowired
   private GatewayEventMonitor gatewayEventMonitor;
 
   @Value("${service.rabbit.url}")

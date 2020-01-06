@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import uk.gov.ons.census.fwmt.events.data.GatewayEventDTO;
 import uk.gov.ons.census.fwmt.events.utils.GatewayEventMonitor;
 import uk.gov.ons.census.fwmt.tests.acceptance.utils.QueueClient;
 import uk.gov.ons.census.fwmt.tests.acceptance.utils.TMMockUtils;
@@ -69,11 +70,10 @@ public class OutcomeCCSPLSteps {
 
 
   @Before
-  public void before() throws URISyntaxException, IOException, TimeoutException {
+  public void before() throws IOException, TimeoutException, InterruptedException {
     tmMockUtils.enableRequestRecorder();
     tmMockUtils.resetMock();
     queueClient.createQueue();
-    queueUtils.clearQueues();
 
     gatewayEventMonitor.enableEventMonitor(rabbitLocation, rabbitUsername, rabbitPassword);
   }
@@ -193,7 +193,7 @@ public class OutcomeCCSPLSteps {
     gatewayEventMonitor.checkForEvent(caseId, CCSPL_OUTCOME_SENT);
 
     try {
-      actualMessage = queueUtils.getMessage(caseEvent);
+      actualMessage = queueClient.getMessage(caseEvent);
       assertTrue(compareCaseEventMessages(secondaryOutcome, actualMessage, caseId));
     } catch (InterruptedException e) {
       throw new RuntimeException("Problem getting message", e);
