@@ -15,8 +15,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
-import uk.gov.ons.census.fwmt.events.data.GatewayEventDTO;
 import uk.gov.ons.census.fwmt.events.utils.GatewayEventMonitor;
 import uk.gov.ons.census.fwmt.tests.acceptance.utils.QueueClient;
 import uk.gov.ons.census.fwmt.tests.acceptance.utils.TMMockUtils;
@@ -38,7 +36,7 @@ public class OutcomeCCSPLSteps {
   private TMMockUtils tmMockUtils;
   
   @Autowired
-  private QueueClient queueUtils;
+  private QueueClient queueClient;
 
   private GatewayEventMonitor gatewayEventMonitor = new GatewayEventMonitor();
 
@@ -74,6 +72,7 @@ public class OutcomeCCSPLSteps {
   public void before() throws URISyntaxException, IOException, TimeoutException {
     tmMockUtils.enableRequestRecorder();
     tmMockUtils.resetMock();
+    queueClient.createQueue();
     queueUtils.clearQueues();
 
     gatewayEventMonitor.enableEventMonitor(rabbitLocation, rabbitUsername, rabbitPassword);
