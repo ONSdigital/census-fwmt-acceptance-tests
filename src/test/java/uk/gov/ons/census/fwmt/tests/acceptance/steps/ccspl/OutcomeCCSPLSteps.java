@@ -26,8 +26,10 @@ import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.concurrent.TimeoutException;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static uk.gov.ons.census.fwmt.tests.acceptance.steps.ccscsvservice.CCSCSVServiceSteps.CSV_CCS_REQUEST_EXTRACTED;
 
 @Slf4j
 public class OutcomeCCSPLSteps {
@@ -69,18 +71,16 @@ public class OutcomeCCSPLSteps {
 
 
   @Before
-  public void before() throws URISyntaxException {
-    try {
-      gatewayEventMonitor.enableEventMonitor(rabbitLocation, rabbitUsername, rabbitPassword);
-    } catch (IOException | TimeoutException e) {
-      throw new RuntimeException("Problem with setting up", e);
-    }
-
+  public void before() throws URISyntaxException, IOException, TimeoutException {
+    tmMockUtils.enableRequestRecorder();
+    tmMockUtils.resetMock();
     queueUtils.clearQueues();
+
+    gatewayEventMonitor.enableEventMonitor(rabbitLocation, rabbitUsername, rabbitPassword);
   }
 
   @After
-  public void after() throws IOException, TimeoutException, URISyntaxException {
+  public void after() {
     gatewayEventMonitor.tearDownGatewayEventMonitor();
   }
 
@@ -183,6 +183,9 @@ public class OutcomeCCSPLSteps {
   public void theOutcomeServiceForTheCCSPLShouldCreateAValidForTheCorrect(String caseEvent) {
     Collection<GatewayEventDTO> message;
     message = gatewayEventMonitor.grabEventsTriggered(CCSPL_OUTCOME_SENT, 1, 10000L);
+
+    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, CSV_CCS_REQUEST_EXTRACTED, 10000L);
+    assertThat(hasBeenTriggered).isTrue();
 
     for (GatewayEventDTO retrieveCaseId : message) {
       caseId = retrieveCaseId.getCaseId();
