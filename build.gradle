@@ -100,6 +100,10 @@ dependencies {
 
     compile("com.google.guava:guava:27.0.1-jre")
 
+    compile group: 'com.google.cloud', name: 'google-cloud-storage', version: '1.2.3'
+
+    compile group: 'org.springframework.cloud', name: 'spring-cloud-gcp-starter-storage', version: '1.2.1.RELEASE'
+
     jaxb("javax.xml.bind:jaxb-api:2.3.0")
     jaxb("com.sun.xml.bind:jaxb-core:2.3.0.1")
     jaxb("com.sun.xml.bind:jaxb-impl:2.3.1")

@@ -1,5 +1,7 @@
 package uk.gov.ons.census.fwmt.tests.acceptance.steps.addresscheck;
 
+import com.google.common.base.Charsets;
+import com.google.common.io.Resources;
 import cucumber.api.java.After;
 import cucumber.api.java.Before;
 import cucumber.api.java.en.Given;
@@ -60,6 +62,9 @@ public class AddressCheckServiceTestSteps {
 
   @After
   public void tearDownGatewayEventMonitor() throws IOException {
+    String csvData = Resources
+        .toString(Resources.getResource("files/csv/AC15_07_94.csv"), Charsets.UTF_8);
+    csvSerivceUtils.putCSVInBucket("AC15_07_94", csvData);
     gatewayEventMonitor.tearDownGatewayEventMonitor();
     tmMockUtils.disableRequestRecorder();
   }
