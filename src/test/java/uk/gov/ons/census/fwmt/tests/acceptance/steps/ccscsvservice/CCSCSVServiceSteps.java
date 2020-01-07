@@ -1,7 +1,5 @@
 package uk.gov.ons.census.fwmt.tests.acceptance.steps.ccscsvservice;
 
-import com.google.common.base.Charsets;
-import com.google.common.io.Resources;
 import cucumber.api.java.After;
 import cucumber.api.java.Before;
 import cucumber.api.java.en.Given;
@@ -10,7 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.Resource;
 import uk.gov.ons.census.fwmt.common.data.modelcase.ModelCase;
 import uk.gov.ons.census.fwmt.events.data.GatewayEventDTO;
 import uk.gov.ons.census.fwmt.events.utils.GatewayEventMonitor;
@@ -44,9 +41,6 @@ public class CCSCSVServiceSteps {
 
   private GatewayEventMonitor gatewayEventMonitor;
 
-  @Value("${service.mocktm.url}")
-  private String mockTmUrl;
-
   @Value("${service.rabbit.url}")
   private String rabbitLocation;
 
@@ -56,22 +50,16 @@ public class CCSCSVServiceSteps {
   @Value("${service.rabbit.password}")
   private String rabbitPassword;
 
-  @Value("${service.csvservice.gcpBucket.ccslocation}")
-  private Resource resource;
-
   private String caseId;
 
   @Before
   public void setup() throws IOException, TimeoutException, URISyntaxException {
-    String csvData = Resources.toString(Resources.getResource("files/testCCSCSV.csv"), Charsets.UTF_8);
-
     tmMockUtils.enableRequestRecorder();
     tmMockUtils.resetMock();
     queueUtils.clearQueues();
 
     gatewayEventMonitor = new GatewayEventMonitor();
     gatewayEventMonitor.enableEventMonitor(rabbitLocation, rabbitUsername, rabbitPassword);
-//    putCSVInBucket(csvData);
   }
 
   @After
@@ -105,12 +93,4 @@ public class CCSCSVServiceSteps {
     assertEquals(caseId, modelCase.getId().toString());
     assertEquals(postcode, modelCase.getAddress().getPostcode());
   }
-
-//  private void putCSVInBucket(String CSV) throws IOException {
-//    String fileName = "testCCSCSV.csv";
-//
-//    try (OutputStream os = ((WritableResource) resource.createRelative(fileName)).getOutputStream()) {
-//      os.write(CSV.getBytes());
-//    }
-//  }
 }
