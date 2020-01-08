@@ -91,6 +91,7 @@ public class CSVSerivceUtils {
   }
 
   private void sendFile(String file, String fileName) throws IOException {
+    log.info("Resource Implmentation:" + resource.getClass().getCanonicalName());
     try (OutputStream os = ((WritableResource) resource.createRelative(fileName)).getOutputStream()) {
       os.write(file.getBytes());
     }

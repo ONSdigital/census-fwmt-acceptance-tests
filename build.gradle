@@ -102,7 +102,7 @@ dependencies {
 
     compile group: 'com.google.cloud', name: 'google-cloud-storage', version: '1.2.3'
 
-    compile group: 'org.springframework.cloud', name: 'spring-cloud-gcp-starter-storage', version: '1.2.1.RELEASE'
+    testImplementation group: 'org.springframework.cloud', name: 'spring-cloud-gcp-starter-storage', version: '1.2.1.RELEASE'
 
     jaxb("javax.xml.bind:jaxb-api:2.3.0")
     jaxb("com.sun.xml.bind:jaxb-core:2.3.0.1")
