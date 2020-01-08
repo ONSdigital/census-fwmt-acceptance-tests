@@ -28,4 +28,4 @@ Feature: CCS Property Listing Outcome Tests
       | Derelict / Uninhabitable    | CE                         | Field.other | CCS_ADDRESS_LISTED |
       | Under construction          | CE                         | Field.other | CCS_ADDRESS_LISTED |
       | CE Out of scope             | CE                         | Field.other | CCS_ADDRESS_LISTED |
-      | Non-residential or business  | Non residential or business | Field.other | CCS_ADDRESS_LISTED |
+      | Non-residential or business | Non residential or business| Field.other | CCS_ADDRESS_LISTED |

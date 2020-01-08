@@ -10,22 +10,23 @@ import cucumber.api.java.en.And;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
-import gherkin.deps.com.google.gson.JsonObject;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import uk.gov.ons.census.fwmt.events.data.GatewayEventDTO;
 import uk.gov.ons.census.fwmt.events.utils.GatewayEventMonitor;
 import uk.gov.ons.census.fwmt.tests.acceptance.utils.QueueClient;
 import uk.gov.ons.census.fwmt.tests.acceptance.utils.TMMockUtils;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.concurrent.TimeoutException;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static uk.gov.ons.census.fwmt.tests.acceptance.steps.ccscsvservice.CCSCSVServiceSteps.CSV_CCS_REQUEST_EXTRACTED;
 
 @Slf4j
 public class OutcomeCCSPLSteps {
@@ -65,21 +66,17 @@ public class OutcomeCCSPLSteps {
   
   private String resourcePath;
 
-
   @Before
-  public void before() throws URISyntaxException {
-    try {
-      queueClient.createQueue();
-      gatewayEventMonitor.enableEventMonitor(rabbitLocation, rabbitUsername, rabbitPassword);
-    } catch (IOException | TimeoutException | InterruptedException e) {
-      throw new RuntimeException("Problem with setting up", e);
-    }
+  public void before() throws IOException, TimeoutException, InterruptedException {
+    tmMockUtils.enableRequestRecorder();
+    tmMockUtils.resetMock();
+    queueClient.createQueue();
 
-    queueClient.clearQueues();
+    gatewayEventMonitor.enableEventMonitor(rabbitLocation, rabbitUsername, rabbitPassword);
   }
 
   @After
-  public void after() throws IOException, TimeoutException, URISyntaxException {
+  public void after() {
     gatewayEventMonitor.tearDownGatewayEventMonitor();
   }
 
@@ -183,6 +180,9 @@ public class OutcomeCCSPLSteps {
     Collection<GatewayEventDTO> message;
     message = gatewayEventMonitor.grabEventsTriggered(CCSPL_OUTCOME_SENT, 1, 10000L);
 
+    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, CSV_CCS_REQUEST_EXTRACTED, 10000L);
+    assertThat(hasBeenTriggered).isTrue();
+
     for (GatewayEventDTO retrieveCaseId : message) {
       caseId = retrieveCaseId.getCaseId();
     }
@@ -190,7 +190,7 @@ public class OutcomeCCSPLSteps {
     gatewayEventMonitor.checkForEvent(caseId, CCSPL_OUTCOME_SENT);
 
     try {
-      actualMessage = queueUtils.getMessage(caseEvent);
+      actualMessage = queueClient.getMessage(caseEvent);
       assertTrue(compareCaseEventMessages(secondaryOutcome, actualMessage, caseId));
     } catch (InterruptedException e) {
       throw new RuntimeException("Problem getting message", e);

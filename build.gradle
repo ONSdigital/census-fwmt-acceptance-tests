@@ -96,9 +96,13 @@ task genJaxb {
 dependencies {
 
     compile("uk.gov.ons.census.fwmt:census-fwmt-events:1.0.17-RELEASE")
-    compile('uk.gov.ons.census.fwmt:census-fwmt-common:1.0.41-RELEASE')
+    compile('uk.gov.ons.census.fwmt:census-fwmt-common:1.0.46-RELEASE')
 
     compile("com.google.guava:guava:27.0.1-jre")
+
+    compile group: 'com.google.cloud', name: 'google-cloud-storage', version: '1.2.3'
+
+    testImplementation group: 'org.springframework.cloud', name: 'spring-cloud-gcp-starter-storage', version: '1.2.1.RELEASE'
 
     jaxb("javax.xml.bind:jaxb-api:2.3.0")
     jaxb("com.sun.xml.bind:jaxb-core:2.3.0.1")
