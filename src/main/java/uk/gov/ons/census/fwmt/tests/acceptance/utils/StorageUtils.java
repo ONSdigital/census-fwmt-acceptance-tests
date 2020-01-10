@@ -78,9 +78,11 @@ public class StorageUtils {
   }
 
   private List<Blob> listBlobs(String directory) {
+    directory = "csv-bucket-test";
+    String dir = "processed/";
     var list = new ArrayList<Blob>();
     Page<Blob> blobs = storage.list(
-        directory, Storage.BlobListOption.currentDirectory(), Storage.BlobListOption.prefix(directory));
+        directory, Storage.BlobListOption.currentDirectory(), Storage.BlobListOption.prefix(dir));
     for (Blob blob : blobs.iterateAll()) {
       list.add(blob);
       log.info(blob.getName());

@@ -76,7 +76,7 @@ public class AddressCheckServiceTestSteps {
   public void tearDownGatewayEventMonitor() throws IOException {
     gatewayEventMonitor.tearDownGatewayEventMonitor();
     tmMockUtils.disableRequestRecorder();
-    storageUtils.deleteFiles(location);
+    storageUtils.deleteFiles(location+"processed");
   }
 
   @Given("the Gateway receives a CSV Address Check")
