@@ -13,6 +13,7 @@ import uk.gov.ons.census.fwmt.events.data.GatewayEventDTO;
 import uk.gov.ons.census.fwmt.events.utils.GatewayEventMonitor;
 import uk.gov.ons.census.fwmt.tests.acceptance.utils.CSVSerivceUtils;
 import uk.gov.ons.census.fwmt.tests.acceptance.utils.QueueClient;
+import uk.gov.ons.census.fwmt.tests.acceptance.utils.StorageUtils;
 import uk.gov.ons.census.fwmt.tests.acceptance.utils.TMMockUtils;
 
 import java.io.IOException;
@@ -37,6 +38,12 @@ public class AddressCheckServiceTestSteps {
   @Autowired
   private CSVSerivceUtils csvSerivceUtils;
 
+  @Autowired
+  private StorageUtils storageUtils;
+
+  @Value("${service.csvservice.gcpBucket.aclocation}")
+  String location;
+
   private GatewayEventMonitor gatewayEventMonitor = new GatewayEventMonitor();
 
   @Value("${service.rabbit.url}")
@@ -50,6 +57,7 @@ public class AddressCheckServiceTestSteps {
 
   private String caseId;
 
+
   @Before
   public void setup() throws IOException, TimeoutException, URISyntaxException {
     tmMockUtils.enableRequestRecorder();
@@ -58,7 +66,7 @@ public class AddressCheckServiceTestSteps {
 
     String csvData = Resources
         .toString(Resources.getResource("files/csv/AC15_07_94.csv"), Charsets.UTF_8);
-    csvSerivceUtils.putCSVInBucket("AC15_07_94", csvData);
+    storageUtils.createFile("AC15_07_94", csvData, location);
 
     gatewayEventMonitor = new GatewayEventMonitor();
     gatewayEventMonitor.enableEventMonitor(rabbitLocation, rabbitUsername, rabbitPassword);
@@ -68,6 +76,7 @@ public class AddressCheckServiceTestSteps {
   public void tearDownGatewayEventMonitor() throws IOException {
     gatewayEventMonitor.tearDownGatewayEventMonitor();
     tmMockUtils.disableRequestRecorder();
+    storageUtils.deleteFiles(location);
   }
 
   @Given("the Gateway receives a CSV Address Check")
