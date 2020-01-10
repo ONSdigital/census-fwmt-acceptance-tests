@@ -59,7 +59,6 @@ public class CECSVServiceSteps {
 
     @Before
     public void setup() throws IOException, TimeoutException, URISyntaxException {
-
         tmMockUtils.enableRequestRecorder();
         tmMockUtils.resetMock();
         queueUtils.clearQueues();
