@@ -56,15 +56,16 @@ public class AddressCheckServiceTestSteps {
     tmMockUtils.resetMock();
     queueUtils.clearQueues();
 
+    String csvData = Resources
+        .toString(Resources.getResource("files/csv/AC15_07_94.csv"), Charsets.UTF_8);
+    csvSerivceUtils.putCSVInBucket("AC15_07_94", csvData);
+
     gatewayEventMonitor = new GatewayEventMonitor();
     gatewayEventMonitor.enableEventMonitor(rabbitLocation, rabbitUsername, rabbitPassword);
   }
 
   @After
   public void tearDownGatewayEventMonitor() throws IOException {
-    String csvData = Resources
-        .toString(Resources.getResource("files/csv/AC15_07_94.csv"), Charsets.UTF_8);
-    csvSerivceUtils.putCSVInBucket("AC15_07_94", csvData);
     gatewayEventMonitor.tearDownGatewayEventMonitor();
     tmMockUtils.disableRequestRecorder();
   }
