@@ -1,0 +1,52 @@
+version: '3'
+services:
+  job:
+    container_name: job
+    image: eu.gcr.io/census-gcr-fwmt-gateway/census-rm-fwmtjobsvc:release
+    external_links:
+      - rabbitmq
+    ports:
+      - "${JOB_PORT}:8020"
+    environment:
+      - RABBITMQ_HOSTNAME=rabbitmq
+      - TOTALMOBILE_BASEURL=http://mock:8000/
+  adapter:
+    container_name: adapter
+    image: eu.gcr.io/census-gcr-fwmt-gateway/census-rm-fwmtrmadapter:release
+    external_links:
+      - rabbitmq
+    ports:
+      - "${ADAPTER_PORT}:8010"
+    environment:
+      - RABBITMQ_HOSTNAME=rabbitmq
+  mock:
+    container_name: mock
+    image: eu.gcr.io/census-gcr-fwmt-gateway/census-rm-fwmttmmock:snapshot
+    external_links:
+      - rabbitmq
+    ports:
+      - "${MOCK_PORT}:8000"
+    environment:
+      - RABBITMQ_HOST=rabbitmq
+  outcome:
+    container_name: outcome
+    image: eu.gcr.io/census-gcr-fwmt-gateway/census-rm-fwmtoutcomesvc:release
+    external_links:
+      - rabbitmq
+    ports:
+      - "${OUTCOME_PORT}:8030"
+    environment:
+      - RABBITMQ_HOSTNAME=rabbitmq
+  csvserv:
+    container_name: csvserv
+    image: eu.gcr.io/census-gcr-fwmt-gateway/census-rm-fwmtcsvservice:release
+    external_links:
+      - rabbitmq
+    ports:
+      - "${CSVSERV_PORT}:8060"
+    environment:
+      - RABBITMQ_HOST=rabbitmq
+networks:
+  default:
+    external:
+      name: censusrmdockerdev_default
