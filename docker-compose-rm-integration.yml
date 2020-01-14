@@ -1,5 +1,10 @@
 version: '3'
 services:
+  redis:
+    container_name: redis
+    image: redis:4.0
+    ports:
+      - "6379:6379"
   job:
     container_name: job
     image: eu.gcr.io/census-gcr-fwmt-gateway/census-rm-fwmtjobsvc:release
@@ -10,6 +15,7 @@ services:
     environment:
       - RABBITMQ_HOSTNAME=rabbitmq
       - TOTALMOBILE_BASEURL=http://mock:8000/
+      - REDIS_HOST=redis
   adapter:
     container_name: adapter
     image: eu.gcr.io/census-gcr-fwmt-gateway/census-rm-fwmtrmadapter:release
@@ -19,6 +25,7 @@ services:
       - "${ADAPTER_PORT}:8010"
     environment:
       - RABBITMQ_HOSTNAME=rabbitmq
+      - REDIS_HOST=redis
   mock:
     container_name: mock
     image: eu.gcr.io/census-gcr-fwmt-gateway/census-rm-fwmttmmock:snapshot
@@ -37,6 +44,7 @@ services:
       - "${OUTCOME_PORT}:8030"
     environment:
       - RABBITMQ_HOSTNAME=rabbitmq
+      - REDIS_HOST=redis
   csvserv:
     container_name: csvserv
     image: eu.gcr.io/census-gcr-fwmt-gateway/census-rm-fwmtcsvservice:release
@@ -46,6 +54,7 @@ services:
       - "${CSVSERV_PORT}:8060"
     environment:
       - RABBITMQ_HOST=rabbitmq
+      - REDIS_HOST=redis
 networks:
   default:
     external:

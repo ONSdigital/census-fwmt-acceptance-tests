@@ -10,6 +10,13 @@ services:
       - "15671-15672:15671-15672"
     networks:
       - internal
+  redis:
+    container_name: redis
+    image: redis:4.0
+    ports:
+      - "6379:6379"
+    networks:
+      - internal
   job:
     container_name: job
     image: eu.gcr.io/census-gcr-fwmt-gateway/census-rm-fwmtjobsvc:release
@@ -20,6 +27,7 @@ services:
     environment:
       - RABBITMQ_HOSTNAME=rabbit
       - TOTALMOBILE_BASEURL=http://mock:8000/
+      - REDIS_HOST=redis
     depends_on:
       - rabbit
   adapter:
@@ -31,6 +39,7 @@ services:
       - internal
     environment:
       - RABBITMQ_HOSTNAME=rabbit
+      - REDIS_HOST=redis
     depends_on:
       - rabbit
   mock:
@@ -42,6 +51,7 @@ services:
       - internal
     environment:
       - RABBITMQ_HOST=rabbit
+      - REDIS_HOST=redis
     depends_on:
       - rabbit
   outcome:
@@ -53,6 +63,7 @@ services:
       - internal
     environment:
       - RABBITMQ_HOSTNAME=rabbit
+      - REDIS_HOST=redis
     depends_on:
       - rabbit
   csvserv:
@@ -64,6 +75,7 @@ services:
       - internal
     environment:
       - RABBITMQ_HOST=rabbit
+      - REDIS_HOST=redis
     depends_on:
       - rabbit
 networks:
