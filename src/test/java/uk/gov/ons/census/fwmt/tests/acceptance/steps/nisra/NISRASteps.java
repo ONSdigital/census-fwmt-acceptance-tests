@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.concurrent.TimeoutException;
 
 import javax.xml.bind.JAXBElement;
@@ -61,7 +60,7 @@ public class NISRASteps {
   private String rabbitPassword;
 
   @Before
-  public void setup() throws IOException, TimeoutException, URISyntaxException {
+  public void setup() throws IOException, TimeoutException {
     nisraNoFieldOfficerMessage = Resources.toString(Resources.getResource("files/input/nisraNoFieldOfficerActionInstruction.xml"), Charsets.UTF_8);
     nisraHouseholdMessage = Resources.toString(Resources.getResource("files/input/nisraActionInstruction.xml"), Charsets.UTF_8);
 
@@ -69,13 +68,12 @@ public class NISRASteps {
     tmMockUtils.resetMock();
     queueUtils.clearQueues();
 
-
     gatewayEventMonitor = new GatewayEventMonitor();
     gatewayEventMonitor.enableEventMonitor(rabbitLocation, rabbitUsername, rabbitPassword);
   }
 
   @After
-  public void tearDownGatewayEventMonitor() throws IOException, TimeoutException {
+  public void tearDownGatewayEventMonitor() throws IOException {
     gatewayEventMonitor.tearDownGatewayEventMonitor();
     tmMockUtils.disableRequestRecorder();
   }
@@ -83,7 +81,7 @@ public class NISRASteps {
   @Given("RM sends a create NISRA job request job which has a case ID of {string} and a field officer ID {string}")
   public void rmSendsACreateHouseHoldJobRequestJobWhichHasACaseIDOfAndAFieldOfficerID(String caseId,
       String fieldOfficerId)
-      throws URISyntaxException, InterruptedException, JAXBException {
+      throws JAXBException {
     JAXBElement<ActionInstruction> actionInstruction = tmMockUtils.unmarshalXml(nisraHouseholdMessage);
     queueUtils.sendToRMFieldQueue(nisraHouseholdMessage);
     boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, RM_CREATE_REQUEST_RECEIVED, 10000L);
@@ -98,21 +96,20 @@ public class NISRASteps {
   }
 
   @Then("a new case with id of {string} is created in TM for NISRA")
-  public void aNewCaseIsCreatedInTm(String caseId) throws InterruptedException {
+  public void aNewCaseIsCreatedInTm(String caseId) {
     ModelCase modelCase = tmMockUtils.getCaseById(caseId);
     assertEquals(caseId, modelCase.getId().toString());
   }
 
   @Given("RM sends a create NISRA job request job which has a case ID of {string}")
-  public void rmSendsACreateHouseHoldJobRequestJobWhichHasACaseIDOfAndAnID(String caseId)
-      throws URISyntaxException, InterruptedException, JAXBException {
+  public void rmSendsACreateHouseHoldJobRequestJobWhichHasACaseIDOfAndAnID(String caseId) {
     queueUtils.sendToRMFieldQueue(nisraNoFieldOfficerMessage);
     boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, RM_CREATE_REQUEST_RECEIVED, 10000L);
     assertThat(hasBeenTriggered).isTrue();
   }
 
   @Then("RM will throw an exception for case ID {string} for NISRA")
-  public void rmWillThrowAnExceptionForCaseID(String caseId) throws URISyntaxException, InterruptedException {
+  public void rmWillThrowAnExceptionForCaseID(String caseId) {
     queueUtils.sendToRMFieldQueue(nisraNoFieldOfficerMessage);
     assertThatExceptionOfType(GatewayException.class).isThrownBy(() -> {
       throw new GatewayException(

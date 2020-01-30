@@ -27,8 +27,8 @@ import static org.junit.Assert.assertEquals;
 @PropertySource("classpath:application.properties")
 public class CCSCSVServiceSteps {
 
-  public static final String CSV_CCS_REQUEST_EXTRACTED = "CSV_CCS_REQUEST_EXTRACTED";
-  public static final String COMET_CREATE_ACK = "COMET_CREATE_ACK";
+  private static final String CSV_CCS_REQUEST_EXTRACTED = "CSV_CCS_REQUEST_EXTRACTED";
+  private static final String COMET_CREATE_ACK = "COMET_CREATE_ACK";
 
   @Autowired
   private TMMockUtils tmMockUtils;
@@ -69,7 +69,7 @@ public class CCSCSVServiceSteps {
   }
 
   @Given("the Gateway receives a CSV CCS")
-  public void theGatewayReceivesACSVCCSWithCaseID() throws IOException, InterruptedException {
+  public void theGatewayReceivesACSVCCSWithCaseID() {
     Collection<GatewayEventDTO> message;
 
     csvSerivceUtils.enableCCSCsvService();

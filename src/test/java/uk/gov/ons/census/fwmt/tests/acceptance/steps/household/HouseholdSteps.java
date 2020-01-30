@@ -28,7 +28,6 @@ import uk.gov.ons.ctp.response.action.message.instruction.ActionInstruction;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.time.OffsetDateTime;
 import java.util.concurrent.TimeoutException;
 
@@ -84,7 +83,7 @@ public class HouseholdSteps {
   private ObjectMapper objectMapper = new ObjectMapper();
 
   @Before
-  public void setup() throws IOException, TimeoutException, URISyntaxException {
+  public void setup() throws IOException, TimeoutException {
     cancelMessage = Resources
         .toString(Resources.getResource("files/input/actionCancelInstruction.xml"), Charsets.UTF_8);
     cancelMessageNonHH = Resources
@@ -109,7 +108,7 @@ public class HouseholdSteps {
   }
 
   @After
-  public void tearDownGatewayEventMonitor() throws IOException, TimeoutException {
+  public void tearDownGatewayEventMonitor() throws IOException {
     gatewayEventMonitor.tearDownGatewayEventMonitor();
     tmMockUtils.disableRequestRecorder();
   }
@@ -125,7 +124,7 @@ public class HouseholdSteps {
   }
 
   @And("RM sends a create HouseHold job request")
-  public void rmSendsACreateHouseHoldJobRequest() throws URISyntaxException, InterruptedException {
+  public void rmSendsACreateHouseHoldJobRequest() {
     String caseId = "39bad71c-7de5-4e1b-9a07-d9597737977f";
     queueUtils.sendToRMFieldQueue(receivedRMMessage);
     boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, RM_CREATE_REQUEST_RECEIVED, 10000L);
@@ -149,7 +148,7 @@ public class HouseholdSteps {
   @Given("RM sends a create HouseHold job request job which has a case ID of {string} and a field officer ID {string}")
   public void rmSendsACreateHouseHoldJobRequestJobWhichHasACaseIDOfAndAFieldOfficerID(String caseId,
       String fieldOfficerId)
-      throws URISyntaxException, InterruptedException, JAXBException {
+      throws JAXBException {
     JAXBElement<ActionInstruction> actionInstruction = tmMockUtils.unmarshalXml(nisraHouseholdMessage);
     queueUtils.sendToRMFieldQueue(nisraHouseholdMessage);
     boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, RM_CREATE_REQUEST_RECEIVED, 10000L);
@@ -164,15 +163,14 @@ public class HouseholdSteps {
   }
 
   @Given("RM sends a create HouseHold job request job which has a case ID of {string}")
-  public void rmSendsACreateHouseHoldJobRequestJobWhichHasACaseIDOfAndAnID(String caseId)
-      throws URISyntaxException, InterruptedException, JAXBException {
+  public void rmSendsACreateHouseHoldJobRequestJobWhichHasACaseIDOfAndAnID(String caseId) {
     queueUtils.sendToRMFieldQueue(nisraNoFieldOfficerMessage);
     boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, RM_CREATE_REQUEST_RECEIVED, 10000L);
     assertThat(hasBeenTriggered).isTrue();
   }
 
   @Then("RM will throw an exception for case ID {string}")
-  public void rmWillThrowAnExceptionForCaseID(String caseId) throws URISyntaxException, InterruptedException {
+  public void rmWillThrowAnExceptionForCaseID(String caseId) {
     queueUtils.sendToRMFieldQueue(nisraNoFieldOfficerMessage);
     assertThatExceptionOfType(GatewayException.class).isThrownBy(() -> {
       throw new GatewayException(
@@ -182,7 +180,7 @@ public class HouseholdSteps {
 
   // Unused steps - should I delete?
   @Given("a message in an invalid format from RM")
-  public void aMessageInAnInvalidFormatFromRm() throws URISyntaxException, InterruptedException {
+  public void aMessageInAnInvalidFormatFromRm() {
     queueUtils.sendToRMFieldQueue(invalidRMMessage);
     throw new cucumber.api.PendingException();
   }
@@ -206,8 +204,7 @@ public class HouseholdSteps {
   }
 
   @And("RM sends a cancel case Household job request with case ID {string}")
-  public void tmHasAnExistingJobWithCaseID(String caseId) throws URISyntaxException, InterruptedException {
-
+  public void tmHasAnExistingJobWithCaseID(String caseId) {
     queueUtils.sendToRMFieldQueue(cancelMessage);
     boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, CANONICAL_CANCEL_SENT, 10000L);
     assertThat(hasBeenTriggered).isTrue();
@@ -221,7 +218,6 @@ public class HouseholdSteps {
 
   @Then("a pause datetime of {string} will be assigned to the case with id {string}")
   public void theCaseWithIdOfWillBeCancelled(String until, String caseId) throws InterruptedException {
-
     Thread.sleep(1000);
 
     CasePause casePause = tmMockUtils.getPauseCase(caseId);
@@ -229,7 +225,7 @@ public class HouseholdSteps {
   }
 
   @Given("RM sends a cancel case CSS job request with case ID {string} and receives an exception from RM")
-  public void rmSendsACancelCaseCSSJobRequestWithCaseID(String caseId) throws URISyntaxException, InterruptedException {
+  public void rmSendsACancelCaseCSSJobRequestWithCaseID(String caseId) {
     queueUtils.sendToRMFieldQueue(cancelMessageNonHH);
     assertThatExceptionOfType(GatewayException.class).isThrownBy(() -> {
       throw new GatewayException(
@@ -244,22 +240,21 @@ public class HouseholdSteps {
   }
 
   @Given("TM already has an existing job with case ID {string}")
-  public void tmAlreadyHasAnExistingJobWithCaseID(String caseId) throws URISyntaxException, InterruptedException {
+  public void tmAlreadyHasAnExistingJobWithCaseID(String caseId) {
     queueUtils.sendToRMFieldQueue(receivedRMMessage);
     boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, RM_CREATE_REQUEST_RECEIVED, 10000L);
     assertThat(hasBeenTriggered).isTrue();
   }
 
   @And("RM sends an update case job request with case ID {string}")
-  public void rmSendsAnUpdatePauseCaseJobRequestWithCaseID(String caseId)
-      throws URISyntaxException, InterruptedException {
+  public void rmSendsAnUpdatePauseCaseJobRequestWithCaseID(String caseId) {
     queueUtils.sendToRMFieldQueue(updateMessage);
     boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, CANONICAL_UPDATE_SENT, 10000L);
     assertThat(hasBeenTriggered).isTrue();
   }
 
   @When("the Gateway sends a Update Case with Pause request to TM with case ID {string}")
-  public void theGatewaySendsAUpdateCaseWithPauseRequestToTMWithCaseID(String caseId) throws InterruptedException {
+  public void theGatewaySendsAUpdateCaseWithPauseRequestToTMWithCaseID(String caseId) {
     boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, CANONICAL_UPDATE_RECEIVED, 100000L);
     assertThat(hasBeenTriggered).isTrue();
   }
@@ -277,8 +272,7 @@ public class HouseholdSteps {
   }
 
   @Given("TM already has an existing job with case ID {string} with a pause")
-  public void tmAlreadyHasAnExistingJobWithCaseIDWithAPause(String caseId)
-      throws URISyntaxException, InterruptedException {
+  public void tmAlreadyHasAnExistingJobWithCaseIDWithAPause(String caseId) {
     queueUtils.sendToRMFieldQueue(receivedRMMessage);
 
     boolean caseIdPresent = gatewayEventMonitor.hasEventTriggered(caseId, RM_CREATE_REQUEST_RECEIVED, 10000L);
@@ -309,8 +303,7 @@ public class HouseholdSteps {
   }
 
   @Given("RM sends an update case Household job request with case ID {string} and receives an exception from RM")
-  public void rmSendsACancelCaseHouseholdJobRequestWithCaseIDAndReceivesAnExceptionFromRM(String arg0)
-          throws URISyntaxException, InterruptedException {
+  public void rmSendsACancelCaseHouseholdJobRequestWithCaseIDAndReceivesAnExceptionFromRM(String arg0) {
     queueUtils.sendToRMFieldQueue(updateMessageWithoutCreate);
     assertThatExceptionOfType(GatewayException.class).isThrownBy(() -> {
       throw new GatewayException(

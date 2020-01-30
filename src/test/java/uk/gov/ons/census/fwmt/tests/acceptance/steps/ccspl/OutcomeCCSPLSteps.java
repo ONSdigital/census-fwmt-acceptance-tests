@@ -26,7 +26,6 @@ import java.util.concurrent.TimeoutException;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static uk.gov.ons.census.fwmt.tests.acceptance.steps.ccscsvservice.CCSCSVServiceSteps.CSV_CCS_REQUEST_EXTRACTED;
 
 @Slf4j
 public class OutcomeCCSPLSteps {
@@ -58,7 +57,9 @@ public class OutcomeCCSPLSteps {
 
   private String secondaryOutcome;
   
-  public static final String CCSPL_OUTCOME_SENT = "CCSPL_OUTCOME_SENT";
+  private static final String CCSPL_OUTCOME_SENT = "CCSPL_OUTCOME_SENT";
+
+  private static final String COMET_CCSPL_OUTCOME_RECEIVED = "COMET_CCSPL_OUTCOME_RECEIVED";
 
   private String actualMessage;
 
@@ -67,10 +68,11 @@ public class OutcomeCCSPLSteps {
   private String resourcePath;
 
   @Before
-  public void before() throws IOException, TimeoutException, InterruptedException {
+  public void before() throws IOException, TimeoutException {
     tmMockUtils.enableRequestRecorder();
     tmMockUtils.resetMock();
     queueClient.createQueue();
+    queueClient.clearQueues();
 
     gatewayEventMonitor.enableEventMonitor(rabbitLocation, rabbitUsername, rabbitPassword);
   }
@@ -105,7 +107,6 @@ public class OutcomeCCSPLSteps {
     } catch (IOException e) {
       throw new RuntimeException("Problem retrieving resource file", e);
     }
-
   }
 
   private String addNewCaseId(String expectedMessage, String newCaseId) {
@@ -118,9 +119,9 @@ public class OutcomeCCSPLSteps {
     return wholeMessage.toString();
   }
 
-  private boolean compareCaseEventMessages(String so, String actualMessage, String caseId) {
+  private boolean compareCaseEventMessages(String secondaryOutcome, String actualMessage, String caseId) {
     try {
-      String expectedCaseEvent = getExpectedCaseEvent(so);
+      String expectedCaseEvent = getExpectedCaseEvent(secondaryOutcome);
       String updateExpectedCaseEvent = addNewCaseId(expectedCaseEvent, caseId);
       JsonNode expectedMessageRootNode = jsonObjectMapper.readTree(updateExpectedCaseEvent);
       JsonNode actualMessageRootNode = jsonObjectMapper.readTree(actualMessage);
@@ -169,7 +170,7 @@ public class OutcomeCCSPLSteps {
 
   @When("the Outcome Service processes the CCS PL message")
   public void theOutcomeServiceProcessTheCCSPLMessage() {
-    JsonNode node = tmRequestRootNode.path("caseId");
+    JsonNode node = tmRequestRootNode.path("propertyListingCaseId");
     caseId = node.asText();
     int response = tmMockUtils.sendTMCCSPLResponseMessage(tmRequest, caseId);
     assertEquals(202, response);
@@ -177,17 +178,15 @@ public class OutcomeCCSPLSteps {
 
   @Then("the Outcome Service for the CCS PL should create a valid {string}")
   public void theOutcomeServiceForTheCCSPLShouldCreateAValidForTheCorrect(String caseEvent) {
+    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, COMET_CCSPL_OUTCOME_RECEIVED, 10000L);
+    assertThat(hasBeenTriggered).isTrue();
+
     Collection<GatewayEventDTO> message;
     message = gatewayEventMonitor.grabEventsTriggered(CCSPL_OUTCOME_SENT, 1, 10000L);
-
-    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, CSV_CCS_REQUEST_EXTRACTED, 10000L);
-    assertThat(hasBeenTriggered).isTrue();
 
     for (GatewayEventDTO retrieveCaseId : message) {
       caseId = retrieveCaseId.getCaseId();
     }
-
-    gatewayEventMonitor.checkForEvent(caseId, CCSPL_OUTCOME_SENT);
 
     try {
       actualMessage = queueClient.getMessage(caseEvent);
@@ -207,5 +206,4 @@ public class OutcomeCCSPLSteps {
       throw new RuntimeException("Problem parsing ", e);
     }
   }
-
 }

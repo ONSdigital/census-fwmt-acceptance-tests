@@ -1,9 +1,7 @@
 package uk.gov.ons.census.fwmt.tests.acceptance.utils;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.WritableResource;
@@ -17,13 +15,13 @@ import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Map;
 
 @Slf4j
 @Component
 public class CSVSerivceUtils {
+
+  @Value("${service.csvservice.gcpBucket.aclocation}")
+  Resource resource;
 
   @Value("${service.ccscsv.url}")
   private String ccsCsvService;
@@ -42,9 +40,6 @@ public class CSVSerivceUtils {
 
   @Value("${service.csvservice.password}")
   private String csvServicePassword;
-
-  @Value("${service.csvservice.gcpBucket.aclocation}")
-  Resource resource;
 
   public int enableCCSCsvService() {
     return sendRequest(ccsCsvService);

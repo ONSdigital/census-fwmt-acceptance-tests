@@ -4,8 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-import java.io.*;
-import java.net.URISyntaxException;
+import java.io.File;
+import java.io.IOException;
+import java.io.StringWriter;
 import java.util.Collection;
 import java.util.concurrent.TimeoutException;
 
@@ -78,20 +79,19 @@ public class CCSInterviewRM {
   private String rabbitPassword;
 
   @Before
-  public void setup() throws IOException, TimeoutException, URISyntaxException {
+  public void setup() throws TimeoutException, IOException {
     receivedRMMessage = Resources.toString(Resources.getResource("files/input/actionInstructionCCSIV.xml"), Charsets.UTF_8);
 
     tmMockUtils.enableRequestRecorder();
     tmMockUtils.resetMock();
     queueClient.clearQueues();
 
-
     gatewayEventMonitor = new GatewayEventMonitor();
     gatewayEventMonitor.enableEventMonitor(rabbitLocation, rabbitUsername, rabbitPassword);
   }
 
   @After
-  public void tearDownGatewayEventMonitor() throws IOException, TimeoutException {
+  public void tearDownGatewayEventMonitor() throws IOException {
     gatewayEventMonitor.tearDownGatewayEventMonitor();
     tmMockUtils.disableRequestRecorder();
   }
@@ -107,7 +107,7 @@ public class CCSInterviewRM {
   }
 
   @And("RM sends a create CCS Interview job request")
-  public void rmSendsACreateHouseHoldJobRequest() throws URISyntaxException, InterruptedException {
+  public void rmSendsACreateHouseHoldJobRequest() {
     Collection<GatewayEventDTO> message;
     message = gatewayEventMonitor.grabEventsTriggered(CCSPL_OUTCOME_SENT, 1, 10000L);
 
@@ -197,5 +197,4 @@ public class CCSInterviewRM {
     }
     return null;
   }
-
 }

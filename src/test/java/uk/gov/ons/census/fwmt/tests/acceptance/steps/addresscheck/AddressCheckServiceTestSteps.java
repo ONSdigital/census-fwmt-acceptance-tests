@@ -25,8 +25,8 @@ import static org.junit.Assert.assertEquals;
 
 public class AddressCheckServiceTestSteps {
 
-  public static final String CSV_ADDRESS_CHECK_REQUEST_EXTRACTED = "CSV_ADDRESS_CHECK_REQUEST_EXTRACTED";
-  public static final String COMET_CREATE_ACK = "COMET_CREATE_ACK";
+  private static final String CSV_ADDRESS_CHECK_REQUEST_EXTRACTED = "CSV_ADDRESS_CHECK_REQUEST_EXTRACTED";
+  private static final String COMET_CREATE_ACK = "COMET_CREATE_ACK";
 
   @Autowired
   private TMMockUtils tmMockUtils;

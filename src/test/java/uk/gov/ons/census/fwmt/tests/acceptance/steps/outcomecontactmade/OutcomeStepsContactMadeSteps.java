@@ -14,26 +14,24 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.http.ResponseEntity;
-import uk.gov.ons.census.fwmt.common.error.GatewayException;
 import uk.gov.ons.census.fwmt.events.utils.GatewayEventMonitor;
 import uk.gov.ons.census.fwmt.tests.acceptance.utils.QueueClient;
 import uk.gov.ons.census.fwmt.tests.acceptance.utils.TMMockUtils;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeoutException;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 @Slf4j
 @PropertySource("classpath:application.properties")
 public class OutcomeStepsContactMadeSteps {
+
+  public static final String HH_OUTCOME_SENT = "HH_OUTCOME_SENT";
 
   private String testOutcomeJson = null;
 
@@ -64,12 +62,9 @@ public class OutcomeStepsContactMadeSteps {
   private ObjectMapper jsonObjectMapper = new ObjectMapper();
 
   private JsonNode tmRequestRootNode;
-
   private String caseId;
 
   private String secondaryOutcome;
-
-  public static final String HH_OUTCOME_SENT = "HH_OUTCOME_SENT";
 
   private String actualMessage;
 
@@ -80,7 +75,7 @@ public class OutcomeStepsContactMadeSteps {
   private List<JsonNode> multipleMessages;
 
   @Before
-  public void setup() throws IOException, TimeoutException, URISyntaxException, InterruptedException {
+  public void setup() throws IOException, TimeoutException {
     testOutcomeJson = null;
     queueClient.createQueue();
     tmMockUtils.enableRequestRecorder();
@@ -92,7 +87,7 @@ public class OutcomeStepsContactMadeSteps {
   }
 
   @After
-  public void tearDownGatewayEventMonitor() throws IOException, TimeoutException {
+  public void tearDownGatewayEventMonitor() throws IOException {
     gatewayEventMonitor.tearDownGatewayEventMonitor();
     tmMockUtils.disableRequestRecorder();
   }
@@ -111,7 +106,9 @@ public class OutcomeStepsContactMadeSteps {
     try {
       String pathname = createPathnameFromOutcomeName(inputMessage);
       String message = Resources.toString(
-              Resources.getResource("files/outcome/" + resourcePath + "/" + pathname + "/tmrequest" + (qIdHasValue?"-q":"") + ".json"), Charsets.UTF_8);
+          Resources.getResource(
+              "files/outcome/" + resourcePath + "/" + pathname + "/tmrequest" + (qIdHasValue ? "-q" : "") + ".json"),
+          Charsets.UTF_8);
       return message;
     } catch (IOException e) {
       throw new RuntimeException("Problem retrieving resource file", e);
@@ -131,7 +128,8 @@ public class OutcomeStepsContactMadeSteps {
 
       boolean isEqual = expectedMessageRootNode.equals(actualMessageRootNode);
       if (!isEqual) {
-        log.info("expected and actual caseEvents are not the same: \n expected:\n {} \n\n actual: \n {}", expectedCaseEvent, actualMessage);
+        log.info("expected and actual caseEvents are not the same: \n expected:\n {} \n\n actual: \n {}",
+            expectedCaseEvent, actualMessage);
       }
       return isEqual;
 
@@ -144,14 +142,16 @@ public class OutcomeStepsContactMadeSteps {
     try {
       String pathname = createPathnameFromOutcomeName(so);
       String message = Resources.toString(
-              Resources.getResource("files/outcome/" + resourcePath + "/" + pathname + "/eventresponse" + (qIdHasValue?"-q":"") + ".json"), Charsets.UTF_8);
+          Resources.getResource(
+              "files/outcome/" + resourcePath + "/" + pathname + "/eventresponse" + (qIdHasValue ? "-q" : "")
+                  + ".json"), Charsets.UTF_8);
       return message;
     } catch (IOException e) {
       throw new RuntimeException("Problem retrieving resource file", e);
     }
   }
 
-    @Given("TM sends a {string} Census Case Outcome to the Gateway where {string}")
+  @Given("TM sends a {string} Census Case Outcome to the Gateway where {string}")
   public void tm_sends_a_Census_Case_Outcome_to_the_Gateway_where(String inputMessage, String qIdHasValue) {
     this.qIdHasValue = Boolean.valueOf(qIdHasValue);
     resourcePath = "household/contactmade";
@@ -186,7 +186,8 @@ public class OutcomeStepsContactMadeSteps {
   public void tm_sends_a_Contact_Made_Census_Case_Outcome_to_the_Gateway() {
     try {
       tmRequest = Resources.toString(
-              Resources.getResource("files/outcome/household/contactmade/fulfilmentrequests/tmrequest-multiple.json"), Charsets.UTF_8);
+          Resources.getResource("files/outcome/household/contactmade/fulfilmentrequests/tmrequest-multiple.json"),
+          Charsets.UTF_8);
       tmRequestRootNode = jsonObjectMapper.readTree(tmRequest);
     } catch (IOException e) {
       throw new RuntimeException("Problem retrieving resource file", e);
@@ -197,7 +198,8 @@ public class OutcomeStepsContactMadeSteps {
   public void tm_sends_a_Questionnaire_Linked_Contact_Made_Census_Case_Outcome_to_the_Gateway() {
     try {
       tmRequest = Resources.toString(
-              Resources.getResource("files/outcome/household/contactmade/fulfilmentrequests/tmrequest-multiple-q.json"), Charsets.UTF_8);
+          Resources.getResource("files/outcome/household/contactmade/fulfilmentrequests/tmrequest-multiple-q.json"),
+          Charsets.UTF_8);
       tmRequestRootNode = jsonObjectMapper.readTree(tmRequest);
     } catch (IOException e) {
       throw new RuntimeException("Problem retrieving resource file", e);
@@ -208,7 +210,8 @@ public class OutcomeStepsContactMadeSteps {
   public void tm_sends_a_Mixed_Contact_Made_Census_Case_Outcome_to_the_Gateway() {
     try {
       tmRequest = Resources.toString(
-              Resources.getResource("files/outcome/household/contactmade/fulfilmentrequests/tmrequest-multiple-mixed.json"), Charsets.UTF_8);
+          Resources.getResource("files/outcome/household/contactmade/fulfilmentrequests/tmrequest-multiple-mixed.json"),
+          Charsets.UTF_8);
       tmRequestRootNode = jsonObjectMapper.readTree(tmRequest);
     } catch (IOException e) {
       throw new RuntimeException("Problem retrieving resource file", e);
@@ -245,15 +248,18 @@ public class OutcomeStepsContactMadeSteps {
   public void the_messages_should_be_correct() throws IOException {
     try {
       String message1 = Resources.toString(
-              Resources.getResource("files/outcome/household/contactmade/fulfilmentrequests/eventresponse-multiple1.json"), Charsets.UTF_8);
+          Resources.getResource("files/outcome/household/contactmade/fulfilmentrequests/eventresponse-multiple1.json"),
+          Charsets.UTF_8);
       assertTrue(multipleMessages.contains(jsonObjectMapper.readTree(message1)));
 
       String message2 = Resources.toString(
-              Resources.getResource("files/outcome/household/contactmade/fulfilmentrequests/eventresponse-multiple2.json"), Charsets.UTF_8);
+          Resources.getResource("files/outcome/household/contactmade/fulfilmentrequests/eventresponse-multiple2.json"),
+          Charsets.UTF_8);
       assertTrue(multipleMessages.contains(jsonObjectMapper.readTree(message2)));
 
       String message3 = Resources.toString(
-              Resources.getResource("files/outcome/household/contactmade/fulfilmentrequests/eventresponse-multiple3.json"), Charsets.UTF_8);
+          Resources.getResource("files/outcome/household/contactmade/fulfilmentrequests/eventresponse-multiple3.json"),
+          Charsets.UTF_8);
       assertTrue(multipleMessages.contains(jsonObjectMapper.readTree(message3)));
     } catch (IOException e) {
       throw new RuntimeException("Problem parsing file", e);
@@ -264,15 +270,21 @@ public class OutcomeStepsContactMadeSteps {
   public void the_Questionnaire_Linked_messages_should_be_correct() {
     try {
       String message1 = Resources.toString(
-              Resources.getResource("files/outcome/household/contactmade/fulfilmentrequests/eventresponse-multiple-q1.json"), Charsets.UTF_8);
+          Resources
+              .getResource("files/outcome/household/contactmade/fulfilmentrequests/eventresponse-multiple-q1.json"),
+          Charsets.UTF_8);
       assertTrue(multipleMessages.contains(jsonObjectMapper.readTree(message1)));
 
       String message2 = Resources.toString(
-              Resources.getResource("files/outcome/household/contactmade/fulfilmentrequests/eventresponse-multiple-q2.json"), Charsets.UTF_8);
+          Resources
+              .getResource("files/outcome/household/contactmade/fulfilmentrequests/eventresponse-multiple-q2.json"),
+          Charsets.UTF_8);
       assertTrue(multipleMessages.contains(jsonObjectMapper.readTree(message2)));
 
       String message3 = Resources.toString(
-              Resources.getResource("files/outcome/household/contactmade/fulfilmentrequests/eventresponse-multiple-q3.json"), Charsets.UTF_8);
+          Resources
+              .getResource("files/outcome/household/contactmade/fulfilmentrequests/eventresponse-multiple-q3.json"),
+          Charsets.UTF_8);
       assertTrue(multipleMessages.contains(jsonObjectMapper.readTree(message3)));
     } catch (IOException e) {
       throw new RuntimeException("Problem parsing file", e);
@@ -283,15 +295,21 @@ public class OutcomeStepsContactMadeSteps {
   public void the_Mixed_messages_should_be_correct() {
     try {
       String message1 = Resources.toString(
-              Resources.getResource("files/outcome/household/contactmade/fulfilmentrequests/eventresponse-multiple-mixed1.json"), Charsets.UTF_8);
+          Resources
+              .getResource("files/outcome/household/contactmade/fulfilmentrequests/eventresponse-multiple-mixed1.json"),
+          Charsets.UTF_8);
       assertTrue(multipleMessages.contains(jsonObjectMapper.readTree(message1)));
 
       String message2 = Resources.toString(
-              Resources.getResource("files/outcome/household/contactmade/fulfilmentrequests/eventresponse-multiple-mixed2.json"), Charsets.UTF_8);
+          Resources
+              .getResource("files/outcome/household/contactmade/fulfilmentrequests/eventresponse-multiple-mixed2.json"),
+          Charsets.UTF_8);
       assertTrue(multipleMessages.contains(jsonObjectMapper.readTree(message2)));
 
       String message3 = Resources.toString(
-              Resources.getResource("files/outcome/household/contactmade/fulfilmentrequests/eventresponse-multiple-mixed3.json"), Charsets.UTF_8);
+          Resources
+              .getResource("files/outcome/household/contactmade/fulfilmentrequests/eventresponse-multiple-mixed3.json"),
+          Charsets.UTF_8);
       assertTrue(multipleMessages.contains(jsonObjectMapper.readTree(message3)));
     } catch (IOException e) {
       throw new RuntimeException("Problem parsing file", e);
@@ -314,7 +332,8 @@ public class OutcomeStepsContactMadeSteps {
   public void tmSendsABlankFulfillmentRequestAndReceivesAnErrorFromOutcomeService() {
     try {
       tmRequest = Resources.toString(
-              Resources.getResource("files/outcome/household/contactmade/missingfulfilment/tmrequest.json"), Charsets.UTF_8);
+          Resources.getResource("files/outcome/household/contactmade/missingfulfilment/tmrequest.json"),
+          Charsets.UTF_8);
       tmRequestRootNode = jsonObjectMapper.readTree(tmRequest);
     } catch (IOException e) {
       throw new RuntimeException("Problem retrieving resource file", e);
@@ -326,7 +345,6 @@ public class OutcomeStepsContactMadeSteps {
 
     boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, "HH_OUTCOME_SENT", 10000L);
     assertThat(hasBeenTriggered).isFalse();
-
 
   }
 }

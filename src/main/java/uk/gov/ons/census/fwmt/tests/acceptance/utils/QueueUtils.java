@@ -16,21 +16,6 @@ import java.util.concurrent.TimeoutException;
 @Component
 public class QueueUtils {
 
-  @Value("${service.rabbit.url}")
-  private String rabbitmqHost;
-
-  @Value("${service.rabbit.username}")
-  private String rabbitmqUsername;
-
-  @Value("${service.rabbit.password}")
-  private String rabbitmqPassword;
-
-  @Value("${service.rabbit.port:5672}")
-  private int rabbitmqPort;
-
-  @Value("${service.rabbit.virtualHost:/}")
-  private String rabbitmqVirtualHost;
-
   // Queue names
   public static final String FIELD_REFUSALS_QUEUE = "Field.refusals";
   public static final String TEMP_FIELD_OTHERS_QUEUE = "Field.other";
@@ -48,7 +33,6 @@ public class QueueUtils {
   public static final String GATEWAY_EVENT_FIELDCASE_UPDATE_ROUTING_KEY = "event.fieldcase.update";
   public static final String GATEWAY_CASE_APPOINTMENT_ROUTING_KEY = "event.case.appointment";
   public static final String GATEWAY_RESPONSE_AUTHENTICATION_ROUTING_KEY = "event.response.authentication";
-
   // keys unused but in RM data dictionary
   public static final String GATEWAY_FULFILMENT_CONFIRMED_ROUTING_KEY = "event.fulfilment.confirmed";
   public static final String GATEWAY_RESPONSE_RECEIPT_ROUTING_KEY = "event.response.receipt";
@@ -56,11 +40,30 @@ public class QueueUtils {
   public static final String GATEWAY_CASE_UPDATE_ROUTING_KEY = "event.case.update";
   public static final String GATEWAY_SAMPLEUNIT_UPDATE_ROUTING_KEY = "event.sampleunit.update";
 
+  @Value("${service.rabbit.url}")
+  private String rabbitmqHost;
+
+  @Value("${service.rabbit.username}")
+  private String rabbitmqUsername;
+
+  @Value("${service.rabbit.password}")
+  private String rabbitmqPassword;
+
+  @Value("${service.rabbit.port:5672}")
+  private int rabbitmqPort;
+
+  @Value("${service.rabbit.virtualHost:/rm}")
+  private String rabbitmqRmVirtualHost;
+
+  @Value("${service.rabbit.virtualHost:/}")
+  private String rabbitmqVirtualHost;
+
   public String getMessageOffQueue(String qname) {
     Connection connection = null;
     Channel channel = null;
     try {
-      ConnectionFactory factory = getRabbitMQConnectionFactory();
+      ConnectionFactory factory = createConnectionFactory(rabbitmqHost, rabbitmqUsername, rabbitmqPassword,
+          rabbitmqRmVirtualHost);
       connection = factory.newConnection();
       channel = connection.createChannel();
 
@@ -112,21 +115,12 @@ public class QueueUtils {
     }
   }
 
-  private ConnectionFactory getRabbitMQConnectionFactory() {
-    ConnectionFactory factory = new ConnectionFactory();
-    factory.setHost(rabbitmqHost);
-    factory.setUsername(rabbitmqUsername);
-    factory.setPassword(rabbitmqPassword);
-    factory.setVirtualHost(rabbitmqVirtualHost);
-    return factory;
-  }
-
-  public Boolean addMessage(String exchange,
-      String routingkey, String message) {
+  public Boolean addMessage(String virtualHost, String exchange, String routingKey, String message) {
     Connection connection = null;
     Channel channel = null;
     try {
-      ConnectionFactory factory = getRabbitMQConnectionFactory();
+      ConnectionFactory factory = createConnectionFactory(rabbitmqHost, rabbitmqUsername, rabbitmqPassword,
+          virtualHost);
       connection = factory.newConnection();
       channel = connection.createChannel();
 
@@ -134,7 +128,7 @@ public class QueueUtils {
       builder.contentType("text/xml");
       BasicProperties properties = builder.build();
 
-      channel.basicPublish(exchange, routingkey, properties, message.getBytes());
+      channel.basicPublish(exchange, routingKey, properties, message.getBytes());
       log.info("Published to exchange: " + exchange);
 
       return true;
@@ -153,11 +147,12 @@ public class QueueUtils {
     }
   }
 
-  public Boolean deleteMessage(String qname) {
+  public Boolean deleteMessage(String qname, String virtualHost) {
     Connection connection = null;
     Channel channel = null;
     try {
-      ConnectionFactory factory = getRabbitMQConnectionFactory();
+      ConnectionFactory factory = createConnectionFactory(rabbitmqHost, rabbitmqUsername, rabbitmqPassword,
+          virtualHost);
       connection = factory.newConnection();
       channel = connection.createChannel();
 
@@ -180,13 +175,16 @@ public class QueueUtils {
     }
   }
 
-  public void createOutcomeQueues() throws IOException, TimeoutException, InterruptedException {
-    Connection connection = null;
-    Channel channel = null;
+  public void createOutcomeQueues() throws IOException, TimeoutException {
+    Connection connection;
+    Channel channel;
 
-    ConnectionFactory factory = getRabbitMQConnectionFactory();
+    ConnectionFactory factory = createConnectionFactory(rabbitmqHost, rabbitmqUsername, rabbitmqPassword,
+        rabbitmqRmVirtualHost);
     connection = factory.newConnection();
     channel = connection.createChannel();
+
+    channel.exchangeDeclare(GATEWAY_OUTCOME_EXCHANGE, "topic");
 
     channel.queueDeclare(FIELD_REFUSALS_QUEUE, false, false, true, null);
     channel.queueDeclare(TEMP_FIELD_OTHERS_QUEUE, false, false, true, null);
@@ -206,5 +204,24 @@ public class QueueUtils {
     channel.queueBind(TEMP_FIELD_OTHERS_QUEUE, GATEWAY_OUTCOME_EXCHANGE, GATEWAY_UAC_UPDATED_ROUTING_KEY);
     channel.queueBind(TEMP_FIELD_OTHERS_QUEUE, GATEWAY_OUTCOME_EXCHANGE, GATEWAY_CASE_UPDATE_ROUTING_KEY);
     channel.queueBind(TEMP_FIELD_OTHERS_QUEUE, GATEWAY_OUTCOME_EXCHANGE, GATEWAY_SAMPLEUNIT_UPDATE_ROUTING_KEY);
+  }
+
+  private ConnectionFactory createConnectionFactory(String host, String username, String password,
+      String virtualHost) {
+    ConnectionFactory factory = new ConnectionFactory();
+    factory.setHost(host);
+    factory.setUsername(username);
+    factory.setPassword(password);
+    factory.setVirtualHost(virtualHost);
+    return factory;
+  }
+
+  private ConnectionFactory getRabbitMQConnectionFactory() {
+    ConnectionFactory factory = new ConnectionFactory();
+    factory.setHost(rabbitmqHost);
+    factory.setUsername(rabbitmqUsername);
+    factory.setPassword(rabbitmqPassword);
+    factory.setVirtualHost(rabbitmqVirtualHost);
+    return factory;
   }
 }
