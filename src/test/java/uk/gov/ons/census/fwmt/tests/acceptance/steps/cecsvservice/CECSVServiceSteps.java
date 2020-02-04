@@ -23,7 +23,6 @@ import java.util.concurrent.TimeoutException;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 
-
 @Slf4j
 @PropertySource("classpath:application.properties")
 public class CECSVServiceSteps {

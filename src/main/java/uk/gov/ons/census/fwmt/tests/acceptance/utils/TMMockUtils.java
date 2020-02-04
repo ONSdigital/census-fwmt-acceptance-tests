@@ -30,15 +30,6 @@ import java.net.URL;
 @Component
 public final class TMMockUtils {
 
-  @Value("${service.jobservice.url}")
-  private String jobServiceUrl;
-
-  @Value("${service.jobservice.username}")
-  private String jobServiceUsername;
-
-  @Value("${service.jobservice.password}")
-  private String jobServicePassword;
-
   @Value("${service.outcome.url}")
   private String outcomeServiceUrl;
 
