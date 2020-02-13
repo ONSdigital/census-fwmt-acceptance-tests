@@ -98,7 +98,7 @@ dependencies {
 
     compile("uk.gov.ons.census.fwmt:census-fwmt-events:1.0.17-RELEASE")
     compile('uk.gov.ons.census.fwmt:census-fwmt-common:1.0.46-RELEASE')
-    compile("uk.gov.ons.census.ffa:census-ffa-storage-utils:0.0.1-SNAPSHOT")
+    compile("uk.gov.ons.census.ffa:census-ffa-storage-utils:0.0.1-RELEASE")
 
     compile("com.google.guava:guava:27.0.1-jre")
 
