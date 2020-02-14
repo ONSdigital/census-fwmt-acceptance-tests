@@ -55,6 +55,7 @@ test {
     testLogging.showStandardStreams = true
     systemProperties System.getProperties()
     systemProperties.remove("java.endorsed.dirs")
+    systemProperty "cucumber.options", System.getProperty("cucumber.options") 
 }
 
 task genJaxb {
@@ -97,12 +98,13 @@ dependencies {
 
     compile("uk.gov.ons.census.fwmt:census-fwmt-events:1.0.17-RELEASE")
     compile('uk.gov.ons.census.fwmt:census-fwmt-common:1.0.46-RELEASE')
+    compile("uk.gov.ons.census.ffa:census-ffa-storage-utils:0.0.1-RELEASE")
 
     compile("com.google.guava:guava:27.0.1-jre")
 
-    compile group: 'com.google.cloud', name: 'google-cloud-storage', version: '1.2.3'
+    implementation group: 'com.google.cloud', name: 'google-cloud-storage', version: '1.2.3'
 
-    testImplementation group: 'org.springframework.cloud', name: 'spring-cloud-gcp-starter-storage', version: '1.2.1.RELEASE'
+    implementation group: 'org.springframework.cloud', name: 'spring-cloud-gcp-starter-storage', version: '1.2.1.RELEASE'
 
     jaxb("javax.xml.bind:jaxb-api:2.3.0")
     jaxb("com.sun.xml.bind:jaxb-core:2.3.0.1")
@@ -123,12 +125,13 @@ dependencies {
     compile("org.projectlombok:lombok:1.18.4")
     annotationProcessor("org.projectlombok:lombok:1.18.4")
 
-    testCompile("org.springframework.boot:spring-boot-starter:${springBootVersion}")
-    testCompile("org.springframework.boot:spring-boot-starter-amqp:${springBootVersion}")
-    testCompile("org.springframework.boot:spring-boot-test:${springBootVersion}")
-    testCompile("org.springframework.retry:spring-retry:1.2.2.RELEASE")
-    testCompile("org.springframework:spring-web:5.1.2.RELEASE")
-    testCompile("org.springframework:spring-aop:5.1.2.RELEASE")
+    implementation("org.springframework.boot:spring-boot-starter:${springBootVersion}")
+    implementation("org.springframework.boot:spring-boot-starter-amqp:${springBootVersion}")
+    implementation("org.springframework.boot:spring-boot-test:${springBootVersion}")
+    implementation("org.springframework.retry:spring-retry:1.2.2.RELEASE")
+    implementation("org.springframework:spring-web:5.1.2.RELEASE")
+    implementation("org.springframework:spring-aop:5.1.2.RELEASE")
+	implementation("org.springframework.boot:spring-boot-starter-web:${springBootVersion}")
 
     compile("org.json:json:20180813")
 	compile('org.freemarker:freemarker:2.3.28')
@@ -138,14 +141,12 @@ dependencies {
 
     compile("org.apache.httpcomponents:httpclient:4.5.6")
 
-
     testCompile("org.springframework:spring-test:5.1.2.RELEASE")
 
-    testCompile("io.cucumber:cucumber-java:4.0.2")
-    testCompile("io.cucumber:cucumber-junit:4.0.2")
-    testCompile("io.cucumber:cucumber-spring:4.0.2")
-    testCompile("org.assertj:assertj-core:3.11.1")
-
+    testImplementation("io.cucumber:cucumber-java:4.0.2")
+    testImplementation("io.cucumber:cucumber-junit:4.0.2")
+    testImplementation("io.cucumber:cucumber-spring:4.0.2")
+    testImplementation("org.assertj:assertj-core:3.11.1")
 
     testCompile("org.projectlombok:lombok:1.18.4")
     testAnnotationProcessor("org.projectlombok:lombok:1.18.4")

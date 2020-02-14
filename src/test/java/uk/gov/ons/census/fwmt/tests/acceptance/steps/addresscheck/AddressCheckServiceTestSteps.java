@@ -1,13 +1,12 @@
 package uk.gov.ons.census.fwmt.tests.acceptance.steps.addresscheck;
 
-import com.google.common.base.Charsets;
-import com.google.common.io.Resources;
 import cucumber.api.java.After;
 import cucumber.api.java.Before;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import uk.gov.census.ffa.storage.utils.StorageUtils;
 import uk.gov.ons.census.fwmt.common.data.modelcase.ModelCase;
 import uk.gov.ons.census.fwmt.events.data.GatewayEventDTO;
 import uk.gov.ons.census.fwmt.events.utils.GatewayEventMonitor;
@@ -15,9 +14,12 @@ import uk.gov.ons.census.fwmt.tests.acceptance.utils.CSVSerivceUtils;
 import uk.gov.ons.census.fwmt.tests.acceptance.utils.QueueClient;
 import uk.gov.ons.census.fwmt.tests.acceptance.utils.TMMockUtils;
 
+import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.TimeoutException;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -36,6 +38,12 @@ public class AddressCheckServiceTestSteps {
 
   @Autowired
   private CSVSerivceUtils csvSerivceUtils;
+
+  @Autowired
+  private StorageUtils storageUtils;
+
+  @Value("${service.csvservice.gcpBucket.directory}")
+  private String directory;
 
   private GatewayEventMonitor gatewayEventMonitor = new GatewayEventMonitor();
 
@@ -56,17 +64,22 @@ public class AddressCheckServiceTestSteps {
     tmMockUtils.resetMock();
     queueUtils.clearQueues();
 
+    File file = new File("files/csv/AC15_07_94.csv");
+    storageUtils.move(file.toURI(), URI.create(directory));
+
     gatewayEventMonitor = new GatewayEventMonitor();
     gatewayEventMonitor.enableEventMonitor(rabbitLocation, rabbitUsername, rabbitPassword);
   }
 
   @After
   public void tearDownGatewayEventMonitor() throws IOException {
-    String csvData = Resources
-        .toString(Resources.getResource("files/csv/AC15_07_94.csv"), Charsets.UTF_8);
-    csvSerivceUtils.putCSVInBucket("AC15_07_94", csvData);
     gatewayEventMonitor.tearDownGatewayEventMonitor();
     tmMockUtils.disableRequestRecorder();
+
+    List<URI> filesToDelete = storageUtils.getFilenamesInFolder(URI.create(directory));
+    for (URI uri : filesToDelete){
+      storageUtils.delete(uri);
+    }
   }
 
   @Given("the Gateway receives a CSV Address Check")
