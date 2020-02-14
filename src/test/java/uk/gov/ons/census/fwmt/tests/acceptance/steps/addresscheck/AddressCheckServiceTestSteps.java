@@ -64,8 +64,11 @@ public class AddressCheckServiceTestSteps {
     tmMockUtils.resetMock();
     queueUtils.clearQueues();
 
-    File file = new File("files/csv/AC15_07_94.csv");
-    storageUtils.move(file.toURI(), URI.create(directory));
+    File jobFile = new File(getClass().getClassLoader().getResource("files/csv/AC15_07_94.csv").getFile());
+    storageUtils.move(jobFile.toURI(), URI.create(directory + jobFile.getName()));
+
+    File lookupFile = new File(getClass().getClassLoader().getResource("files/csv/addressLookup.csv").getFile());
+    storageUtils.move(lookupFile.toURI(), URI.create(directory + lookupFile.getName()));
 
     gatewayEventMonitor = new GatewayEventMonitor();
     gatewayEventMonitor.enableEventMonitor(rabbitLocation, rabbitUsername, rabbitPassword);
