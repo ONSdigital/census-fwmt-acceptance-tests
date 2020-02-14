@@ -67,8 +67,9 @@ public class CCSCSVServiceSteps {
     tmMockUtils.enableRequestRecorder();
     tmMockUtils.resetMock();
     queueUtils.clearQueues();
-    File file = new File("files/csv/testCCSCSV.csv");
-    storageUtils.move(file.toURI(), URI.create(directory));
+
+    File file = new File(getClass().getClassLoader().getResource("files/csv/ccsTestCSV.csv").getFile());
+    storageUtils.move(file.toURI(), URI.create(directory + file.getName()));
 
     gatewayEventMonitor = new GatewayEventMonitor();
     gatewayEventMonitor.enableEventMonitor(rabbitLocation, rabbitUsername, rabbitPassword);
