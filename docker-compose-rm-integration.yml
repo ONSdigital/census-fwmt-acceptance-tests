@@ -2,7 +2,7 @@ version: '3'
 services:
   postgres:
     container_name: postgres
-    image: postgres:11
+    image: postgres:9.6docke
     command: ["-c", "shared_buffers=256MB", "-c", "max_connections=500"]
     ports:
       - "${POSTGRES_PORT}:5432"
@@ -35,6 +35,10 @@ services:
       - RABBITMQ_HOSTNAME=rabbit
       - TOTALMOBILE_BASEURL=http://mock:8000/
       - REDIS_HOST=redis
+      - SPRING_DATASOURCE_URL='jdbc:postgresql://postgres/postgres?currentSchema=fwmtg'
+      - SPRING_DATASOURCE_PASSWORD='password'
+      - SPRING_LIQUIBASE_URL= 'jdbc:postgresql://postgres/postgres?currentSchema=fwmtg'
+      - SPRING_LIQUIBASE_PASSWOR='password'
     depends_on:
       - rabbit
       - postgres
@@ -67,6 +71,10 @@ services:
     environment:
       - RABBITMQ_HOSTNAME=rabbitmq
       - REDIS_HOST=redis
+      - SPRING_DATASOURCE_URL='jdbc:postgresql://postgres/postgres?currentSchema=fwmtg'
+      - SPRING_DATASOURCE_PASSWORD='password'
+      - SPRING_LIQUIBASE_URL='jdbc:postgresql://postgres/postgres?currentSchema=fwmtg'
+      - SPRING_LIQUIBASE_PASSWORD='password'
   csvserv:
     container_name: csvserv
     image: eu.gcr.io/census-gcr-fwmt-gateway/census-rm-fwmtcsvservice:release
