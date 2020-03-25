@@ -8,6 +8,8 @@ services:
       - "${POSTGRES_PORT}:5432"
     environment:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    networks:
+      - internal
   rabbit:
     container_name: rabbit
     image: rabbitmq:3.6.10-management
@@ -46,13 +48,13 @@ services:
     networks:
       - internal
     environment:
-      - RABBITMQ_HOSTNAME=rabbit
-      - TOTALMOBILE_BASEURL=http://mock:8000/
-      - REDIS_HOST=redis
-      - SPRING_DATASOURCE_URL="jdbc:postgresql://postgres/postgres?currentSchema=fwmtg"
-      - SPRING_DATASOURCE_PASSWORD=password
-      - SPRING_LIQUIBASE_URL="jdbc:postgresql://postgres/postgres?currentSchema=fwmtg"
-      - SPRING_LIQUIBASE_PASSWORD=password
+      RABBITMQ_HOSTNAME: rabbit
+      TOTALMOBILE_BASEURL: http://mock:8000/
+      REDIS_HOST: redis
+      SPRING_DATASOURCE_URL: 'jdbc:postgresql://postgres/postgres?currentSchema=fwmtg'
+      SPRING_DATASOURCE_PASSWORD: 'password'
+      SPRING_LIQUIBASE_URL: 'jdbc:postgresql://postgres/postgres?currentSchema=fwmtg'
+      SPRING_LIQUIBASE_PASSWORD: 'password'
     depends_on:
       - rabbit
       - postgres
@@ -88,12 +90,12 @@ services:
     networks:
       - internal
     environment:
-      - RABBITMQ_HOSTNAME=rabbit
-      - REDIS_HOST=redis
-      - SPRING_DATASOURCE_URL='jdbc:postgresql://postgres/postgres?currentSchema=fwmtg'
-      - SPRING_DATASOURCE_PASSWORD= 'password'
-      - SPRING_LIQUIBASE_URL= 'jdbc:postgresql://postgres/postgres?currentSchema=fwmtg'
-      - SPRING_LIQUIBASE_PASSWORD= 'password'
+      RABBITMQ_HOSTNAME: rabbit
+      REDIS_HOST: redis
+      SPRING_DATASOURCE_URL: 'jdbc:postgresql://postgres/postgres?currentSchema=fwmtg'
+      SPRING_DATASOURCE_PASSWORD: 'password'
+      SPRING_LIQUIBASE_URL: 'jdbc:postgresql://postgres/postgres?currentSchema=fwmtg'
+      SPRING_LIQUIBASE_PASSWORD: 'password'
     depends_on:
       - rabbit
       - postgres
