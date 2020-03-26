@@ -1,5 +1,15 @@
 version: '3'
 services:
+  rabbit:
+    container_name: rabbit
+    image: rabbitmq:3.6.10-management
+    ports:
+      - "4369:4369"
+      - "25672:25672"
+      - "5671-5672:5671-5672"
+      - "15671-15672:15671-15672"
+    networks:
+      - internal
   postgres:
     container_name: postgres
     image: postgres:9.6
