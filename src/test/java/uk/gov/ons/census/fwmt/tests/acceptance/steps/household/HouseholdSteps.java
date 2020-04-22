@@ -23,9 +23,7 @@ import uk.gov.ons.census.fwmt.events.utils.GatewayEventMonitor;
 import uk.gov.ons.census.fwmt.tests.acceptance.utils.CSVSerivceUtils;
 import uk.gov.ons.census.fwmt.tests.acceptance.utils.QueueClient;
 import uk.gov.ons.census.fwmt.tests.acceptance.utils.TMMockUtils;
-import uk.gov.ons.ctp.response.action.message.instruction.ActionInstruction;
 
-import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -146,16 +144,16 @@ public class HouseholdSteps {
     assertEquals(caseId, modelCase.getId().toString());
   }
 
-  @Given("RM sends a create HouseHold job request job which has a case ID of {string} and a field officer ID {string}")
-  public void rmSendsACreateHouseHoldJobRequestJobWhichHasACaseIDOfAndAFieldOfficerID(String caseId,
-      String fieldOfficerId)
-      throws URISyntaxException, InterruptedException, JAXBException {
-    JAXBElement<ActionInstruction> actionInstruction = tmMockUtils.unmarshalXml(nisraHouseholdMessage);
-    queueUtils.sendToRMFieldQueue(nisraHouseholdMessage);
-    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, RM_CREATE_REQUEST_RECEIVED, 10000L);
-    assertEquals(fieldOfficerId, actionInstruction.getValue().getActionRequest().getFieldOfficerId());
-    assertThat(hasBeenTriggered).isTrue();
-  }
+//  @Given("RM sends a create HouseHold job request job which has a case ID of {string} and a field officer ID {string}")
+//  public void rmSendsACreateHouseHoldJobRequestJobWhichHasACaseIDOfAndAFieldOfficerID(String caseId,
+//      String fieldOfficerId)
+//      throws URISyntaxException, InterruptedException, JAXBException {
+//    JAXBElement<ActionInstruction> actionInstruction = tmMockUtils.unmarshalXml(nisraHouseholdMessage);
+//    queueUtils.sendToRMFieldQueue(nisraHouseholdMessage);
+//    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, RM_CREATE_REQUEST_RECEIVED, 10000L);
+//    assertEquals(fieldOfficerId, actionInstruction.getValue().getActionRequest().getFieldOfficerId());
+//    assertThat(hasBeenTriggered).isTrue();
+//  }
 
   @When("the Gateway sends a Create Job message to TM with case ID of {string}")
   public void theGatewaySendsACreateJobMessageToTMWithCaseIdOf(String caseId) {

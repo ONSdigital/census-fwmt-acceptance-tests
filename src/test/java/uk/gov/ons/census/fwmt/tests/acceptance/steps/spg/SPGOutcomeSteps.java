@@ -1,5 +1,6 @@
 package uk.gov.ons.census.fwmt.tests.acceptance.steps.spg;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Charsets;
@@ -68,6 +69,8 @@ public class SPGOutcomeSteps {
 
   public static final String CCSI_OUTCOME_SENT = "CCSI_OUTCOME_SENT";
 
+  public static final String TEMP_FIELD_OTHERS_QUEUE = "Field.other";
+
   public static final String GATEWAY_RESPONDENT_REFUSAL_ROUTING_KEY = "event.respondent.refusal";
 
   public static final String GATEWAY_ADDRESS_UPDATE_ROUTING_KEY = "event.case.address.update";
@@ -96,6 +99,8 @@ public class SPGOutcomeSteps {
 
   private final String surveyType = "spg";
 
+  private JsonNode rmJsonNode;
+
   @Before
   public void before() throws URISyntaxException {
     try {
@@ -104,7 +109,6 @@ public class SPGOutcomeSteps {
     } catch (IOException | TimeoutException | InterruptedException e) {
       throw new RuntimeException("Problem with setting up", e);
     }
-    queueClient.clearQueues();
   }
 
   @After
@@ -114,41 +118,34 @@ public class SPGOutcomeSteps {
 
   @Given("the Field Officer sends a {string}")
   public void theFieldOfficerSendsA(String outcomeType) {
-    JsonNode node = tmRequestRootNode.path("outcomeType");
     this.qIdHasValue = false;
     this.eventType = outcomeType;
-    assertEquals(outcomeType, node.asText());
   }
 
-  @And("the Primary {string} is {string}")
-  public void thePrimaryOutcomeIs(String primaryOutcome) {
-    JsonNode node = tmRequestRootNode.path("primaryOutcomeDescription");
+  @Given("the Primary Outcome is {string}")
+  public void the_Primary_Outcome_is(String primaryOutcome) {
     this.primaryOutcome = primaryOutcome;
-    inputRoot.put("primaryOutcomeDescription",secondaryOutcome);
-    assertEquals(primaryOutcome, node.asText());
+    inputRoot.put("primaryOutcomeDescription", primaryOutcome);
   }
 
   @And("the secondary Outcome {string}")
   public void theSecondaryOutcome(String secondaryOutcome) {
-    JsonNode node = tmRequestRootNode.path("secondaryOutcomeDescription");
     this.secondaryOutcome = secondaryOutcome;
-    inputRoot.put("secondaryOutcomeDescription",secondaryOutcome);
-    assertEquals(secondaryOutcome, node.asText());
+    inputRoot.put("secondaryOutcomeDescription", secondaryOutcome);
   }
 
   @And("Outcome code is {string}")
   public void outcomeCodeIs(String outcomeCode) {
-    JsonNode node = tmRequestRootNode.path("outcomeCode");
     this.outcomeCode = outcomeCode;
-    inputRoot.put("outcomeCode",outcomeCode);
-    assertEquals(outcomeCode, node.asText());
+    inputRoot.put("outcomeCode", outcomeCode);
   }
 
   @When("Gateway receives the outcome")
-  public void gatewayReceivesTheOutcome() {
-    JsonNode node = tmRequestRootNode.path("caseId");
-    caseId = node.asText();
+  public void gatewayReceivesTheOutcome() throws JsonProcessingException {
     String TMRequest = createOutcomeMessage(eventType + "-in", inputRoot, surveyType);
+    ObjectMapper mapper = new ObjectMapper();
+    JsonNode tmJsonNode = mapper.readTree(TMRequest);
+    caseId = tmJsonNode.path("caseId").asText();
     readRequest(TMRequest);
     int response = tmMockUtils.sendTMSPGResponseMessage(tmRequest, caseId);
     assertEquals(200, response);
@@ -165,7 +162,7 @@ public class SPGOutcomeSteps {
       try {
         actualMessages.add(queueClient.getMessage(operationToQueue(operation)));
         for(String message : actualMessages) {
-          assertTrue(compareCaseEventMessages(secondaryOutcome, message));
+          assertTrue(compareCaseEventMessages(eventType, message));
         }
       } catch (InterruptedException e) {
         throw new RuntimeException("Problem getting message", e);
@@ -179,16 +176,12 @@ public class SPGOutcomeSteps {
     List<String> eventTypeList;
     eventTypeList = Arrays.asList(splitEventTypes);
     int index = 0;
+    // TODO : creating RM message further up, may just need to do for all
     for (String event : eventTypeList) {
       try {
         if (actualMessages.get(index) == null) break;
         JsonNode actualMessageRootNode = jsonObjectMapper.readTree(actualMessages.get(index));
         JsonNode node = actualMessageRootNode.path("event").path("type");
-        // TODO : handle this if lookup is null
-        inputRoot.put("reason", spgReasonCodeLookup.getLookup(outcomeCode));
-        String rmOutcome = createOutcomeMessage(event + "-out", outputRoot, surveyType);
-        ObjectMapper mapper = new ObjectMapper();
-        JsonNode rmJsonNode = mapper.readTree(rmOutcome);
         assertEquals(rmJsonNode.path("event").path("type").asText(), node.asText());
       } catch (IOException e) {
         throw new RuntimeException("Problem parsing ", e);
@@ -206,6 +199,7 @@ public class SPGOutcomeSteps {
     }
   }
 
+  // TODO : this should be queues not keys
   private String operationToQueue(String operation) {
     switch (operation) {
     case "HARD_REFUSAL_RECEIVED":
@@ -214,7 +208,7 @@ public class SPGOutcomeSteps {
     case "ADDRESS_NOT_VALID":
     case "ADDRESS_TYPE_CHANGED_HH":
     case "ADDRESS_TYPE_CHANGED_CE_EST":
-      return GATEWAY_ADDRESS_UPDATE_ROUTING_KEY;
+      return TEMP_FIELD_OTHERS_QUEUE;
     case "FULFILMENT_REQUESTED":
       return GATEWAY_FULFILMENT_REQUEST_ROUTING_KEY;
     case "LINKED_QID":
@@ -224,15 +218,19 @@ public class SPGOutcomeSteps {
     }
   }
 
-  private boolean compareCaseEventMessages(String so, String actualMessage) {
+  private boolean compareCaseEventMessages(String eventType, String actualMessage) {
     try {
-      String expectedCaseEvent = getExpectedCaseEvent(so);
-      JsonNode expectedMessageRootNode = jsonObjectMapper.readTree(expectedCaseEvent);
+      // TODO : handle this if lookup is null
+      outputRoot.put("reason", spgReasonCodeLookup.getLookup(outcomeCode));
+      String rmOutcome = createOutcomeMessage(eventType + "-out", outputRoot, surveyType);
+      ObjectMapper mapper = new ObjectMapper();
+      rmJsonNode = mapper.readTree(rmOutcome);
       JsonNode actualMessageRootNode = jsonObjectMapper.readTree(actualMessage);
 
-      boolean isEqual = expectedMessageRootNode.equals(actualMessageRootNode);
+      boolean isEqual = rmJsonNode.equals(actualMessageRootNode);
       if (!isEqual) {
-        log.info("expected and actual caseEvents are not the same: \n expected:\n {} \n\n actual: \n {}", expectedCaseEvent, actualMessage);
+        log.info("expected and actual caseEvents are not the same: \n expected:\n {} \n\n actual: \n {}",
+            rmJsonNode, actualMessage);
       }
       return isEqual;
 
@@ -258,7 +256,7 @@ public class SPGOutcomeSteps {
   }
 
   public String createOutcomeMessage(String eventType, Map<String, Object> root, String surveyType) {
-    String outcomeMessage = "";
+     String outcomeMessage = "";
 
     try {
       Configuration configuration = new Configuration(Configuration.VERSION_2_3_28);
@@ -275,7 +273,7 @@ public class SPGOutcomeSteps {
         out.flush();
 
         outcomeEventMessage.flush();
-        outcomeMessage = outcomeEventMessage.toString();
+        outcomeMessage = out.toString();
 
       } catch (TemplateException e) {
         log.error("Error: ", e);

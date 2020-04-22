@@ -29,7 +29,6 @@ import uk.gov.ons.census.fwmt.common.error.GatewayException;
 import uk.gov.ons.census.fwmt.events.utils.GatewayEventMonitor;
 import uk.gov.ons.census.fwmt.tests.acceptance.utils.QueueClient;
 import uk.gov.ons.census.fwmt.tests.acceptance.utils.TMMockUtils;
-import uk.gov.ons.ctp.response.action.message.instruction.ActionInstruction;
 
 @Slf4j
 @PropertySource("classpath:application.properties")
@@ -80,16 +79,16 @@ public class NISRASteps {
     tmMockUtils.disableRequestRecorder();
   }
 
-  @Given("RM sends a create NISRA job request job which has a case ID of {string} and a field officer ID {string}")
-  public void rmSendsACreateHouseHoldJobRequestJobWhichHasACaseIDOfAndAFieldOfficerID(String caseId,
-      String fieldOfficerId)
-      throws URISyntaxException, InterruptedException, JAXBException {
-    JAXBElement<ActionInstruction> actionInstruction = tmMockUtils.unmarshalXml(nisraHouseholdMessage);
-    queueUtils.sendToRMFieldQueue(nisraHouseholdMessage);
-    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, RM_CREATE_REQUEST_RECEIVED, 10000L);
-    assertEquals(fieldOfficerId, actionInstruction.getValue().getActionRequest().getFieldOfficerId());
-    assertThat(hasBeenTriggered).isTrue();
-  }
+//  @Given("RM sends a create NISRA job request job which has a case ID of {string} and a field officer ID {string}")
+//  public void rmSendsACreateHouseHoldJobRequestJobWhichHasACaseIDOfAndAFieldOfficerID(String caseId,
+//      String fieldOfficerId)
+//      throws URISyntaxException, InterruptedException, JAXBException {
+//    JAXBElement<ActionInstruction> actionInstruction = tmMockUtils.unmarshalXml(nisraHouseholdMessage);
+//    queueUtils.sendToRMFieldQueue(nisraHouseholdMessage);
+//    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, RM_CREATE_REQUEST_RECEIVED, 10000L);
+//    assertEquals(fieldOfficerId, actionInstruction.getValue().getActionRequest().getFieldOfficerId());
+//    assertThat(hasBeenTriggered).isTrue();
+//  }
 
   @And("the Gateway sends a create NISRA Job message to TM with case ID of {string}")
   public void theGatewaySendsACreateJobMessageToTMWithCaseIdOf(String caseId) {
