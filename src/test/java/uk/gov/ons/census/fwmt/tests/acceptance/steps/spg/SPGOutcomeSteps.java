@@ -189,8 +189,9 @@ public class SPGOutcomeSteps {
         JsonNode node = actualMessageRootNode.path("event").path("type");
         inputRoot.put("reason", spgReasonCodeLookup.getLookup(outcomeCode));
         String rmOutcome = createOutcomeMessage(event + "-out", outputRoot, surveyType);
-        // TODO : string back into node
-        assertEquals(rmOutcome, node.asText());
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode rmJsonNode = mapper.readTree(rmOutcome);
+        assertEquals(rmJsonNode.path("event").path("type").asText(), node.asText());
       } catch (IOException e) {
         throw new RuntimeException("Problem parsing ", e);
       }
