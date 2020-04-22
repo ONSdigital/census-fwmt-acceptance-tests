@@ -17,7 +17,9 @@ import freemarker.template.TemplateExceptionHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import uk.gov.ons.census.fwmt.events.utils.GatewayEventMonitor;
 import uk.gov.ons.census.fwmt.tests.acceptance.utils.QueueClient;
+import uk.gov.ons.census.fwmt.tests.acceptance.utils.SpgReasonCodeLookup;
 import uk.gov.ons.census.fwmt.tests.acceptance.utils.TMMockUtils;
 
 import java.io.IOException;
@@ -41,6 +43,9 @@ public class SPGOutcomeSteps {
 
   @Autowired
   private QueueClient queueClient;
+
+  @Autowired
+  private SpgReasonCodeLookup spgReasonCodeLookup;
 
   private GatewayEventMonitor gatewayEventMonitor = new GatewayEventMonitor();
 
@@ -182,7 +187,7 @@ public class SPGOutcomeSteps {
         // TODO : I have the actual value from the queue and I have the string from template - fix comparison
         JsonNode actualMessageRootNode = jsonObjectMapper.readTree(actualMessages.get(index));
         JsonNode node = actualMessageRootNode.path("event").path("type");
-        inputRoot.put("reason", "bnb");
+        inputRoot.put("reason", spgReasonCodeLookup.getLookup(outcomeCode));
         String rmOutcome = createOutcomeMessage(event + "-out", outputRoot, surveyType);
         // TODO : string back into node
         assertEquals(rmOutcome, node.asText());
