@@ -42,6 +42,15 @@ public final class TMMockUtils {
   @Value("${service.outcome.CCSInt.endpoint}")
   private String ccsIntOutcomeEnpoint;
 
+  @Value("${service.outcome.SPG.endpoint}")
+  private String spgOutcomeEndpoint;
+
+  @Value("${service.outcome.SPGNewUnit.endpoint}")
+  private String spgNewUnitOutcomeEndpoint;
+
+  @Value("${service.outcome.SPGStandalone.endpoint}")
+  private String spgStandaloneOutcomeEndpoint;
+
   @Value("${service.outcome.username}")
   private String outcomeServiceUsername;
 
@@ -122,6 +131,48 @@ public final class TMMockUtils {
 
     RestTemplate restTemplate = new RestTemplate();
     String postUrl = outcomeServiceUrl + ccsIntOutcomeEnpoint + caseId;
+
+    HttpEntity<String> post = new HttpEntity<>(data, headers);
+    ResponseEntity<Void> response = restTemplate.exchange(postUrl, HttpMethod.POST, post, Void.class);
+
+    return response.getStatusCode().value();
+  }
+
+  public int sendTMSPGResponseMessage(String data, String caseId) {
+    HttpHeaders headers = createBasicAuthHeaders(outcomeServiceUsername, outcomeServicePassword);
+
+    headers.setContentType(MediaType.APPLICATION_JSON);
+
+    RestTemplate restTemplate = new RestTemplate();
+    String postUrl = outcomeServiceUrl + spgOutcomeEndpoint + caseId;
+
+    HttpEntity<String> post = new HttpEntity<>(data, headers);
+    ResponseEntity<Void> response = restTemplate.exchange(postUrl, HttpMethod.POST, post, Void.class);
+
+    return response.getStatusCode().value();
+  }
+
+  public int sendTMSPGNewStandaloneAddressResponseMessage(String data, String caseId) {
+    HttpHeaders headers = createBasicAuthHeaders(outcomeServiceUsername, outcomeServicePassword);
+
+    headers.setContentType(MediaType.APPLICATION_JSON);
+
+    RestTemplate restTemplate = new RestTemplate();
+    String postUrl = outcomeServiceUrl + spgStandaloneOutcomeEndpoint;
+
+    HttpEntity<String> post = new HttpEntity<>(data, headers);
+    ResponseEntity<Void> response = restTemplate.exchange(postUrl, HttpMethod.POST, post, Void.class);
+
+    return response.getStatusCode().value();
+  }
+
+  public int sendTMSPGNewUnitAddressResponseMessage(String data, String caseId) {
+    HttpHeaders headers = createBasicAuthHeaders(outcomeServiceUsername, outcomeServicePassword);
+
+    headers.setContentType(MediaType.APPLICATION_JSON);
+
+    RestTemplate restTemplate = new RestTemplate();
+    String postUrl = outcomeServiceUrl + spgNewUnitOutcomeEndpoint;
 
     HttpEntity<String> post = new HttpEntity<>(data, headers);
     ResponseEntity<Void> response = restTemplate.exchange(postUrl, HttpMethod.POST, post, Void.class);

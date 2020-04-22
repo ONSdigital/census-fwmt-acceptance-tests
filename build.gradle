@@ -1,23 +1,33 @@
 buildscript {
     ext {
-        springBootVersion = '2.1.0.RELEASE'
+        springVersion = '5.2.3.RELEASE'
+        springBootVersion = '2.2.4.RELEASE'
     }
+
     repositories {
         mavenCentral()
         jcenter()
+    }
+
+    dependencies {
+        classpath "org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}"
+        classpath 'org.jfrog.buildinfo:build-info-extractor-gradle:latest.release'
+        classpath 'org.ajoberstar:gradle-git:1.4.2'
     }
 }
 
 plugins {
     id 'java'
-    id 'eclipse'
+    id 'application'
+    id 'maven'
+    id 'maven-publish'
+    id 'com.jfrog.artifactory' version '4.13.0'
     id 'idea'
+    id 'eclipse'
 }
 
 description = 'census-fwmt-acceptance-tests'
-
 group = 'uk.gov.ons.census.fwmt'
-
 version = '4.0.0-SNAPSHOT'
 
 sourceCompatibility = 11
@@ -25,71 +35,33 @@ targetCompatibility = 11
 
 repositories {
     mavenLocal()
-    if (!project.hasProperty('omitSDCArtifactory')) {
-        maven { url 'http://artifactory-sdc.onsdigital.uk/artifactory/libs-release' }
-        maven { url 'http://artifactory-sdc.onsdigital.uk/artifactory/libs-snapshot' }
-    }
-    mavenCentral()
-    mavenLocal()
-}
-
-configurations {
-    jaxb
-    cucumberRuntime {
-        extendsFrom testRuntime
-    }
-}
-
-task cucumber(dependsOn: testClasses) {
-    doLast {
-        javaexec {
-            main = 'cucumber.api.cli.Main'
-            classpath = configurations.testRuntimeClasspath + sourceSets.main.output + sourceSets.test.output
-            args = ['--plugin', 'pretty', '--glue', 'uk.gov.ons.census.fwmt.census-acceptance-tests', 'src/test/resources']
+    maven {
+        url 'https://ons.jfrog.io/ons/libs-releases-virtual'
+        credentials {
+            username "${artifactory_user}"
+            password "${artifactory_password}"
         }
     }
+    maven {
+        url 'https://ons.jfrog.io/ons/libs-snapshots-virtual'
+        credentials {
+            username "${artifactory_user}"
+            password "${artifactory_password}"
+        }
+    }
+    mavenCentral()
 }
 
-test {
-    dependsOn cleanTest
-    testLogging.showStandardStreams = true
-    systemProperties System.getProperties()
-    systemProperties.remove("java.endorsed.dirs")
-    systemProperty "cucumber.options", System.getProperty("cucumber.options") 
-}
-
-task genJaxb {
-    ext.sourcesDir = "${buildDir}/generated-sources/jaxb"
-    ext.classesDir = "${buildDir}/classes/jaxb"
-    ext.schema = "${projectDir}/src/test/resources/xsd"
-
-    outputs.dir classesDir
-
-    doLast() {
-        project.ant {
-            taskdef name: 'xjc', classname: 'com.sun.tools.xjc.XJCTask',
-                    classpath: configurations.jaxb.asPath
-            mkdir(dir: sourcesDir)
-            mkdir(dir: classesDir)
-
-            xjc(destdir: sourcesDir) {
-                produces(dir: sourcesDir, includes: '**/*.java')
-                schema(dir: schema, includes: '**/*.xsd')
-            }
-
-            javac(destdir: classesDir, source: 1.8, target: 1.8, debug: true,
-                    debugLevel: 'lines,vars,source',
-                    classpath: configurations.jaxb.asPath) {
-                src(path: sourcesDir)
-                include(name: "**/*.java")
-                include(name: "*.java")
-            }
-
-            copy(todir: classesDir) {
-                fileset(dir: sourcesDir, erroronmissingdir: false) {
-                    exclude(name: "**/*.java")
-                }
-            }
+artifactory {
+    contextUrl = 'https://ons.jfrog.io/ons/'
+    publish {
+        repository {
+            repoKey = 'libs-releases-local'
+            username = "${artifactory_user}"
+            password = "${artifactory_password}"
+        }
+        defaults {
+            publishBuildInfo = false
         }
     }
 }
@@ -106,11 +78,6 @@ dependencies {
 
     implementation group: 'org.springframework.cloud', name: 'spring-cloud-gcp-starter-storage', version: '1.2.1.RELEASE'
 
-    jaxb("javax.xml.bind:jaxb-api:2.3.0")
-    jaxb("com.sun.xml.bind:jaxb-core:2.3.0.1")
-    jaxb("com.sun.xml.bind:jaxb-impl:2.3.1")
-    jaxb("com.sun.xml.bind:jaxb-xjc:2.3.1")
-    jaxb("javax.activation:activation:1.1.1")
     compile("javax.xml.bind:jaxb-api:2.3.0")
     compile("com.sun.xml.bind:jaxb-core:2.3.0.1")
     compile("com.sun.xml.bind:jaxb-impl:2.3.1")
@@ -119,8 +86,6 @@ dependencies {
 
     compile ('org.springframework.data:spring-data-redis:2.0.10.RELEASE')
     compile('redis.clients:jedis:2.9.0')
-
-    compile(files((String) genJaxb.classesDir).builtBy(genJaxb))
 
     compile("org.projectlombok:lombok:1.18.4")
     annotationProcessor("org.projectlombok:lombok:1.18.4")
@@ -134,7 +99,7 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-web:${springBootVersion}")
 
     compile("org.json:json:20180813")
-	compile('org.freemarker:freemarker:2.3.28')
+	testCompile('org.freemarker:freemarker:2.3.28')
 
     testCompile("com.fasterxml.jackson.core:jackson-databind:2.9.7")
     testCompile("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.9.7")
@@ -150,4 +115,20 @@ dependencies {
 
     testCompile("org.projectlombok:lombok:1.18.4")
     testAnnotationProcessor("org.projectlombok:lombok:1.18.4")
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId = group
+            artifactId = 'census-fwmt-outcome-service'
+            version = version
+
+            from components.java
+        }
+    }
+}
+
+artifactoryPublish {
+    publications('maven')
 }
