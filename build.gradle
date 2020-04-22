@@ -68,7 +68,7 @@ artifactory {
 
 dependencies {
 
-    compile("uk.gov.ons.census.fwmt:census-fwmt-events:1.0.17-RELEASE")
+    compile("uk.gov.ons.census.fwmt:census-fwmt-events:1.0.23-RELEASE")
     compile('uk.gov.ons.census.fwmt:census-fwmt-common:1.0.46-RELEASE')
     compile("uk.gov.ons.census.ffa:census-ffa-storage-utils:0.0.1-RELEASE")
 

@@ -85,7 +85,9 @@ public class SPGOutcomeSteps {
 
   private String outcomeCode;
 
-  private Map<String, Object> root = new HashMap<>();
+  private Map<String, Object> inputRoot = new HashMap<>();
+
+  private Map<String, Object> outputRoot = new HashMap<>();
 
   private String surveyType = "spg";
 
@@ -118,7 +120,7 @@ public class SPGOutcomeSteps {
   public void thePrimaryOutcomeIs(String primaryOutcome) {
     JsonNode node = tmRequestRootNode.path("primaryOutcomeDescription");
     this.primaryOutcome = primaryOutcome;
-    root.put("primaryOutcomeDescription",secondaryOutcome);
+    inputRoot.put("primaryOutcomeDescription",secondaryOutcome);
     assertEquals(primaryOutcome, node.asText());
   }
 
@@ -126,7 +128,7 @@ public class SPGOutcomeSteps {
   public void theSecondaryOutcome(String secondaryOutcome) {
     JsonNode node = tmRequestRootNode.path("secondaryOutcomeDescription");
     this.secondaryOutcome = secondaryOutcome;
-    root.put("secondaryOutcomeDescription",secondaryOutcome);
+    inputRoot.put("secondaryOutcomeDescription",secondaryOutcome);
     assertEquals(secondaryOutcome, node.asText());
   }
 
@@ -134,7 +136,7 @@ public class SPGOutcomeSteps {
   public void outcomeCodeIs(String outcomeCode) {
     JsonNode node = tmRequestRootNode.path("outcomeCode");
     this.outcomeCode = outcomeCode;
-    root.put("outcomeCode",outcomeCode);
+    inputRoot.put("outcomeCode",outcomeCode);
     assertEquals(outcomeCode, node.asText());
   }
 
@@ -142,7 +144,7 @@ public class SPGOutcomeSteps {
   public void gatewayReceivesTheOutcome() {
     JsonNode node = tmRequestRootNode.path("caseId");
     caseId = node.asText();
-    String TMRequest = createOutcomeMessage(eventType, root, surveyType);
+    String TMRequest = createOutcomeMessage(eventType + "-in", inputRoot, surveyType);
     readRequest(TMRequest);
     int response = tmMockUtils.sendTMSPGResponseMessage(tmRequest, caseId);
     assertEquals(200, response);
@@ -177,9 +179,13 @@ public class SPGOutcomeSteps {
     for (String event : eventTypeList) {
       try {
         if (actualMessages.get(index) == null) break;
+        // TODO : I have the actual value from the queue and I have the string from template - fix comparison
         JsonNode actualMessageRootNode = jsonObjectMapper.readTree(actualMessages.get(index));
         JsonNode node = actualMessageRootNode.path("event").path("type");
-        assertEquals(event, node.asText());
+        inputRoot.put("reason", "bnb");
+        String rmOutcome = createOutcomeMessage(event + "-out", outputRoot, surveyType);
+        // TODO : string back into node
+        assertEquals(rmOutcome, node.asText());
       } catch (IOException e) {
         throw new RuntimeException("Problem parsing ", e);
       }
