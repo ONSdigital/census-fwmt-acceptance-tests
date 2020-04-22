@@ -94,7 +94,7 @@ public class SPGOutcomeSteps {
 
   private Map<String, Object> outputRoot = new HashMap<>();
 
-  private String surveyType = "spg";
+  private final String surveyType = "spg";
 
   @Before
   public void before() throws URISyntaxException {
@@ -104,7 +104,6 @@ public class SPGOutcomeSteps {
     } catch (IOException | TimeoutException | InterruptedException e) {
       throw new RuntimeException("Problem with setting up", e);
     }
-
     queueClient.clearQueues();
   }
 
@@ -164,7 +163,6 @@ public class SPGOutcomeSteps {
       // TODO : this event will differ based on the operation being performed
       gatewayEventMonitor.checkForEvent(caseId, "CESPG_OUTCOME_SENT");
       try {
-        // TODO : find queue based on operation and add the message to list - allow not to find find
         actualMessages.add(queueClient.getMessage(operationToQueue(operation)));
         for(String message : actualMessages) {
           assertTrue(compareCaseEventMessages(secondaryOutcome, message));
@@ -212,19 +210,15 @@ public class SPGOutcomeSteps {
     switch (operation) {
     case "HARD_REFUSAL_RECEIVED":
     case "EXTRAORDINARY_REFUSAL_RECEIVED":
-      return GATEWAY_RESPONDENT_REFUSAL_ROUTING_KEY
-    break;
+      return GATEWAY_RESPONDENT_REFUSAL_ROUTING_KEY;
     case "ADDRESS_NOT_VALID":
     case "ADDRESS_TYPE_CHANGED_HH":
     case "ADDRESS_TYPE_CHANGED_CE_EST":
       return GATEWAY_ADDRESS_UPDATE_ROUTING_KEY;
-    break;
     case "FULFILMENT_REQUESTED":
       return GATEWAY_FULFILMENT_REQUEST_ROUTING_KEY;
-    break;
     case "LINKED_QID":
       return GATEWAY_QUESTIONNAIRE_UPDATE_ROUTING_KEY;
-    break;
     default:
       throw new RuntimeException("Problem matching operation");
     }
