@@ -69,6 +69,8 @@ public class SPGOutcomeSteps {
 
   public static final String CCSI_OUTCOME_SENT = "CCSI_OUTCOME_SENT";
 
+  public static final String FIELD_REFUSALS_QUEUE = "Field.refusals";
+  // TODO : add correct queses throught test suite
   public static final String TEMP_FIELD_OTHERS_QUEUE = "Field.other";
 
   public static final String GATEWAY_RESPONDENT_REFUSAL_ROUTING_KEY = "event.respondent.refusal";
@@ -204,15 +206,15 @@ public class SPGOutcomeSteps {
     switch (operation) {
     case "HARD_REFUSAL_RECEIVED":
     case "EXTRAORDINARY_REFUSAL_RECEIVED":
-      return GATEWAY_RESPONDENT_REFUSAL_ROUTING_KEY;
+      return FIELD_REFUSALS_QUEUE;
     case "ADDRESS_NOT_VALID":
     case "ADDRESS_TYPE_CHANGED_HH":
     case "ADDRESS_TYPE_CHANGED_CE_EST":
       return TEMP_FIELD_OTHERS_QUEUE;
     case "FULFILMENT_REQUESTED":
-      return GATEWAY_FULFILMENT_REQUEST_ROUTING_KEY;
+      return TEMP_FIELD_OTHERS_QUEUE;
     case "LINKED_QID":
-      return GATEWAY_QUESTIONNAIRE_UPDATE_ROUTING_KEY;
+      return TEMP_FIELD_OTHERS_QUEUE;
     default:
       throw new RuntimeException("Problem matching operation");
     }
