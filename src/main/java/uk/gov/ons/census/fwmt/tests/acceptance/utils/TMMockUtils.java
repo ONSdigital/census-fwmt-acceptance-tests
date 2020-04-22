@@ -146,7 +146,7 @@ public final class TMMockUtils {
     return response.getStatusCode().value();
   }
 
-  public int sendTMSPGNewStandaloneAddressResponseMessage(String data, String caseId) {
+  public int sendTMSPGNewStandaloneAddressResponseMessage(String data) {
     HttpHeaders headers = createBasicAuthHeaders(outcomeServiceUsername, outcomeServicePassword);
 
     headers.setContentType(MediaType.APPLICATION_JSON);
@@ -160,7 +160,7 @@ public final class TMMockUtils {
     return response.getStatusCode().value();
   }
 
-  public int sendTMSPGNewUnitAddressResponseMessage(String data, String caseId) {
+  public int sendTMSPGNewUnitAddressResponseMessage(String data) {
     HttpHeaders headers = createBasicAuthHeaders(outcomeServiceUsername, outcomeServicePassword);
 
     headers.setContentType(MediaType.APPLICATION_JSON);

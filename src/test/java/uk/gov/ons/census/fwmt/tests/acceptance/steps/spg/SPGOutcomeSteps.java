@@ -73,14 +73,6 @@ public class SPGOutcomeSteps {
   // TODO : add correct queses throught test suite
   public static final String TEMP_FIELD_OTHERS_QUEUE = "Field.other";
 
-  public static final String GATEWAY_RESPONDENT_REFUSAL_ROUTING_KEY = "event.respondent.refusal";
-
-  public static final String GATEWAY_ADDRESS_UPDATE_ROUTING_KEY = "event.case.address.update";
-
-  public static final String GATEWAY_FULFILMENT_REQUEST_ROUTING_KEY = "event.fulfilment.request";
-
-  public static final String GATEWAY_QUESTIONNAIRE_UPDATE_ROUTING_KEY = "event.questionnaire.update";
-
   private List<String> actualMessages = new ArrayList<>();
 
   private boolean qIdHasValue;
@@ -142,8 +134,8 @@ public class SPGOutcomeSteps {
     inputRoot.put("outcomeCode", outcomeCode);
   }
 
-  @When("Gateway receives the outcome")
-  public void gatewayReceivesTheOutcome() throws JsonProcessingException {
+  @When("Gateway receives SPG outcome")
+  public void gatewayReceivesSPGOutcome() throws JsonProcessingException {
     String TMRequest = createOutcomeMessage(eventType + "-in", inputRoot, surveyType);
     ObjectMapper mapper = new ObjectMapper();
     JsonNode tmJsonNode = mapper.readTree(TMRequest);
@@ -151,6 +143,7 @@ public class SPGOutcomeSteps {
     readRequest(TMRequest);
     int response = tmMockUtils.sendTMSPGResponseMessage(tmRequest, caseId);
     assertEquals(200, response);
+
   }
 
   @Then("It will send an {string} messages to RM")
