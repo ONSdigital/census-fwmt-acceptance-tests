@@ -240,22 +240,6 @@ public class SPGOutcomeSteps {
     }
   }
 
-  private String getExpectedCaseEvent(String so) {
-    try {
-      String pathname = createPathnameFromOutcomeName(so);
-      String message = Resources.toString(
-          Resources.getResource("files/outcome/" + resourcePath + "/" + pathname + "/eventresponse" +
-              (qIdHasValue ? "-q" : "") + ".json"), Charsets.UTF_8);
-      return message;
-    } catch (IOException e) {
-      throw new RuntimeException("Problem retrieving resource file", e);
-    }
-  }
-
-  private String createPathnameFromOutcomeName(String outcomeName) {
-    return outcomeName.replaceAll("[^A-Za-z]+", "").toLowerCase();
-  }
-
   public String createOutcomeMessage(String eventType, Map<String, Object> root, String surveyType) {
      String outcomeMessage = "";
 
