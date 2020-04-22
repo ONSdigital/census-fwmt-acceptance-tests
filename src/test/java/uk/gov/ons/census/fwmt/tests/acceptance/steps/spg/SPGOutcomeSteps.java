@@ -201,7 +201,6 @@ public class SPGOutcomeSteps {
     }
   }
 
-  // TODO : this should be queues not keys
   private String operationToQueue(String operation) {
     switch (operation) {
     case "HARD_REFUSAL_RECEIVED":
@@ -222,7 +221,7 @@ public class SPGOutcomeSteps {
 
   private boolean compareCaseEventMessages(String eventType, String actualMessage) {
     try {
-      // TODO : handle this if lookup is null
+      // TODO : handle this if lookup is null - if we wont only use this for ADDRESS_NOT_VALID
       outputRoot.put("reason", spgReasonCodeLookup.getLookup(outcomeCode));
       String rmOutcome = createOutcomeMessage(eventType + "-out", outputRoot, surveyType);
       ObjectMapper mapper = new ObjectMapper();
