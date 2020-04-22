@@ -184,9 +184,9 @@ public class SPGOutcomeSteps {
     for (String event : eventTypeList) {
       try {
         if (actualMessages.get(index) == null) break;
-        // TODO : I have the actual value from the queue and I have the string from template - fix comparison
         JsonNode actualMessageRootNode = jsonObjectMapper.readTree(actualMessages.get(index));
         JsonNode node = actualMessageRootNode.path("event").path("type");
+        // TODO : handle this if lookup is null
         inputRoot.put("reason", spgReasonCodeLookup.getLookup(outcomeCode));
         String rmOutcome = createOutcomeMessage(event + "-out", outputRoot, surveyType);
         ObjectMapper mapper = new ObjectMapper();
