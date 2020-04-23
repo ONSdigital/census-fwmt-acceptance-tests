@@ -152,7 +152,7 @@ public class SPGOutcomeSteps {
       // TODO : this event will differ based on the operation being performed
       gatewayEventMonitor.checkForEvent(caseId, "CESPG_OUTCOME_SENT");
       try {
-        actualMessages.add(queueClient.getMessage(operationToQueue(operation)));
+        actualMessages.add(queueClient.getMessage( operationToQueue(operation)));
         for(String message : actualMessages) {
           assertTrue(compareCaseEventMessages(eventType, message));
         }
