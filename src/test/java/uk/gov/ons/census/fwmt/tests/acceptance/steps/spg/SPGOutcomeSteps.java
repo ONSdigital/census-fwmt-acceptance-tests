@@ -65,6 +65,8 @@ public class SPGOutcomeSteps {
   @Value("${service.rabbit.password}")
   private String rabbitPassword;
 
+  private static final String RM_FIELD_QUEUE = "RM.Field";
+
   public static final String FIELD_REFUSALS_QUEUE = "Field.refusals";
   // TODO : add correct queses throught test suite
   public static final String TEMP_FIELD_OTHERS_QUEUE = "Field.other";
@@ -193,6 +195,7 @@ public class SPGOutcomeSteps {
     switch (operation) {
     case "HARD_REFUSAL_RECEIVED":
     case "EXTRAORDINARY_REFUSAL_RECEIVED":
+    case "REFUSAL_RECEIVED":
       return FIELD_REFUSALS_QUEUE;
     case "ADDRESS_NOT_VALID":
     case "ADDRESS_TYPE_CHANGED_HH":
@@ -202,6 +205,8 @@ public class SPGOutcomeSteps {
       return TEMP_FIELD_OTHERS_QUEUE;
     case "LINKED_QID":
       return TEMP_FIELD_OTHERS_QUEUE;
+    case "CANCEL_FEEDBACK":
+      return RM_FIELD_QUEUE;
     default:
       throw new RuntimeException("Problem matching operation");
     }
