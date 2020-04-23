@@ -3,8 +3,6 @@ package uk.gov.ons.census.fwmt.tests.acceptance.steps.spg;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Charsets;
-import com.google.common.io.Resources;
 import cucumber.api.java.After;
 import cucumber.api.java.Before;
 import cucumber.api.java.en.And;
@@ -66,8 +64,6 @@ public class SPGOutcomeSteps {
 
   @Value("${service.rabbit.password}")
   private String rabbitPassword;
-
-  public static final String CCSI_OUTCOME_SENT = "CCSI_OUTCOME_SENT";
 
   public static final String FIELD_REFUSALS_QUEUE = "Field.refusals";
   // TODO : add correct queses throught test suite
@@ -143,7 +139,6 @@ public class SPGOutcomeSteps {
     readRequest(TMRequest);
     int response = tmMockUtils.sendTMSPGResponseMessage(tmRequest, caseId);
     assertEquals(200, response);
-
   }
 
   @Then("It will send an {string} messages to RM")

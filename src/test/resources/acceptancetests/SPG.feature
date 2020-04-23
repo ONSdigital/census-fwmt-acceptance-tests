@@ -24,14 +24,11 @@ Feature: SPG Outcome Tests
       | ADDRESS_NOT_VALID | Engagement - Not-valid    | Visit - Non-residential        | 6-10-55      | ADDRESS_NOT_VALID | ADDRESS_NOT_VALID   |
       | ADDRESS_NOT_VALID | Engagement - Not-valid    | Visit - Duplicate              | 6-10-58      | ADDRESS_NOT_VALID | ADDRESS_NOT_VALID   |
       | ADDRESS_NOT_VALID | Engagement - Not-valid    | Visit - Under construction     | 6-10-57      | ADDRESS_NOT_VALID | ADDRESS_NOT_VALID   |
-
       | ADDRESS_NOT_VALID | Engagement - Not-valid    | Phone - Derelict or demolished | 6-10-06      | ADDRESS_NOT_VALID | ADDRESS_NOT_VALID   |
       | ADDRESS_NOT_VALID | Engagement - Not-valid    | Phone - Non-residential        | 6-10-05      | ADDRESS_NOT_VALID | ADDRESS_NOT_VALID   |
       | ADDRESS_NOT_VALID | Engagement - Not-valid    | Phone - Incorrect address      | 6-10-08      | ADDRESS_NOT_VALID | ADDRESS_NOT_VALID   |
       | ADDRESS_NOT_VALID | Engagement - Not-valid    | Phone - Under construction     | 6-10-07      | ADDRESS_NOT_VALID | ADDRESS_NOT_VALID   |
-
       | ADDRESS_NOT_VALID | Engagement - No contact   | Visit - Unoccupied site        | 6-30-03      | ADDRESS_NOT_VALID | ADDRESS_NOT_VALID   |
-
       | ADDRESS_NOT_VALID | Engagement - Contact made | Phone - Unoccupied site        | 6-20-01      | ADDRESS_NOT_VALID | ADDRESS_NOT_VALID   |
       | ADDRESS_NOT_VALID | Engagement - Contact made | Phone - Unoccupied site        | 6-20-01      | ADDRESS_NOT_VALID | ADDRESS_NOT_VALID   |
       | ADDRESS_NOT_VALID | Engagement - Contact made | Visit - Unoccupied site        | 6-20-55      | ADDRESS_NOT_VALID | ADDRESS_NOT_VALID   |
@@ -39,7 +36,6 @@ Feature: SPG Outcome Tests
       # SPG UNIT DELIVERY
 
       | ADDRESS_NOT_VALID | No contact                | Unoccupied unit                | 7-30-01      | ADDRESS_NOT_VALID | ADDRESS_NOT_VALID   |
-
       | ADDRESS_NOT_VALID | Not-valid                 | Derelict or demolished         | 7-10-07      | ADDRESS_NOT_VALID | ADDRESS_NOT_VALID   |
       | ADDRESS_NOT_VALID | Not-valid                 | Can't find property            | 7-10-10      | ADDRESS_NOT_VALID | ADDRESS_NOT_VALID   |
       | ADDRESS_NOT_VALID | Not-valid                 | Unaddressable object           | 7-10-06      | ADDRESS_NOT_VALID | ADDRESS_NOT_VALID   |
@@ -51,7 +47,6 @@ Feature: SPG Outcome Tests
       # SPG UNIT FOLLOW UP
 
       | ADDRESS_NOT_VALID | No contact made           | Unoccupied unit                | 8-30-03      | ADDRESS_NOT_VALID | ADDRESS_NOT_VALID   |
-
       | ADDRESS_NOT_VALID | Not-valid                 | Derelict or demolished         | 8-10-07      | ADDRESS_NOT_VALID | ADDRESS_NOT_VALID   |
       | ADDRESS_NOT_VALID | Not-valid                 | Can't find property            | 8-10-10      | ADDRESS_NOT_VALID | ADDRESS_NOT_VALID   |
       | ADDRESS_NOT_VALID | Not-valid                 | Unaddressable object           | 8-10-06      | ADDRESS_NOT_VALID | ADDRESS_NOT_VALID   |
