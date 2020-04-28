@@ -1,4 +1,4 @@
-package uk.gov.ons.census.fwmt.tests.acceptance.steps.spg;
+package uk.gov.ons.census.fwmt.tests.acceptance.steps.spgoutcome;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;

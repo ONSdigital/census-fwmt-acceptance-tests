@@ -67,6 +67,7 @@ artifactory {
 }
 
 dependencies {
+    runtimeOnly('org.postgresql:postgresql:42.2.5')
 
     compile("uk.gov.ons.census.fwmt:census-fwmt-events:1.0.23-RELEASE")
     compile('uk.gov.ons.census.fwmt:census-fwmt-common:1.0.46-RELEASE')

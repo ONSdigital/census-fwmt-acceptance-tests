@@ -19,6 +19,10 @@ import javax.xml.bind.JAXBContext;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 @Slf4j
 @Component
@@ -53,6 +57,15 @@ public final class TMMockUtils {
 
   @Value("${service.mocktm.url}")
   private String mockTmUrl;
+
+  @Value("${spring.datasource.url}")
+  private String url;
+
+  @Value("${spring.datasource.username}")
+  private String username;
+
+  @Value("${spring.datasource.password}")
+  private String password;
 
   private RestTemplate restTemplate = new RestTemplate();
 
@@ -201,6 +214,29 @@ public final class TMMockUtils {
     httpURLConnection.setRequestMethod("GET");
     if (httpURLConnection.getResponseCode() != 200) {
       throw new MockInaccessibleException("Failed : HTTP error code : " + httpURLConnection.getResponseCode());
+    }
+  }
+
+  public void clearDownDatabase() throws Exception {
+    System.out.println("CLEARDB" + url + username + password);
+    Statement stmt = null;
+    try (Connection conn = DriverManager.getConnection(url, username, password)) {
+      if (conn != null) {
+        System.out.println("Connected to the database!");
+        stmt = conn.createStatement();
+        String sql = "DELETE FROM gateway_cache";
+        stmt.executeUpdate(sql);
+        sql = "DELETE FROM request_log";
+        stmt.execute(sql);
+      } else {
+        System.out.println("Failed to make connection!");
+      }
+    } finally {
+      try {
+        if (stmt != null)
+          stmt.close();
+      } catch (SQLException ignored) {
+      }
     }
   }
 }

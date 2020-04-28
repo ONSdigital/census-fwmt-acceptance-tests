@@ -83,19 +83,6 @@ public class HouseholdSteps {
 
   @Before
   public void setup() throws IOException, TimeoutException, URISyntaxException {
-    cancelMessage = Resources
-        .toString(Resources.getResource("files/input/actionCancelInstruction.xml"), Charsets.UTF_8);
-    cancelMessageNonHH = Resources
-        .toString(Resources.getResource("files/input/actionNonHHCancelInstruction.xml"), Charsets.UTF_8);
-    invalidRMMessage = Resources.toString(Resources.getResource("files/input/invalidInstruction.xml"), Charsets.UTF_8);
-    receivedRMMessage = Resources.toString(Resources.getResource("files/input/actionInstruction.xml"), Charsets.UTF_8);
-    updateMessage = Resources.toString(Resources.getResource("files/input/actionUpdateInstruction.xml"), Charsets.UTF_8);
-    updatePauseMessage = Resources.toString(Resources.getResource("files/input/actionUpdatePauseInstruction.xml"), Charsets.UTF_8);
-    updateMessageWithoutCreate = Resources
-            .toString(Resources.getResource("files/input/actionUpdateInstructionWithoutCreate.xml"), Charsets.UTF_8);
-    nisraNoFieldOfficerMessage = Resources
-            .toString(Resources.getResource("files/input/nisraNoFieldOfficerActionInstruction.xml"), Charsets.UTF_8);
-    nisraHouseholdMessage = Resources.toString(Resources.getResource("files/input/nisraActionInstruction.xml"), Charsets.UTF_8);
 
     tmMockUtils.enableRequestRecorder();
     tmMockUtils.resetMock();
@@ -107,41 +94,9 @@ public class HouseholdSteps {
   }
 
   @After
-  public void tearDownGatewayEventMonitor() throws IOException, TimeoutException {
+  public void tearDownGatewayEventMonitor() throws IOException {
     gatewayEventMonitor.tearDownGatewayEventMonitor();
     tmMockUtils.disableRequestRecorder();
-  }
-
-  @Given("a TM doesnt have an existing job with case ID {string}")
-  public void aTMDoesntHaveAnExistingJobWithCaseId(String caseId) {
-    try {
-      tmMockUtils.getCaseById(caseId);
-      fail("Case should not exist");
-    } catch (HttpClientErrorException e) {
-      assertEquals(HttpStatus.NOT_FOUND, e.getStatusCode());
-    }
-  }
-
-  @And("RM sends a create HouseHold job request")
-  public void rmSendsACreateHouseHoldJobRequest() throws URISyntaxException, InterruptedException {
-    String caseId = "39bad71c-7de5-4e1b-9a07-d9597737977f";
-    queueUtils.sendToRMFieldQueue(receivedRMMessage);
-    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, RM_CREATE_REQUEST_RECEIVED, 10000L);
-    assertThat(hasBeenTriggered).isTrue();
-  }
-
-  @When("the Gateway sends a Create Job message to TM")
-  public void theGatewaySendsACreateJobMessageToTM() {
-    String caseId = "39bad71c-7de5-4e1b-9a07-d9597737977f";
-    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, COMET_CREATE_ACK, 10000L);
-    assertThat(hasBeenTriggered).isTrue();
-  }
-
-  @Then("a new case with id of {string} is created in TM")
-  public void aNewCaseIsCreatedInTm(String caseId) throws InterruptedException {
-    Thread.sleep(1000);
-    ModelCase modelCase = tmMockUtils.getCaseById(caseId);
-    assertEquals(caseId, modelCase.getId().toString());
   }
 
 //  @Given("RM sends a create HouseHold job request job which has a case ID of {string} and a field officer ID {string}")

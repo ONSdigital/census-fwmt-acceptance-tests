@@ -9,5 +9,3 @@ Feature: SPG Outcome Tests
     When Gateway receives SPG outcome
     Then It will send an "<Operation List>" messages to RM
     And each message conforms to "<Output Message List>"
-
-

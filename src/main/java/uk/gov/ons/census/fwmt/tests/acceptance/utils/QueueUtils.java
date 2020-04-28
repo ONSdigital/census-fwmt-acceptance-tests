@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.concurrent.TimeoutException;
 
 @Slf4j
@@ -131,7 +132,9 @@ public class QueueUtils {
       channel = connection.createChannel();
 
       BasicProperties.Builder builder = new BasicProperties.Builder();
-      builder.contentType("text/xml");
+      builder.headers(Map.of("__TypeId__","uk.gov.ons.census.fwmtadapter.model.dto.fwmt.FwmtActionInstruction"));
+      builder.contentType("application/json");
+      builder.contentEncoding("UTF-8");
       BasicProperties properties = builder.build();
 
       channel.basicPublish(exchange, routingkey, properties, message.getBytes());
