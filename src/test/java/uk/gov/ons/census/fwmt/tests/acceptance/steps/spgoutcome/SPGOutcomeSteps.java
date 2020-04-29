@@ -59,7 +59,7 @@ public class SPGOutcomeSteps {
 
   private JsonNode tmRequestRootNode;
 
-  private String caseId = "N/A";
+  private String caseId;
 
   @Value("${service.rabbit.url}")
   private String rabbitLocation;
@@ -187,9 +187,6 @@ public class SPGOutcomeSteps {
     List<String> operationsList;
     operationsList = Arrays.asList(splitEventTypes);
     int index = 0;
-    while (!caseId.equals("N/A")) {
-      getCaseId();
-    }
     for (String operation : operationsList) {
       gatewayEventMonitor.checkForEvent(caseId, CESPG_OUTCOME_SENT);
       try {
