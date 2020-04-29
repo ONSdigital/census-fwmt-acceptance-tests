@@ -4,12 +4,12 @@
 "eventDate":"2020-04-17T11:53:11.000+0000",
 "officerId":"SH-TWH1-ZA-25",
 "coordinatorId":"SH-TWH1-ZA",
-"primaryOutcomeDescription""${primaryOutcomeDescription}",
+"primaryOutcomeDescription":"${primaryOutcomeDescription}",
 "secondaryOutcomeDescription":"${secondaryOutcomeDescription}",
-"outcomeCode":"${outcomeCode}"
-"fulfilmentRequests":{
-[
+"outcomeCode":"${outcomeCode}",
+"fulfilmentRequests":[
+{
 "questionnaireID":"1110000009"
-]
 }
+]
 }

@@ -7,10 +7,10 @@
 "primaryOutcomeDescription":"${primaryOutcomeDescription}",
 "secondaryOutcomeDescription":"${secondaryOutcomeDescription}",
 "outcomeCode":"${outcomeCode}",
-"fulfilmentRequests": {
-[
+"fulfilmentRequests": [
+{
 "questionnaireType": "HUAC2",
 "requesterPhone": "07777000000"
-]
 }
+]
 }

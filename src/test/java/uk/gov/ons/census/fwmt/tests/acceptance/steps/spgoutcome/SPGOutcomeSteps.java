@@ -3,6 +3,7 @@ package uk.gov.ons.census.fwmt.tests.acceptance.steps.spgoutcome;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.api.client.json.Json;
 import cucumber.api.java.After;
 import cucumber.api.java.Before;
 import cucumber.api.java.en.And;
@@ -91,10 +92,12 @@ public class SPGOutcomeSteps {
 
   private final String surveyType = "spg";
 
-  private JsonNode rmJsonNode;
+  private List<JsonNode> jsonNodeList = new ArrayList<>();
+
+  private int index = 0;
 
   @Before
-  public void before() throws URISyntaxException {
+  public void before() {
     try {
       queueClient.createQueue();
       gatewayEventMonitor.enableEventMonitor(rabbitLocation, rabbitUsername, rabbitPassword);
@@ -104,8 +107,9 @@ public class SPGOutcomeSteps {
   }
 
   @After
-  public void after() throws IOException, TimeoutException, URISyntaxException {
+  public void after() throws URISyntaxException {
     gatewayEventMonitor.tearDownGatewayEventMonitor();
+    queueClient.clearQueues();
   }
 
   @Given("the Field Officer sends a {string}")
@@ -148,17 +152,20 @@ public class SPGOutcomeSteps {
     String[] splitEventTypes = operationList.split(",");
     List<String> operationsList;
     operationsList = Arrays.asList(splitEventTypes);
+    int index = 0;
     for (String operation : operationsList) {
       // TODO : this event will differ based on the operation being performed
       gatewayEventMonitor.checkForEvent(caseId, "CESPG_OUTCOME_SENT");
       try {
-        actualMessages.add(queueClient.getMessage( operationToQueue(operation)));
-        for(String message : actualMessages) {
-          assertTrue(compareCaseEventMessages(eventType, message));
-        }
+        actualMessages.add(queueClient.getMessage(operationToQueue(operation)));
       } catch (InterruptedException e) {
         throw new RuntimeException("Problem getting message", e);
       }
+    }
+    for(String message : actualMessages) {
+      if (operationsList.get(index) == null) break;
+      assertTrue(compareCaseEventMessages(operationsList.get(index), message));
+      index++;
     }
   }
 
@@ -174,7 +181,7 @@ public class SPGOutcomeSteps {
         if (actualMessages.get(index) == null) break;
         JsonNode actualMessageRootNode = jsonObjectMapper.readTree(actualMessages.get(index));
         JsonNode node = actualMessageRootNode.path("event").path("type");
-        assertEquals(rmJsonNode.path("event").path("type").asText(), node.asText());
+        assertEquals(jsonNodeList.get(index).path("event").path("type").asText(), node.asText());
       } catch (IOException e) {
         throw new RuntimeException("Problem parsing ", e);
       }
@@ -199,7 +206,7 @@ public class SPGOutcomeSteps {
       return FIELD_REFUSALS_QUEUE;
     case "ADDRESS_NOT_VALID":
     case "ADDRESS_TYPE_CHANGED_HH":
-    case "ADDRESS_TYPE_CHANGED_CE_EST":
+    case "ADDRESS_TYPE_CHANGED_CE":
       return TEMP_FIELD_OTHERS_QUEUE;
     case "FULFILMENT_REQUESTED":
       return TEMP_FIELD_OTHERS_QUEUE;
@@ -218,14 +225,16 @@ public class SPGOutcomeSteps {
       outputRoot.put("reason", spgReasonCodeLookup.getLookup(outcomeCode));
       String rmOutcome = createOutcomeMessage(eventType + "-out", outputRoot, surveyType);
       ObjectMapper mapper = new ObjectMapper();
-      rmJsonNode = mapper.readTree(rmOutcome);
+      JsonNode rmJsonNode = mapper.readTree(rmOutcome);
+      jsonNodeList.add(rmJsonNode);
       JsonNode actualMessageRootNode = jsonObjectMapper.readTree(actualMessage);
 
-      boolean isEqual = rmJsonNode.equals(actualMessageRootNode);
+      boolean isEqual = jsonNodeList.get(index).equals(actualMessageRootNode);
       if (!isEqual) {
         log.info("expected and actual caseEvents are not the same: \n expected:\n {} \n\n actual: \n {}",
-            rmJsonNode, actualMessage);
+            jsonNodeList.get(index), actualMessage);
       }
+      this.index++;
       return isEqual;
 
     } catch (IOException e) {

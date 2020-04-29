@@ -6,7 +6,7 @@
 "coordinatorId":"SH-TWH1-ZA",
 "primaryOutcomeDescription":"${primaryOutcomeDescription}",
 "secondaryOutcomeDescription":"${secondaryOutcomeDescription}",
-"outcomeCode":"${outcomeCode}"
-"accessInfo": "....",
-"careCodes":[ "aaaa", "bbb" ]
+"outcomeCode":"${outcomeCode}",
+"accessInfo":null,
+"careCodes":["CAT","DOG"]
 }

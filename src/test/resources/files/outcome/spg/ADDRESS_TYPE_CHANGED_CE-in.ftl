@@ -6,7 +6,7 @@
 "coordinatorId":"SH-TWH1-ZA",
 "primaryOutcomeDescription":"${primaryOutcomeDescription}",
 "secondaryOutcomeDescription":"${secondaryOutcomeDescription}",
-"outcomeCode":"${outcomeCode}"
+"outcomeCode":"${outcomeCode}",
 "ceDetails":{
 "establishmentName":"The last rest",
 "establishmentType":"Care Home",
@@ -16,6 +16,6 @@
 "usualResidents":10,
 "contactPhone":"07977123456"
 },
-"accessInfo":"....",
-"careCodes":[ "aaaa", "bbb" ]
+"accessInfo":null,
+"careCodes":["CAT","DOG"]
 }

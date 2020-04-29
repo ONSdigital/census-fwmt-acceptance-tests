@@ -9,3 +9,7 @@ Feature: SPG Outcome Tests
     When Gateway receives SPG outcome
     Then It will send an "<Operation List>" messages to RM
     And each message conforms to "<Output Message List>"
+
+        # new unit move and edit
+#      | FULFILMENT_REQUESTED | Contact made           | HUAC required by text                     | 9-20-04      | FULFILMENT_REQUESTED    | FULFILMENT_REQUESTED                      |
+#      | LINKED_QID           | Contact made           | HICL or Paper H Questionnaire delivered   | 9-20-05      | LINKED_QID              | LINKED_QID                                |
