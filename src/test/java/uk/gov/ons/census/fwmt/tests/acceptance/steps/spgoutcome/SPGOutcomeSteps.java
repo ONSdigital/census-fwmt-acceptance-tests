@@ -59,7 +59,7 @@ public class SPGOutcomeSteps {
 
   private JsonNode tmRequestRootNode;
 
-  private String caseId;
+  private String caseId = "N/A";
 
   @Value("${service.rabbit.url}")
   private String rabbitLocation;

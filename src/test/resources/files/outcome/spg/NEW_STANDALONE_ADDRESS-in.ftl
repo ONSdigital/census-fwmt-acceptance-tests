@@ -17,7 +17,7 @@
 {
 "questionnaireID":"1111111111",
 "questionnaireType":"HUAC2",
-"requesterForename":"John",,
+"requesterForename":"John",
 "requesterPhone":"07777000000",
 "requesterSurname":"Smith",
 "requesterTitle":"Mr"
@@ -27,5 +27,5 @@
 "outcomeCode":"${outcomeCode}",
 "primaryOutcomeDescription":"${primaryOutcomeDescription}",
 "secondaryOutcomeDescription":"${secondaryOutcomeDescription}",
-"transactionId":"b1646499-c5d8-4fbe-bb21-8e057601a3c2",
+"transactionId":"b1646499-c5d8-4fbe-bb21-8e057601a3c2"
 }
