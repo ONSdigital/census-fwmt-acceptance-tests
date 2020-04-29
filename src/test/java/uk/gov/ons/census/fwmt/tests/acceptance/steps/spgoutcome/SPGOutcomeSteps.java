@@ -17,6 +17,7 @@ import freemarker.template.TemplateExceptionHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import uk.gov.ons.census.fwmt.events.data.GatewayEventDTO;
 import uk.gov.ons.census.fwmt.events.utils.GatewayEventMonitor;
 import uk.gov.ons.census.fwmt.tests.acceptance.utils.QueueClient;
 import uk.gov.ons.census.fwmt.tests.acceptance.utils.SpgReasonCodeLookup;
@@ -27,13 +28,16 @@ import java.io.StringWriter;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeoutException;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static uk.gov.ons.census.fwmt.tests.acceptance.steps.ccscsvservice.CCSCSVServiceSteps.CSV_CCS_REQUEST_EXTRACTED;
 
 @Slf4j
 public class SPGOutcomeSteps {
@@ -65,6 +69,8 @@ public class SPGOutcomeSteps {
 
   @Value("${service.rabbit.password}")
   private String rabbitPassword;
+
+  private static final String CESPG_OUTCOME_SENT = "CESPG_OUTCOME_SENT";
 
   private static final String RM_FIELD_QUEUE = "RM.Field";
 
@@ -147,15 +153,45 @@ public class SPGOutcomeSteps {
     assertEquals(200, response);
   }
 
+  @When("Gateway receives SPG a New Unit Address outcome")
+  public void gatewayReceivesSPGANewUnitAddressOutcome() {
+    String TMRequest = createOutcomeMessage(eventType + "-in", inputRoot, surveyType);
+    readRequest(TMRequest);
+    int response = tmMockUtils.sendTMSPGNewUnitAddressResponseMessage(tmRequest);
+    assertEquals(200, response);
+  }
+
+  @When("Gateway receives SPG New Standalone Address outcome")
+  public void gatewayReceivesSPGNewStandaloneAddressOutcome() {
+    String TMRequest = createOutcomeMessage(eventType + "-in", inputRoot, surveyType);
+    readRequest(TMRequest);
+    int response = tmMockUtils.sendTMSPGNewStandaloneAddressResponseMessage(tmRequest);
+    assertEquals(200, response);
+  }
+
+  public void getCaseId() {
+    Collection<GatewayEventDTO> message;
+    message = gatewayEventMonitor.grabEventsTriggered(CESPG_OUTCOME_SENT, 1, 10000L);
+
+    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered("N/A", CESPG_OUTCOME_SENT, 10000L);
+    assertThat(hasBeenTriggered).isTrue();
+
+    for (GatewayEventDTO retrieveCaseId : message) {
+      caseId = retrieveCaseId.getCaseId();
+    }
+  }
+
   @Then("It will send an {string} messages to RM")
   public void itWillSendAnMessagesToRM(String operationList) {
     String[] splitEventTypes = operationList.split(",");
     List<String> operationsList;
     operationsList = Arrays.asList(splitEventTypes);
     int index = 0;
+    while (!caseId.equals("N/A")) {
+      getCaseId();
+    }
     for (String operation : operationsList) {
-      // TODO : this event will differ based on the operation being performed
-      gatewayEventMonitor.checkForEvent(caseId, "CESPG_OUTCOME_SENT");
+      gatewayEventMonitor.checkForEvent(caseId, CESPG_OUTCOME_SENT);
       try {
         actualMessages.add(queueClient.getMessage(operationToQueue(operation)));
       } catch (InterruptedException e) {
@@ -175,9 +211,10 @@ public class SPGOutcomeSteps {
     List<String> eventTypeList;
     eventTypeList = Arrays.asList(splitEventTypes);
     int index = 0;
-    // TODO : creating RM message further up, may just need to do for all
+    // TODO :
     for (String event : eventTypeList) {
       try {
+        log.info("Processing event :" + event);
         if (actualMessages.get(index) == null) break;
         JsonNode actualMessageRootNode = jsonObjectMapper.readTree(actualMessages.get(index));
         JsonNode node = actualMessageRootNode.path("event").path("type");
@@ -212,6 +249,10 @@ public class SPGOutcomeSteps {
       return TEMP_FIELD_OTHERS_QUEUE;
     case "LINKED_QID":
       return TEMP_FIELD_OTHERS_QUEUE;
+    case "NEW_UNIT_ADDRESS":
+      return TEMP_FIELD_OTHERS_QUEUE;
+    case "NEW_STANDALONE_ADDRESS":
+      return TEMP_FIELD_OTHERS_QUEUE;
     case "CANCEL_FEEDBACK":
       return RM_FIELD_QUEUE;
     default:
@@ -221,7 +262,7 @@ public class SPGOutcomeSteps {
 
   private boolean compareCaseEventMessages(String eventType, String actualMessage) {
     try {
-      // TODO : handle this if lookup is null - if we wont only use this for ADDRESS_NOT_VALID
+      // TODO : we use for REFUSAL_RECEIVED and reason for ADDRESS_NOT_VALID - templates prevent null pointer
       outputRoot.put("reason", spgReasonCodeLookup.getLookup(outcomeCode));
       String rmOutcome = createOutcomeMessage(eventType + "-out", outputRoot, surveyType);
       ObjectMapper mapper = new ObjectMapper();
