@@ -47,11 +47,14 @@ public class SPGCreateSteps {
   private static final String RM_CREATE_REQUEST_RECEIVED = "RM_CREATE_REQUEST_RECEIVED";
   private static final String COMET_CREATE_ACK = "COMET_CREATE_ACK";
 
-  private String receivedRMMessage = null;
+  private String request = null;
+  private String ceSpgEstab = null;
+  private String ceSpgUnit = null;
 
   @Before
   public void setup() throws Exception {
-    receivedRMMessage = Resources.toString(Resources.getResource("files/input/spg/spgEstabCreate.json"), Charsets.UTF_8);
+    ceSpgEstab = Resources.toString(Resources.getResource("files/input/spg/spgEstabCreate.json"), Charsets.UTF_8);
+    ceSpgUnit = Resources.toString(Resources.getResource("files/input/spg/spgUnitCreate.json"), Charsets.UTF_8);
 
     tmMockUtils.enableRequestRecorder();
     tmMockUtils.resetMock();
@@ -68,20 +71,33 @@ public class SPGCreateSteps {
     queueUtils.clearQueues();
   }
 
-  @Given("a TM doesnt have an existing job with case ID {string}")
-  public void aTMDoesntHaveAnExistingJobWithCaseId(String caseId) {
+  @Given("a TM doesnt have a {string} {string} job with case ID {string} in TM")
+  public void aTMDoesntHaveAJobWithCaseIDInTM(String survey, String type, String caseId) {
     try {
+      log.info("Looking for "+ caseId + " " + survey + " " + type + "within TM");
       tmMockUtils.getCaseById(caseId);
       fail("Case should not exist");
     } catch (HttpClientErrorException e) {
       assertEquals(HttpStatus.NOT_FOUND, e.getStatusCode());
     }
+    request = getInput(survey, type);
+  }
+
+  private String getInput(String survey, String type) {
+    switch (type) {
+    case "Estab" :
+      return ceSpgEstab;
+    case "Unit" :
+      return ceSpgUnit;
+    default:
+      throw new RuntimeException("Incorrect survey " + survey + " and type " + type);
+    }
   }
 
   @And("RM sends a create HouseHold job request")
-  public void rmSendsACreateHouseHoldJobRequest() throws URISyntaxException, InterruptedException {
-    String caseId = "8dd42be3-09e6-488e-b4e2-0f14259acb9ef";
-    queueUtils.sendToRMFieldQueue(receivedRMMessage);
+  public void rmSendsACreateHouseHoldJobRequest() throws URISyntaxException {
+    String caseId = "8dd42be3-09e6-488e-b4e2-0f14259acb9e";
+    queueUtils.sendToRMFieldQueue(request);
     boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, RM_CREATE_REQUEST_RECEIVED, 10000L);
     assertThat(hasBeenTriggered).isTrue();
   }
