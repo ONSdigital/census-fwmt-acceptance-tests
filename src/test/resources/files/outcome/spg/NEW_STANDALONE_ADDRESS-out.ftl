@@ -12,8 +12,8 @@
 "id":"${newCaseId}",
 "caseType": "SPG",
 "survey": "CENSUS",
-"fieldcoordinatorId":"SH-TWH1-ZA",
-"fieldofficerId":"SH-TWH1-ZA-25",
+"fieldCoordinatorId":"SH-TWH1-ZA",
+"fieldOfficerId":"SH-TWH1-ZA-25",
 "address":{
 "addressLine1":"Unit name",
 "addressLine2":"Some house name",
