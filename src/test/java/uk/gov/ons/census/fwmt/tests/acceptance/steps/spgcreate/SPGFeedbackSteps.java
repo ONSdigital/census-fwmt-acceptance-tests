@@ -109,16 +109,16 @@ public class SPGFeedbackSteps {
   }
 
   @Then("a {string} feedback message is sent to tm")
-  public void aFeedbackMessageIsSentToTm(String type) {
-    log.info("Sending job type :" + type);
-    boolean jobSent = gatewayEventMonitor.hasEventTriggered(caseId, COMET_CANCEL_SENT, 10000L);
+  public void aFeedbackMessageIsSentToTm(String message) {
+    log.info("Sending job type :" + message);
+    boolean jobSent = gatewayEventMonitor.hasEventTriggered(caseId, message, 10000L);
     assertThat(jobSent).isTrue();
   }
 
   @And("{string} is acknowledged by tm")
-  public void isAcknowledgedByTm(String eventType) {
-    log.info("Confirming tm recieved " + eventType);
-    boolean jobAcknowledged = gatewayEventMonitor.hasEventTriggered(caseId, COMET_CANCEL_ACK, 10000L);
+  public void isAcknowledgedByTm(String message) {
+    log.info("Confirming tm recieved " + message);
+    boolean jobAcknowledged = gatewayEventMonitor.hasEventTriggered(caseId, message, 10000L);
     assertThat(jobAcknowledged).isTrue();
   }
 
