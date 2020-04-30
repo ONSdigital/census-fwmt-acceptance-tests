@@ -3,7 +3,6 @@ package uk.gov.ons.census.fwmt.tests.acceptance.steps.spgoutcome;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.api.client.json.Json;
 import cucumber.api.java.After;
 import cucumber.api.java.Before;
 import cucumber.api.java.en.And;
@@ -37,7 +36,6 @@ import java.util.concurrent.TimeoutException;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static uk.gov.ons.census.fwmt.tests.acceptance.steps.ccscsvservice.CCSCSVServiceSteps.CSV_CCS_REQUEST_EXTRACTED;
 
 @Slf4j
 public class SPGOutcomeSteps {
@@ -106,8 +104,9 @@ public class SPGOutcomeSteps {
   public void before() {
     try {
       queueClient.createQueue();
+      tmMockUtils.clearDownDatabase();
       gatewayEventMonitor.enableEventMonitor(rabbitLocation, rabbitUsername, rabbitPassword);
-    } catch (IOException | TimeoutException | InterruptedException e) {
+    } catch (Exception e) {
       throw new RuntimeException("Problem with setting up", e);
     }
   }
