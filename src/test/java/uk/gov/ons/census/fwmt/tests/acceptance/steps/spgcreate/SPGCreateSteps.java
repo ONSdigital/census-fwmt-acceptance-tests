@@ -45,16 +45,29 @@ public class SPGCreateSteps {
   private String rabbitPassword;
 
   private static final String RM_CREATE_REQUEST_RECEIVED = "RM_CREATE_REQUEST_RECEIVED";
+
   private static final String COMET_CREATE_ACK = "COMET_CREATE_ACK";
 
+  private static final String COMET_UPDATE_ACK = "COMET_UPDATE_ACK";
+
+  private static final String COMET_CANCEL_ACK = "COMET_CANCEL_ACK";
+
   private String request = null;
+
   private String ceSpgEstab = null;
+
   private String ceSpgUnit = null;
+
+  private String spgUpdate = null;
+
+  private String spgCancel = null;
 
   @Before
   public void setup() throws Exception {
     ceSpgEstab = Resources.toString(Resources.getResource("files/input/spg/spgEstabCreate.json"), Charsets.UTF_8);
     ceSpgUnit = Resources.toString(Resources.getResource("files/input/spg/spgUnitCreate.json"), Charsets.UTF_8);
+    spgUpdate = Resources.toString(Resources.getResource("files/input/spg/spgUpdate.json"), Charsets.UTF_8);
+    spgCancel = Resources.toString(Resources.getResource("files/input/spg/spgCancel.json"), Charsets.UTF_8);
 
     tmMockUtils.enableRequestRecorder();
     tmMockUtils.resetMock();
@@ -114,5 +127,35 @@ public class SPGCreateSteps {
     Thread.sleep(1000);
     ModelCase modelCase = tmMockUtils.getCaseById(caseId);
     assertEquals(caseId, modelCase.getId().toString());
+  }
+
+  @And("RM sends a update case request")
+  public void rmSendsAUpdateCaseRequest() throws URISyntaxException {
+    String caseId = "8dd42be3-09e6-488e-b4e2-0f14259acb9e";
+    queueUtils.sendToRMFieldQueue(spgUpdate);
+    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, RM_CREATE_REQUEST_RECEIVED, 10000L);
+    assertThat(hasBeenTriggered).isTrue();
+  }
+
+  @And("RM sends a cancel case request")
+  public void rmSendsACancelCaseRequest() throws URISyntaxException {
+    String caseId = "8dd42be3-09e6-488e-b4e2-0f14259acb9e";
+    queueUtils.sendToRMFieldQueue(spgCancel);
+    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, RM_CREATE_REQUEST_RECEIVED, 10000L);
+    assertThat(hasBeenTriggered).isTrue();
+  }
+
+  @Then("the update job is acknowledged by tm")
+  public void theUpdateJobIsAcknowledgedByTm() {
+    String caseId = "8dd42be3-09e6-488e-b4e2-0f14259acb9e";
+    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, COMET_UPDATE_ACK, 10000L);
+    assertThat(hasBeenTriggered).isTrue();
+  }
+
+  @Then("the cancel job is acknowledged by tm")
+  public void theCancelJobIsAcknowledgedByTm() {
+    String caseId = "8dd42be3-09e6-488e-b4e2-0f14259acb9e";
+    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, COMET_CANCEL_ACK, 10000L);
+    assertThat(hasBeenTriggered).isTrue();
   }
 }

@@ -54,11 +54,7 @@ public class SPGFeedbackSteps {
 
   private final String surveyType = "spg";
 
-  private static final String COMET_CANCEL_SENT = "COMET_CANCEL_SENT";
-
   private static final String COMET_CREATE_ACK = "COMET_CREATE_ACK";
-
-  private static final String COMET_CANCEL_ACK = "COMET_CANCEL_ACK";
 
   @Before
   public void setup() throws Exception {

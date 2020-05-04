@@ -31,7 +31,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeoutException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
@@ -207,7 +206,6 @@ public class SPGOutcomeSteps {
     List<String> eventTypeList;
     eventTypeList = Arrays.asList(splitEventTypes);
     int index = 0;
-    // TODO :
     for (String event : eventTypeList) {
       try {
         log.info("Processing event :" + event);
