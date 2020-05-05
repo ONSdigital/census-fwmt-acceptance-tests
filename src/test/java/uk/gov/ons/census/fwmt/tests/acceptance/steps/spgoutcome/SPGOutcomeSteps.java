@@ -3,6 +3,7 @@ package uk.gov.ons.census.fwmt.tests.acceptance.steps.spgoutcome;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import cucumber.api.java.After;
 import cucumber.api.java.Before;
 import cucumber.api.java.en.And;
@@ -14,9 +15,9 @@ import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateExceptionHandler;
 import lombok.extern.slf4j.Slf4j;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import uk.gov.ons.census.fwmt.events.data.GatewayEventDTO;
 import uk.gov.ons.census.fwmt.events.utils.GatewayEventMonitor;
 import uk.gov.ons.census.fwmt.tests.acceptance.utils.QueueClient;
 import uk.gov.ons.census.fwmt.tests.acceptance.utils.SpgReasonCodeLookup;
@@ -27,12 +28,10 @@ import java.io.StringWriter;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -67,6 +66,10 @@ public class SPGOutcomeSteps {
   @Value("${service.rabbit.password}")
   private String rabbitPassword;
 
+  private static final String NEW_STANDALONE_ADDRESS = "NEW_STANDALONE_ADDRESS";
+
+  private static final String NEW_UNIT_ADDRESS = "NEW_UNIT_ADDRESS";
+
   private static final String CESPG_OUTCOME_SENT = "CESPG_OUTCOME_SENT";
 
   private static final String RM_FIELD_QUEUE = "RM.Field";
@@ -77,7 +80,7 @@ public class SPGOutcomeSteps {
 
   private List<String> actualMessages = new ArrayList<>();
 
-  private boolean qIdHasValue;
+  private boolean caseIdHasValue = true;
 
   private String resourcePath;
 
@@ -118,7 +121,9 @@ public class SPGOutcomeSteps {
 
   @Given("the Field Officer sends a {string}")
   public void theFieldOfficerSendsA(String outcomeType) {
-    this.qIdHasValue = false;
+    if (outcomeType.equals(NEW_UNIT_ADDRESS) || outcomeType.equals(NEW_STANDALONE_ADDRESS)) {
+      caseIdHasValue = false;
+    }
     this.eventType = outcomeType;
   }
 
@@ -165,18 +170,6 @@ public class SPGOutcomeSteps {
     readRequest(TMRequest);
     int response = tmMockUtils.sendTMSPGNewStandaloneAddressResponseMessage(tmRequest);
     assertEquals(200, response);
-  }
-
-  public void getCaseId() {
-    Collection<GatewayEventDTO> message;
-    message = gatewayEventMonitor.grabEventsTriggered(CESPG_OUTCOME_SENT, 1, 10000L);
-
-    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered("N/A", CESPG_OUTCOME_SENT, 10000L);
-    assertThat(hasBeenTriggered).isTrue();
-
-    for (GatewayEventDTO retrieveCaseId : message) {
-      caseId = retrieveCaseId.getCaseId();
-    }
   }
 
   @Then("It will send an {string} messages to RM")
@@ -256,13 +249,23 @@ public class SPGOutcomeSteps {
 
   private boolean compareCaseEventMessages(String eventType, String actualMessage) {
     try {
-      // TODO : we use for REFUSAL_RECEIVED and reason for ADDRESS_NOT_VALID - templates prevent null pointer
       outputRoot.put("reason", spgReasonCodeLookup.getLookup(outcomeCode));
-      String rmOutcome = createOutcomeMessage(eventType + "-out", outputRoot, surveyType);
+      outputRoot.put("newCaseId", "3e007cdb-446d-4164-b2d7-8d8bd7b86c49");
+      outputRoot.put("collectionExerciseId","1ebd37b4-484a-4459-b88f-ca6fa4687acf");
+
       ObjectMapper mapper = new ObjectMapper();
+
+      String rmOutcome = createOutcomeMessage(eventType + "-out", outputRoot, surveyType);
       JsonNode rmJsonNode = mapper.readTree(rmOutcome);
       jsonNodeList.add(rmJsonNode);
-      JsonNode actualMessageRootNode = jsonObjectMapper.readTree(actualMessage);
+
+      JsonNode actualMessageRootNode;
+      if (!caseIdHasValue && (eventType.equals(NEW_UNIT_ADDRESS) || eventType.equals(NEW_STANDALONE_ADDRESS))) {
+        actualMessageRootNode = jsonObjectMapper.readTree(addNewCaseId(
+            actualMessage, "3e007cdb-446d-4164-b2d7-8d8bd7b86c49","1ebd37b4-484a-4459-b88f-ca6fa4687acf"));
+      } else {
+        actualMessageRootNode = jsonObjectMapper.readTree(actualMessage);
+      }
 
       boolean isEqual = jsonNodeList.get(index).equals(actualMessageRootNode);
       if (!isEqual) {
@@ -277,7 +280,18 @@ public class SPGOutcomeSteps {
     }
   }
 
-  public String createOutcomeMessage(String eventType, Map<String, Object> root, String surveyType) {
+  private String addNewCaseId(String expectedMessage, String newCaseId, String collectionCaseId) {
+    JSONObject wholeMessage = new JSONObject(expectedMessage);
+    JSONObject payloadNode = wholeMessage.getJSONObject("payload");
+    JSONObject newAddressNode = payloadNode.getJSONObject("newAddress");
+    JSONObject collectionCaseNode = newAddressNode.getJSONObject("collectionCase");
+    collectionCaseNode.put("id", newCaseId);
+    collectionCaseNode.put("collectionExerciseId", collectionCaseId);
+
+    return wholeMessage.toString();
+  }
+
+  private String createOutcomeMessage(String eventType, Map<String, Object> root, String surveyType) {
      String outcomeMessage = "";
 
     try {
