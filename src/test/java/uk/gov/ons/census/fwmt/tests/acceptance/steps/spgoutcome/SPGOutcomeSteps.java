@@ -3,7 +3,6 @@ package uk.gov.ons.census.fwmt.tests.acceptance.steps.spgoutcome;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import cucumber.api.java.After;
 import cucumber.api.java.Before;
 import cucumber.api.java.en.And;
@@ -22,18 +21,25 @@ import uk.gov.ons.census.fwmt.events.utils.GatewayEventMonitor;
 import uk.gov.ons.census.fwmt.tests.acceptance.utils.QueueClient;
 import uk.gov.ons.census.fwmt.tests.acceptance.utils.SpgReasonCodeLookup;
 import uk.gov.ons.census.fwmt.tests.acceptance.utils.TMMockUtils;
+import uk.gov.ons.ctp.common.error.CTPException;
+import uk.gov.ons.ctp.integration.common.product.ProductReference;
+import uk.gov.ons.ctp.integration.common.product.model.Product;
 
+import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static uk.gov.ons.ctp.integration.common.product.model.Product.RequestChannel.FIELD;
 
 @Slf4j
 public class SPGOutcomeSteps {
@@ -46,6 +52,8 @@ public class SPGOutcomeSteps {
 
   @Autowired
   private SpgReasonCodeLookup spgReasonCodeLookup;
+
+  private ProductReference productReference = new ProductReference();
 
   private GatewayEventMonitor gatewayEventMonitor = new GatewayEventMonitor();
 
@@ -252,6 +260,7 @@ public class SPGOutcomeSteps {
       outputRoot.put("reason", spgReasonCodeLookup.getLookup(outcomeCode));
       outputRoot.put("newCaseId", "3e007cdb-446d-4164-b2d7-8d8bd7b86c49");
       outputRoot.put("collectionExerciseId","1ebd37b4-484a-4459-b88f-ca6fa4687acf");
+      outputRoot.put("fulfilmentCode", getProductFromQuestionnaireType("HUAC1"));
 
       ObjectMapper mapper = new ObjectMapper();
 
@@ -278,6 +287,23 @@ public class SPGOutcomeSteps {
     } catch (IOException e) {
       throw new RuntimeException("Problem comparing 2 json files", e);
     }
+  }
+
+  @Nonnull
+  private Product getProductFromQuestionnaireType(String questionnaireType) {
+    Product product = new Product();
+    List<Product.RequestChannel> requestChannels = Collections.singletonList(FIELD);
+
+    product.setRequestChannels(requestChannels);
+    product.setFieldQuestionnaireCode(questionnaireType);
+
+    List<Product> productList = null;
+    try {
+      productList = productReference.searchProducts(product);
+    } catch (CTPException e) {
+      log.error("unable to find valid Products {}", e);
+    }
+    return Objects.requireNonNull(productList).get(0);
   }
 
   private String addNewCaseId(String expectedMessage, String newCaseId, String collectionCaseId) {

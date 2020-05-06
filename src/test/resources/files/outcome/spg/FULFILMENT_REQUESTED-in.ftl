@@ -9,7 +9,7 @@
 "outcomeCode":"${outcomeCode}",
 "fulfilmentRequests": [
 {
-"questionnaireType": "HUAC2",
+"questionnaireType": "HUAC1",
 "requesterPhone": "07777000000"
 }
 ]

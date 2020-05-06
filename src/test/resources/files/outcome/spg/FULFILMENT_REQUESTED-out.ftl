@@ -10,7 +10,6 @@
 "fulfilmentRequest":{
 "fulfilmentCode":"${fulfilmentCode}",
 "caseId":"bd6345af-d706-43d3-a13b-8c549e081a76",
-"individualCaseId":"${individualCaseId}",
 "address"{},
 "contact":{
 "title":"",
