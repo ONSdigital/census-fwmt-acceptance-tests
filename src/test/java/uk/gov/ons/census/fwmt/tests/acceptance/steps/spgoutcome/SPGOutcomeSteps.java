@@ -260,7 +260,7 @@ public class SPGOutcomeSteps {
       outputRoot.put("reason", spgReasonCodeLookup.getLookup(outcomeCode));
       outputRoot.put("newCaseId", "3e007cdb-446d-4164-b2d7-8d8bd7b86c49");
       outputRoot.put("collectionExerciseId","1ebd37b4-484a-4459-b88f-ca6fa4687acf");
-      outputRoot.put("fulfilmentCode", getProductFromQuestionnaireType("HUAC1"));
+//      outputRoot.put("fulfilmentCode", getProductFromQuestionnaireType("HUAC1"));
 
       ObjectMapper mapper = new ObjectMapper();
 
