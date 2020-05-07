@@ -149,7 +149,7 @@ public class SPGCreateSteps {
   public void theUpdateJobIsAcknowledgedByTm() {
     String caseId = "bd6345af-d706-43d3-a13b-8c549e081a76";
     boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, COMET_UPDATE_ACK, 10000L);
-    assertThat(hasBeenTriggered).isTrue();
+   assertThat(hasBeenTriggered).isTrue();
   }
 
   @Then("the cancel job is acknowledged by tm")

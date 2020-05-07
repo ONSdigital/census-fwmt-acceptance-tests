@@ -38,6 +38,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -116,6 +117,7 @@ public class SPGOutcomeSteps {
   public void before() {
     try {
       queueClient.createQueue();
+      queueClient.clearQueues();
       tmMockUtils.clearDownDatabase();
       gatewayEventMonitor.enableEventMonitor(rabbitLocation, rabbitUsername, rabbitPassword);
       String request = Resources.toString(Resources.getResource("files/input/spg/spgUnitCreate.json"), Charsets.UTF_8);
@@ -129,7 +131,6 @@ public class SPGOutcomeSteps {
   @After
   public void after() throws URISyntaxException {
     gatewayEventMonitor.tearDownGatewayEventMonitor();
-    queueClient.clearQueues();
   }
 
   @Given("the Field Officer sends a {string}")
@@ -186,23 +187,27 @@ public class SPGOutcomeSteps {
   }
 
   @Then("It will send an {string} messages to RM")
-  public void itWillSendAnMessagesToRM(String operationList) {
-    String[] splitEventTypes = operationList.split(",");
+  public void itWillSendAnMessagesToRM(String ol) {
+    String[] splitEventTypes = ol.split(",");
     List<String> operationsList;
     operationsList = Arrays.asList(splitEventTypes);
     int index = 0;
-    for (String operation : operationsList) {
-      gatewayEventMonitor.checkForEvent(caseId, CESPG_OUTCOME_SENT);
+    gatewayEventMonitor.grabEventsTriggered(CESPG_OUTCOME_SENT, operationsList.size(), 10000L);
+
+    for (String operation : operationsList) {      
       try {
         actualMessages.add(queueClient.getMessage(operationToQueue(operation)));
       } catch (InterruptedException e) {
         throw new RuntimeException("Problem getting message", e);
       }
     }
-    for(String message : actualMessages) {
-      if (operationsList.get(index) == null) break;
-      assertTrue(compareCaseEventMessages(operationsList.get(index), message));
-      index++;
+    assertEquals(operationsList.size(), actualMessages.size());
+    Map<String, String> actualMessagesMap = actualMessages.stream().collect(Collectors.toMap(msg -> (new JSONObject(msg)).getJSONObject("event").getString("type"), String::toString));
+    assertTrue(actualMessagesMap.keySet().containsAll(operationsList));
+   
+    for (String op : operationsList) {
+      String actualMsg = actualMessagesMap.get(op);
+      assertTrue(compareCaseEventMessages(op, actualMsg));
     }
   }
 
@@ -251,7 +256,7 @@ public class SPGOutcomeSteps {
       return TEMP_FIELD_OTHERS_QUEUE;
     case "NEW_UNIT_ADDRESS":
       return TEMP_FIELD_OTHERS_QUEUE;
-    case "NEW_STANDALONE_ADDRESS":
+    case "NEW_ADDRESS_REPORTED":
       return TEMP_FIELD_OTHERS_QUEUE;
     case "CANCEL_FEEDBACK":
       return RM_FIELD_QUEUE;
@@ -260,7 +265,7 @@ public class SPGOutcomeSteps {
     }
   }
 
-  private boolean compareCaseEventMessages(String eventType, String actualMessage) {
+  private boolean compareCaseEventMessages(String rmEventType, String actualMessage) {
     try {
       outputRoot.put("reason", spgReasonCodeLookup.getLookup(outcomeCode));
       outputRoot.put("newCaseId", "3e007cdb-446d-4164-b2d7-8d8bd7b86c49");
@@ -269,22 +274,21 @@ public class SPGOutcomeSteps {
 
       ObjectMapper mapper = new ObjectMapper();
 
-      String rmOutcome = createOutcomeMessage(eventType + "-out", outputRoot, surveyType);
+      String rmOutcome = createOutcomeMessage(eventType + "-" + rmEventType + "-out", outputRoot, surveyType);
       JsonNode rmJsonNode = mapper.readTree(rmOutcome);
-      jsonNodeList.add(rmJsonNode);
 
       JsonNode actualMessageRootNode;
-      if (!caseIdHasValue && (eventType.equals(NEW_UNIT_ADDRESS) || eventType.equals(NEW_STANDALONE_ADDRESS))) {
+      if (!caseIdHasValue && (eventType.equals(NEW_UNIT_ADDRESS) && rmEventType.equals("NEW_ADDRESS_REPORTED")) || (eventType.equals(NEW_STANDALONE_ADDRESS) && rmEventType.equals("NEW_ADDRESS_REPORTED"))) {
         actualMessageRootNode = jsonObjectMapper.readTree(addNewCaseId(
             actualMessage, "3e007cdb-446d-4164-b2d7-8d8bd7b86c49","1ebd37b4-484a-4459-b88f-ca6fa4687acf"));
       } else {
         actualMessageRootNode = jsonObjectMapper.readTree(actualMessage);
       }
-
-      boolean isEqual = jsonNodeList.get(index).equals(actualMessageRootNode);
+      
+      boolean isEqual = rmJsonNode.equals(actualMessageRootNode);
       if (!isEqual) {
         log.info("expected and actual caseEvents are not the same: \n expected:\n {} \n\n actual: \n {}",
-            jsonNodeList.get(index), actualMessage);
+        rmJsonNode.toPrettyString(), actualMessageRootNode.toPrettyString());
       }
       this.index++;
       return isEqual;
@@ -311,12 +315,13 @@ public class SPGOutcomeSteps {
     return Objects.requireNonNull(productList).get(0);
   }
 
-  private String addNewCaseId(String expectedMessage, String newCaseId, String collectionCaseId) {
-    JSONObject wholeMessage = new JSONObject(expectedMessage);
+  private String addNewCaseId(String actualMessage, String newCaseId, String collectionCaseId) {
+    JSONObject wholeMessage = new JSONObject(actualMessage);
     JSONObject payloadNode = wholeMessage.getJSONObject("payload");
     JSONObject newAddressNode = payloadNode.getJSONObject("newAddress");
     JSONObject collectionCaseNode = newAddressNode.getJSONObject("collectionCase");
     collectionCaseNode.put("id", newCaseId);
+    if (collectionCaseNode.has("collectionExerciseId"))
     collectionCaseNode.put("collectionExerciseId", collectionCaseId);
 
     return wholeMessage.toString();

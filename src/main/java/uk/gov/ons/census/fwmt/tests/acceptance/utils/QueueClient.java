@@ -49,10 +49,12 @@ public final class QueueClient {
     }
 
     public void clearQueues() throws URISyntaxException {
-        clearQueue("RM.Field");
-        clearQueue("RM.FieldDLQ");
-        clearQueue("Outcome.Preprocessing");
-        clearQueue("Outcome.PreprocessingDLQ");
+      clearQueue("Field.other");
+      clearQueue("Field.refusals");
+      clearQueue("RM.Field");
+      clearQueue("RM.FieldDLQ");
+      clearQueue("Outcome.Preprocessing");
+      clearQueue("Outcome.PreprocessingDLQ");
     }
 
     public void createQueue() throws IOException, TimeoutException, InterruptedException {
