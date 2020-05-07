@@ -77,7 +77,7 @@ public class SPGFeedbackSteps {
   public void aJobHasBeenCreatedInTMWithCaseId(String caseId) throws IOException, URISyntaxException {
     this.caseId = caseId;
     String request = Resources.toString(Resources.getResource("files/input/spg/spgUnitCreate.json"), Charsets.UTF_8);
-    queueUtils.sendToRMFieldQueue(request);
+    queueUtils.sendToRMFieldQueue(request, "create");
     boolean jobAcknowledged = gatewayEventMonitor.hasEventTriggered(caseId, COMET_CREATE_ACK, 10000L);
     assertThat(jobAcknowledged).isTrue();
   }

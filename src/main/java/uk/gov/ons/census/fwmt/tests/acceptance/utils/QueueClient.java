@@ -42,10 +42,10 @@ public final class QueueClient {
       return message;
     }
 
-    public void sendToRMFieldQueue(String message) throws URISyntaxException {
+    public void sendToRMFieldQueue(String message, String type) throws URISyntaxException {
         String exchangeName = "";
         String routingKey = "RM.Field";
-        queueUtils.addMessage(exchangeName, routingKey, message);
+        queueUtils.addMessage(exchangeName, routingKey, message, type);
     }
 
     public void clearQueues() throws URISyntaxException {

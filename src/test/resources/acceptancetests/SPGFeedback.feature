@@ -2,7 +2,7 @@
 Feature: SPG Outcome Tests
 
   Scenario Outline: As a Gateway I can receive an SPG outcome which will provide feedback to tm
-    Given a job has been created in TM with case id "8dd42be3-09e6-488e-b4e2-0f14259acb9e"
+    Given a job has been created in TM with case id "bd6345af-d706-43d3-a13b-8c549e081a76"
     And tm sends a "<Type>" outcome
     Then a "<input>" feedback message is sent to tm
     And "<output>" is acknowledged by tm

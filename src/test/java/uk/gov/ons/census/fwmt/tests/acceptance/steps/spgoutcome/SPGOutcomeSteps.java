@@ -3,6 +3,8 @@ package uk.gov.ons.census.fwmt.tests.acceptance.steps.spgoutcome;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Charsets;
+import com.google.common.io.Resources;
 import cucumber.api.java.After;
 import cucumber.api.java.Before;
 import cucumber.api.java.en.And;
@@ -116,6 +118,9 @@ public class SPGOutcomeSteps {
       queueClient.createQueue();
       tmMockUtils.clearDownDatabase();
       gatewayEventMonitor.enableEventMonitor(rabbitLocation, rabbitUsername, rabbitPassword);
+      String request = Resources.toString(Resources.getResource("files/input/spg/spgUnitCreate.json"), Charsets.UTF_8);
+
+      queueClient.sendToRMFieldQueue(request, "update");
     } catch (Exception e) {
       throw new RuntimeException("Problem with setting up", e);
     }
