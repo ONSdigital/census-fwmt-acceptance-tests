@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.concurrent.TimeoutException;
 
-import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -105,14 +104,14 @@ public class NISRASteps {
   @Given("RM sends a create NISRA job request job which has a case ID of {string}")
   public void rmSendsACreateHouseHoldJobRequestJobWhichHasACaseIDOfAndAnID(String caseId)
       throws URISyntaxException, InterruptedException, JAXBException {
-    queueUtils.sendToRMFieldQueue(nisraNoFieldOfficerMessage);
+    queueUtils.sendToRMFieldQueue(nisraNoFieldOfficerMessage, "update");
     boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, RM_CREATE_REQUEST_RECEIVED, 10000L);
     assertThat(hasBeenTriggered).isTrue();
   }
 
   @Then("RM will throw an exception for case ID {string} for NISRA")
   public void rmWillThrowAnExceptionForCaseID(String caseId) throws URISyntaxException, InterruptedException {
-    queueUtils.sendToRMFieldQueue(nisraNoFieldOfficerMessage);
+    queueUtils.sendToRMFieldQueue(nisraNoFieldOfficerMessage, "update");
     assertThatExceptionOfType(GatewayException.class).isThrownBy(() -> {
       throw new GatewayException(
           GatewayException.Fault.SYSTEM_ERROR);

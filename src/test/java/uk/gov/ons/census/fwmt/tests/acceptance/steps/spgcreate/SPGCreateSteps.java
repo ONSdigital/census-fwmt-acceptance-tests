@@ -109,15 +109,15 @@ public class SPGCreateSteps {
 
   @And("RM sends a create HouseHold job request")
   public void rmSendsACreateHouseHoldJobRequest() throws URISyntaxException {
-    String caseId = "8dd42be3-09e6-488e-b4e2-0f14259acb9e";
-    queueUtils.sendToRMFieldQueue(request);
+    String caseId = "bd6345af-d706-43d3-a13b-8c549e081a76";
+    queueUtils.sendToRMFieldQueue(request, "create");
     boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, RM_CREATE_REQUEST_RECEIVED, 10000L);
     assertThat(hasBeenTriggered).isTrue();
   }
 
   @When("the Gateway sends a Create Job message to TM")
   public void theGatewaySendsACreateJobMessageToTM() {
-    String caseId = "8dd42be3-09e6-488e-b4e2-0f14259acb9e";
+    String caseId = "bd6345af-d706-43d3-a13b-8c549e081a76";
     boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, COMET_CREATE_ACK, 10000L);
     assertThat(hasBeenTriggered).isTrue();
   }
@@ -131,30 +131,30 @@ public class SPGCreateSteps {
 
   @And("RM sends a update case request")
   public void rmSendsAUpdateCaseRequest() throws URISyntaxException {
-    String caseId = "8dd42be3-09e6-488e-b4e2-0f14259acb9e";
-    queueUtils.sendToRMFieldQueue(spgUpdate);
+    String caseId = "bd6345af-d706-43d3-a13b-8c549e081a76";
+    queueUtils.sendToRMFieldQueue(spgUpdate, "update");
     boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, RM_CREATE_REQUEST_RECEIVED, 10000L);
     assertThat(hasBeenTriggered).isTrue();
   }
 
   @And("RM sends a cancel case request")
   public void rmSendsACancelCaseRequest() throws URISyntaxException {
-    String caseId = "8dd42be3-09e6-488e-b4e2-0f14259acb9e";
-    queueUtils.sendToRMFieldQueue(spgCancel);
+    String caseId = "bd6345af-d706-43d3-a13b-8c549e081a76";
+    queueUtils.sendToRMFieldQueue(spgCancel, "cancel");
     boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, RM_CREATE_REQUEST_RECEIVED, 10000L);
     assertThat(hasBeenTriggered).isTrue();
   }
 
   @Then("the update job is acknowledged by tm")
   public void theUpdateJobIsAcknowledgedByTm() {
-    String caseId = "8dd42be3-09e6-488e-b4e2-0f14259acb9e";
+    String caseId = "bd6345af-d706-43d3-a13b-8c549e081a76";
     boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, COMET_UPDATE_ACK, 10000L);
     assertThat(hasBeenTriggered).isTrue();
   }
 
   @Then("the cancel job is acknowledged by tm")
   public void theCancelJobIsAcknowledgedByTm() {
-    String caseId = "8dd42be3-09e6-488e-b4e2-0f14259acb9e";
+    String caseId = "bd6345af-d706-43d3-a13b-8c549e081a76";
     boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, COMET_CANCEL_ACK, 10000L);
     assertThat(hasBeenTriggered).isTrue();
   }

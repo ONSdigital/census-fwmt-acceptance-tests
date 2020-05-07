@@ -115,7 +115,7 @@ public class CCSInterviewRM {
       newCaseId = retrieveCaseId.getCaseId();
     }
     String updatedRmMessage = updateActionInstructionWithNewCaseId();
-    queueClient.sendToRMFieldQueue(updatedRmMessage);
+    queueClient.sendToRMFieldQueue(updatedRmMessage, "update");
     boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(newCaseId, RM_CREATE_REQUEST_RECEIVED, 10000L);
     assertThat(hasBeenTriggered).isTrue();
   }
