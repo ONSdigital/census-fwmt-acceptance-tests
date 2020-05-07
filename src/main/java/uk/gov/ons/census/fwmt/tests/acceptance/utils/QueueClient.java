@@ -53,8 +53,6 @@ public final class QueueClient {
         clearQueue("RM.FieldDLQ");
         clearQueue("Outcome.Preprocessing");
         clearQueue("Outcome.PreprocessingDLQ");
-        clearQueue("Field.other");
-        clearQueue("Field.refusals");
     }
 
     public void createQueue() throws IOException, TimeoutException, InterruptedException {
