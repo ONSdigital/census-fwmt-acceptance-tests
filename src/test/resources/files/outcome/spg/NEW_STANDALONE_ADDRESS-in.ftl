@@ -15,12 +15,14 @@
 "eventDate":"2020-04-17T11:53:11.000+0000",
 "fulfilmentRequests":[
 {
-"questionnaireID":"1111111111",
-"questionnaireType":"HUAC2",
+"questionnaireType":"HUAC1",
 "requesterForename":"John",
 "requesterPhone":"07777000000",
 "requesterSurname":"Smith",
 "requesterTitle":"Mr"
+},
+{
+"questionnaireID":"1110000009"
 }
 ],
 "officerId":"SH-TWH1-ZA-25",

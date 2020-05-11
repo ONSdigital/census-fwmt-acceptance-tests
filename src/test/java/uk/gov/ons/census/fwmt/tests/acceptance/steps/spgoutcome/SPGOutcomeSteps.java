@@ -51,6 +51,8 @@ public class SPGOutcomeSteps {
 
   private static final String REFUSAL_RECEIVED = "REFUSAL_RECEIVED";
 
+  private static final String FULFILMENT_REQUESTED = "FULFILMENT_REQUESTED";
+
   private static final String CESPG_OUTCOME_SENT = "CESPG_OUTCOME_SENT";
 
   private static final String RM_FIELD_QUEUE = "RM.Field";
@@ -273,7 +275,7 @@ public class SPGOutcomeSteps {
 
       JsonNode actualMessageRootNode;
       if (!caseIdHasValue && (eventType.equals(NEW_UNIT_ADDRESS) || eventType.equals(NEW_STANDALONE_ADDRESS)
-          || eventType.equals(REFUSAL_RECEIVED))) {
+          || eventType.equals(REFUSAL_RECEIVED) || eventType.equals(FULFILMENT_REQUESTED))) {
         actualMessageRootNode = jsonObjectMapper.readTree(addNewCaseId(
             actualMessage, "3e007cdb-446d-4164-b2d7-8d8bd7b86c49", "1ebd37b4-484a-4459-b88f-ca6fa4687acf"));
       } else {
@@ -302,14 +304,21 @@ public class SPGOutcomeSteps {
       collectionCase.remove("id");
       collectionCase.put("id", "bd6345af-d706-43d3-a13b-8c549e081a76");
     }
+    if (payloadNode.has("fulfilmentRequest")) {
+      JSONObject fulfilment = payloadNode.getJSONObject("fulfilmentRequest");
+      fulfilment.remove("caseId");
+      fulfilment.put("caseId", "bd6345af-d706-43d3-a13b-8c549e081a76");
+    }
     if (payloadNode.has("newAddress")) {
       JSONObject newAddressNode = payloadNode.getJSONObject("newAddress");
-      JSONObject collectionCaseNode = newAddressNode.getJSONObject("collectionCase");
-      collectionCaseNode.remove("id");
-      collectionCaseNode.put("id", newCaseId);
-      if (collectionCaseNode.has("collectionExerciseId")) {
-        collectionCaseNode.remove("collectionExerciseId");
-        collectionCaseNode.put("collectionExerciseId", collectionCaseId);
+      if (newAddressNode.has("collectionCase")) {
+        JSONObject collectionCaseNode = newAddressNode.getJSONObject("collectionCase");
+        collectionCaseNode.remove("id");
+        collectionCaseNode.put("id", newCaseId);
+        if (collectionCaseNode.has("collectionExerciseId")) {
+          collectionCaseNode.remove("collectionExerciseId");
+          collectionCaseNode.put("collectionExerciseId", collectionCaseId);
+        }
       }
     }
 
