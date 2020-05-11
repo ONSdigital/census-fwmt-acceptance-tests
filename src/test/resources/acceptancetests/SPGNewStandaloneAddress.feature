@@ -15,7 +15,7 @@ Feature: SPG Outcome Tests
 
        # LINKED QID
 
-      | NEW_STANDALONE_ADDRESS | Access Granted - Contact made | Hard refusal                            | 10-20-02     |  NEW_ADDRESS_REPORTED,REFUSAL_RECEIVED | NEW_ADDRESS_REPORTED,REFUSAL_RECEIVED |
+      | NEW_STANDALONE_ADDRESS | Access Granted - Contact made | Hard refusal                            | 10-20-02     |  NEW_STANDALONE_ADDRESS,REFUSAL_RECEIVED | NEW_ADDRESS_REPORTED,REFUSAL_RECEIVED |
 #      | NEW_STANDALONE_ADDRESS | Access Granted - Contact made | Extraordinary refusal                   | 10-20-03     | NEW_STANDALONE_ADDRESS,REFUSAL_RECEIVED | NEW_STANDALONE_ADDRESS,REFUSAL_RECEIVED |
 #      | NEW_STANDALONE_ADDRESS | Access Granted - Contact made | HICL or Paper H Questionnaire delivered | 10-20-05     | NEW_STANDALONE_ADDRESS,LINKED_QID       | NEW_STANDALONE_ADDRESS,LINKED_QID       |
 #

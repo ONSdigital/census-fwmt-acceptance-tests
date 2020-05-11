@@ -38,7 +38,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -117,12 +116,11 @@ public class SPGOutcomeSteps {
   public void before() {
     try {
       queueClient.createQueue();
-      queueClient.clearQueues("RM.Field", "RM.FieldDLQ", "Outcome.Preprocessing", "Outcome.PreprocessingDLQ", "Field.other", "Field.refusals");
       tmMockUtils.clearDownDatabase();
       gatewayEventMonitor.enableEventMonitor(rabbitLocation, rabbitUsername, rabbitPassword);
       String request = Resources.toString(Resources.getResource("files/input/spg/spgUnitCreate.json"), Charsets.UTF_8);
 
-      queueClient.sendToRMFieldQueue(request, "update");
+      queueClient.sendToRMFieldQueue(request, "create");
     } catch (Exception e) {
       throw new RuntimeException("Problem with setting up", e);
     }
@@ -131,6 +129,7 @@ public class SPGOutcomeSteps {
   @After
   public void after() throws URISyntaxException {
     gatewayEventMonitor.tearDownGatewayEventMonitor();
+    queueClient.clearQueues("Field.other", "Field.refusals");
   }
 
   @Given("the Field Officer sends a {string}")
@@ -187,27 +186,23 @@ public class SPGOutcomeSteps {
   }
 
   @Then("It will send an {string} messages to RM")
-  public void itWillSendAnMessagesToRM(String ol) {
-    String[] splitEventTypes = ol.split(",");
+  public void itWillSendAnMessagesToRM(String operationList) {
+    String[] splitEventTypes = operationList.split(",");
     List<String> operationsList;
     operationsList = Arrays.asList(splitEventTypes);
     int index = 0;
-    gatewayEventMonitor.grabEventsTriggered(CESPG_OUTCOME_SENT, operationsList.size(), 10000L);
-
-    for (String operation : operationsList) {      
+    for (String operation : operationsList) {
+      gatewayEventMonitor.checkForEvent(caseId, CESPG_OUTCOME_SENT);
       try {
         actualMessages.add(queueClient.getMessage(operationToQueue(operation)));
       } catch (InterruptedException e) {
         throw new RuntimeException("Problem getting message", e);
       }
     }
-    assertEquals(operationsList.size(), actualMessages.size());
-    Map<String, String> actualMessagesMap = actualMessages.stream().collect(Collectors.toMap(msg -> (new JSONObject(msg)).getJSONObject("event").getString("type"), String::toString));
-    assertTrue(actualMessagesMap.keySet().containsAll(operationsList));
-   
-    for (String op : operationsList) {
-      String actualMsg = actualMessagesMap.get(op);
-      assertTrue(compareCaseEventMessages(op, actualMsg));
+    for(String message : actualMessages) {
+      if (operationsList.get(index) == null) break;
+      assertTrue(compareCaseEventMessages(operationsList.get(index), message));
+      index++;
     }
   }
 
@@ -256,7 +251,7 @@ public class SPGOutcomeSteps {
       return TEMP_FIELD_OTHERS_QUEUE;
     case "NEW_UNIT_ADDRESS":
       return TEMP_FIELD_OTHERS_QUEUE;
-    case "NEW_ADDRESS_REPORTED":
+    case "NEW_STANDALONE_ADDRESS":
       return TEMP_FIELD_OTHERS_QUEUE;
     case "CANCEL_FEEDBACK":
       return RM_FIELD_QUEUE;
@@ -265,30 +260,30 @@ public class SPGOutcomeSteps {
     }
   }
 
-  private boolean compareCaseEventMessages(String rmEventType, String actualMessage) {
+  private boolean compareCaseEventMessages(String eventType, String actualMessage) {
     try {
       outputRoot.put("reason", spgReasonCodeLookup.getLookup(outcomeCode));
       outputRoot.put("newCaseId", "3e007cdb-446d-4164-b2d7-8d8bd7b86c49");
       outputRoot.put("collectionExerciseId","1ebd37b4-484a-4459-b88f-ca6fa4687acf");
-//      outputRoot.put("fulfilmentCode", getProductFromQuestionnaireType("HUAC1"));
 
       ObjectMapper mapper = new ObjectMapper();
 
-      String rmOutcome = createOutcomeMessage(eventType + "-" + rmEventType + "-out", outputRoot, surveyType);
+      String rmOutcome = createOutcomeMessage(eventType + "-out", outputRoot, surveyType);
       JsonNode rmJsonNode = mapper.readTree(rmOutcome);
+      jsonNodeList.add(rmJsonNode);
 
       JsonNode actualMessageRootNode;
-      if (!caseIdHasValue && (eventType.equals(NEW_UNIT_ADDRESS) && rmEventType.equals("NEW_ADDRESS_REPORTED")) || (eventType.equals(NEW_STANDALONE_ADDRESS) && rmEventType.equals("NEW_ADDRESS_REPORTED"))) {
+      if (!caseIdHasValue && (eventType.equals(NEW_UNIT_ADDRESS) || eventType.equals(NEW_STANDALONE_ADDRESS))) {
         actualMessageRootNode = jsonObjectMapper.readTree(addNewCaseId(
             actualMessage, "3e007cdb-446d-4164-b2d7-8d8bd7b86c49","1ebd37b4-484a-4459-b88f-ca6fa4687acf"));
       } else {
         actualMessageRootNode = jsonObjectMapper.readTree(actualMessage);
       }
-      
-      boolean isEqual = rmJsonNode.equals(actualMessageRootNode);
+
+      boolean isEqual = jsonNodeList.get(index).equals(actualMessageRootNode);
       if (!isEqual) {
         log.info("expected and actual caseEvents are not the same: \n expected:\n {} \n\n actual: \n {}",
-        rmJsonNode.toPrettyString(), actualMessageRootNode.toPrettyString());
+            jsonNodeList.get(index), actualMessage);
       }
       this.index++;
       return isEqual;
@@ -296,23 +291,6 @@ public class SPGOutcomeSteps {
     } catch (IOException e) {
       throw new RuntimeException("Problem comparing 2 json files", e);
     }
-  }
-
-  @Nonnull
-  private Product getProductFromQuestionnaireType(String questionnaireType) {
-    Product product = new Product();
-    List<Product.RequestChannel> requestChannels = Collections.singletonList(FIELD);
-
-    product.setRequestChannels(requestChannels);
-    product.setFieldQuestionnaireCode(questionnaireType);
-
-    List<Product> productList = null;
-    try {
-      productList = productReference.searchProducts(product);
-    } catch (CTPException e) {
-      log.error("unable to find valid Products {}", e);
-    }
-    return Objects.requireNonNull(productList).get(0);
   }
 
   private String addNewCaseId(String actualMessage, String newCaseId, String collectionCaseId) {
@@ -328,7 +306,7 @@ public class SPGOutcomeSteps {
   }
 
   private String createOutcomeMessage(String eventType, Map<String, Object> root, String surveyType) {
-     String outcomeMessage = "";
+    String outcomeMessage = "";
 
     try {
       Configuration configuration = new Configuration(Configuration.VERSION_2_3_28);
