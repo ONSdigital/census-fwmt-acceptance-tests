@@ -48,13 +48,10 @@ public final class QueueClient {
         queueUtils.addMessage(exchangeName, routingKey, message, type);
     }
 
-    public void clearQueues() throws URISyntaxException {
-      clearQueue("Field.other");
-      clearQueue("Field.refusals");
-      clearQueue("RM.Field");
-      clearQueue("RM.FieldDLQ");
-      clearQueue("Outcome.Preprocessing");
-      clearQueue("Outcome.PreprocessingDLQ");
+    public void clearQueues(String... qnames) throws URISyntaxException {
+      for (String q : qnames) {
+        clearQueue(q);
+      }
     }
 
     public void createQueue() throws IOException, TimeoutException, InterruptedException {

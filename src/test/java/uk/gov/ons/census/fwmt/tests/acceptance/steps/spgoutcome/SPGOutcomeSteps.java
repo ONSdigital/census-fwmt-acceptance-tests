@@ -117,7 +117,7 @@ public class SPGOutcomeSteps {
   public void before() {
     try {
       queueClient.createQueue();
-      queueClient.clearQueues();
+      queueClient.clearQueues("RM.Field", "RM.FieldDLQ", "Outcome.Preprocessing", "Outcome.PreprocessingDLQ", "Field.other", "Field.refusals");
       tmMockUtils.clearDownDatabase();
       gatewayEventMonitor.enableEventMonitor(rabbitLocation, rabbitUsername, rabbitPassword);
       String request = Resources.toString(Resources.getResource("files/input/spg/spgUnitCreate.json"), Charsets.UTF_8);

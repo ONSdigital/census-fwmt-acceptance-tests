@@ -79,9 +79,14 @@ public class SPGCreateSteps {
 
   @After
   public void tearDownGatewayEventMonitor() throws Exception {
-    gatewayEventMonitor.tearDownGatewayEventMonitor();
+    try{
+      gatewayEventMonitor.tearDownGatewayEventMonitor();
+    }catch(Exception e){
+      System.out.println(e);
+    }
     tmMockUtils.disableRequestRecorder();
-    queueUtils.clearQueues();
+
+    queueUtils.clearQueues("RM.Field", "RM.FieldDLQ", "Outcome.Preprocessing", "Outcome.PreprocessingDLQ");
   }
 
   @Given("a TM doesnt have a {string} {string} job with case ID {string} in TM")

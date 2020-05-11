@@ -70,7 +70,8 @@ public class SPGFeedbackSteps {
   public void tearDownGatewayEventMonitor() throws Exception {
     gatewayEventMonitor.tearDownGatewayEventMonitor();
     tmMockUtils.disableRequestRecorder();
-    queueUtils.clearQueues();
+
+    queueUtils.clearQueues("RM.Field", "RM.FieldDLQ", "Outcome.Preprocessing", "Outcome.PreprocessingDLQ");
   }
 
   @Given("a job has been created in TM with case id {string}")
