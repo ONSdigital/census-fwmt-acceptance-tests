@@ -23,28 +23,39 @@ import uk.gov.ons.census.fwmt.events.utils.GatewayEventMonitor;
 import uk.gov.ons.census.fwmt.tests.acceptance.utils.QueueClient;
 import uk.gov.ons.census.fwmt.tests.acceptance.utils.SpgReasonCodeLookup;
 import uk.gov.ons.census.fwmt.tests.acceptance.utils.TMMockUtils;
-import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.integration.common.product.ProductReference;
-import uk.gov.ons.ctp.integration.common.product.model.Product;
 
-import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static uk.gov.ons.ctp.integration.common.product.model.Product.RequestChannel.FIELD;
 
 @Slf4j
 public class SPGOutcomeSteps {
+
+  public static final String FIELD_REFUSALS_QUEUE = "Field.refusals";
+
+  // TODO : add correct queses throught test suite
+  public static final String TEMP_FIELD_OTHERS_QUEUE = "Field.other";
+
+  private static final String NEW_STANDALONE_ADDRESS = "NEW_STANDALONE_ADDRESS";
+
+  private static final String NEW_UNIT_ADDRESS = "NEW_UNIT_ADDRESS";
+
+  private static final String REFUSAL_RECEIVED = "REFUSAL_RECEIVED";
+
+  private static final String CESPG_OUTCOME_SENT = "CESPG_OUTCOME_SENT";
+
+  private static final String RM_FIELD_QUEUE = "RM.Field";
+
+  private final String surveyType = "spg";
 
   @Autowired
   private TMMockUtils tmMockUtils;
@@ -55,13 +66,13 @@ public class SPGOutcomeSteps {
   @Autowired
   private SpgReasonCodeLookup spgReasonCodeLookup;
 
-  private ProductReference productReference = new ProductReference();
+  private final ProductReference productReference = new ProductReference();
 
-  private GatewayEventMonitor gatewayEventMonitor = new GatewayEventMonitor();
+  private final GatewayEventMonitor gatewayEventMonitor = new GatewayEventMonitor();
 
   private String tmRequest = null;
 
-  private ObjectMapper jsonObjectMapper = new ObjectMapper();
+  private final ObjectMapper jsonObjectMapper = new ObjectMapper();
 
   private JsonNode tmRequestRootNode;
 
@@ -76,19 +87,7 @@ public class SPGOutcomeSteps {
   @Value("${service.rabbit.password}")
   private String rabbitPassword;
 
-  private static final String NEW_STANDALONE_ADDRESS = "NEW_STANDALONE_ADDRESS";
-
-  private static final String NEW_UNIT_ADDRESS = "NEW_UNIT_ADDRESS";
-
-  private static final String CESPG_OUTCOME_SENT = "CESPG_OUTCOME_SENT";
-
-  private static final String RM_FIELD_QUEUE = "RM.Field";
-
-  public static final String FIELD_REFUSALS_QUEUE = "Field.refusals";
-  // TODO : add correct queses throught test suite
-  public static final String TEMP_FIELD_OTHERS_QUEUE = "Field.other";
-
-  private List<String> actualMessages = new ArrayList<>();
+  private final List<String> actualMessages = new ArrayList<>();
 
   private boolean caseIdHasValue = true;
 
@@ -102,13 +101,11 @@ public class SPGOutcomeSteps {
 
   private String outcomeCode;
 
-  private Map<String, Object> inputRoot = new HashMap<>();
+  private final Map<String, Object> inputRoot = new HashMap<>();
 
-  private Map<String, Object> outputRoot = new HashMap<>();
+  private final Map<String, Object> outputRoot = new HashMap<>();
 
-  private final String surveyType = "spg";
-
-  private List<JsonNode> jsonNodeList = new ArrayList<>();
+  private final List<JsonNode> jsonNodeList = new ArrayList<>();
 
   private int index = 0;
 
@@ -199,8 +196,9 @@ public class SPGOutcomeSteps {
         throw new RuntimeException("Problem getting message", e);
       }
     }
-    for(String message : actualMessages) {
-      if (operationsList.get(index) == null) break;
+    for (String message : actualMessages) {
+      if (operationsList.get(index) == null)
+        break;
       assertTrue(compareCaseEventMessages(operationsList.get(index), message));
       index++;
     }
@@ -215,7 +213,8 @@ public class SPGOutcomeSteps {
     for (String event : eventTypeList) {
       try {
         log.info("Processing event :" + event);
-        if (actualMessages.get(index) == null) break;
+        if (actualMessages.get(index) == null)
+          break;
         JsonNode actualMessageRootNode = jsonObjectMapper.readTree(actualMessages.get(index));
         JsonNode node = actualMessageRootNode.path("event").path("type");
         assertEquals(jsonNodeList.get(index).path("event").path("type").asText(), node.asText());
@@ -264,7 +263,7 @@ public class SPGOutcomeSteps {
     try {
       outputRoot.put("reason", spgReasonCodeLookup.getLookup(outcomeCode));
       outputRoot.put("newCaseId", "3e007cdb-446d-4164-b2d7-8d8bd7b86c49");
-      outputRoot.put("collectionExerciseId","1ebd37b4-484a-4459-b88f-ca6fa4687acf");
+      outputRoot.put("collectionExerciseId", "1ebd37b4-484a-4459-b88f-ca6fa4687acf");
 
       ObjectMapper mapper = new ObjectMapper();
 
@@ -273,9 +272,10 @@ public class SPGOutcomeSteps {
       jsonNodeList.add(rmJsonNode);
 
       JsonNode actualMessageRootNode;
-      if (!caseIdHasValue && (eventType.equals(NEW_UNIT_ADDRESS) || eventType.equals(NEW_STANDALONE_ADDRESS))) {
+      if (!caseIdHasValue && (eventType.equals(NEW_UNIT_ADDRESS) || eventType.equals(NEW_STANDALONE_ADDRESS)
+          || eventType.equals(REFUSAL_RECEIVED))) {
         actualMessageRootNode = jsonObjectMapper.readTree(addNewCaseId(
-            actualMessage, "3e007cdb-446d-4164-b2d7-8d8bd7b86c49","1ebd37b4-484a-4459-b88f-ca6fa4687acf"));
+            actualMessage, "3e007cdb-446d-4164-b2d7-8d8bd7b86c49", "1ebd37b4-484a-4459-b88f-ca6fa4687acf"));
       } else {
         actualMessageRootNode = jsonObjectMapper.readTree(actualMessage);
       }
@@ -296,11 +296,22 @@ public class SPGOutcomeSteps {
   private String addNewCaseId(String actualMessage, String newCaseId, String collectionCaseId) {
     JSONObject wholeMessage = new JSONObject(actualMessage);
     JSONObject payloadNode = wholeMessage.getJSONObject("payload");
-    JSONObject newAddressNode = payloadNode.getJSONObject("newAddress");
-    JSONObject collectionCaseNode = newAddressNode.getJSONObject("collectionCase");
-    collectionCaseNode.put("id", newCaseId);
-    if (collectionCaseNode.has("collectionExerciseId"))
-    collectionCaseNode.put("collectionExerciseId", collectionCaseId);
+    if (payloadNode.has("refusal")) {
+      JSONObject refusal = payloadNode.getJSONObject("refusal");
+      JSONObject collectionCase = refusal.getJSONObject("collectionCase");
+      collectionCase.remove("id");
+      collectionCase.put("id", "bd6345af-d706-43d3-a13b-8c549e081a76");
+    }
+    if (payloadNode.has("newAddress")) {
+      JSONObject newAddressNode = payloadNode.getJSONObject("newAddress");
+      JSONObject collectionCaseNode = newAddressNode.getJSONObject("collectionCase");
+      collectionCaseNode.remove("id");
+      collectionCaseNode.put("id", newCaseId);
+      if (collectionCaseNode.has("collectionExerciseId")) {
+        collectionCaseNode.remove("collectionExerciseId");
+        collectionCaseNode.put("collectionExerciseId", collectionCaseId);
+      }
+    }
 
     return wholeMessage.toString();
   }
