@@ -42,7 +42,6 @@ public class SPGOutcomeSteps {
 
   public static final String FIELD_REFUSALS_QUEUE = "Field.refusals";
 
-  // TODO : add correct queses throught test suite
   public static final String TEMP_FIELD_OTHERS_QUEUE = "Field.other";
 
   private static final String NEW_STANDALONE_ADDRESS = "NEW_STANDALONE_ADDRESS";
@@ -133,9 +132,8 @@ public class SPGOutcomeSteps {
 
   @Given("the Field Officer sends a {string}")
   public void theFieldOfficerSendsA(String outcomeType) {
-    if (outcomeType.equals(NEW_UNIT_ADDRESS) || outcomeType.equals(NEW_STANDALONE_ADDRESS)) {
+    if (outcomeType.equals(NEW_UNIT_ADDRESS) || outcomeType.equals(NEW_STANDALONE_ADDRESS))
       caseIdHasValue = false;
-    }
     this.eventType = outcomeType;
   }
 
@@ -253,6 +251,7 @@ public class SPGOutcomeSteps {
     case "NEW_UNIT_ADDRESS":
       return TEMP_FIELD_OTHERS_QUEUE;
     case "NEW_STANDALONE_ADDRESS":
+    case "NEW_STANDALONE_ADDRESS_LINKED":
       return TEMP_FIELD_OTHERS_QUEUE;
     case "CANCEL_FEEDBACK":
       return RM_FIELD_QUEUE;
@@ -274,8 +273,7 @@ public class SPGOutcomeSteps {
       jsonNodeList.add(rmJsonNode);
 
       JsonNode actualMessageRootNode;
-      if (!caseIdHasValue && (eventType.equals(NEW_UNIT_ADDRESS) || eventType.equals(NEW_STANDALONE_ADDRESS)
-          || eventType.equals(REFUSAL_RECEIVED) || eventType.equals(FULFILMENT_REQUESTED))) {
+      if (!caseIdHasValue) {
         actualMessageRootNode = jsonObjectMapper.readTree(addNewCaseId(
             actualMessage, "3e007cdb-446d-4164-b2d7-8d8bd7b86c49", "1ebd37b4-484a-4459-b88f-ca6fa4687acf"));
       } else {
@@ -298,17 +296,6 @@ public class SPGOutcomeSteps {
   private String addNewCaseId(String actualMessage, String newCaseId, String collectionCaseId) {
     JSONObject wholeMessage = new JSONObject(actualMessage);
     JSONObject payloadNode = wholeMessage.getJSONObject("payload");
-    if (payloadNode.has("refusal")) {
-      JSONObject refusal = payloadNode.getJSONObject("refusal");
-      JSONObject collectionCase = refusal.getJSONObject("collectionCase");
-      collectionCase.remove("id");
-      collectionCase.put("id", "bd6345af-d706-43d3-a13b-8c549e081a76");
-    }
-    if (payloadNode.has("fulfilmentRequest")) {
-      JSONObject fulfilment = payloadNode.getJSONObject("fulfilmentRequest");
-      fulfilment.remove("caseId");
-      fulfilment.put("caseId", "bd6345af-d706-43d3-a13b-8c549e081a76");
-    }
     if (payloadNode.has("newAddress")) {
       JSONObject newAddressNode = payloadNode.getJSONObject("newAddress");
       if (newAddressNode.has("collectionCase")) {
@@ -321,7 +308,17 @@ public class SPGOutcomeSteps {
         }
       }
     }
-
+    if (payloadNode.has("refusal")) {
+      JSONObject refusal = payloadNode.getJSONObject("refusal");
+      JSONObject collectionCase = refusal.getJSONObject("collectionCase");
+      collectionCase.remove("id");
+      collectionCase.put("id", "bd6345af-d706-43d3-a13b-8c549e081a76");
+    }
+    if (payloadNode.has("fulfilmentRequest")) {
+      JSONObject fulfilment = payloadNode.getJSONObject("fulfilmentRequest");
+      fulfilment.remove("caseId");
+      fulfilment.put("caseId", "bd6345af-d706-43d3-a13b-8c549e081a76");
+    }
     return wholeMessage.toString();
   }
 

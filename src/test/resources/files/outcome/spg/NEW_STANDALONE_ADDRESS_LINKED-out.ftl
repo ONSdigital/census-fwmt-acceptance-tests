@@ -8,19 +8,23 @@
 },
 "payload":{
 "newAddress":{
-"sourceCaseId": "bd6345af-d706-43d3-a13b-8c549e081a76",
-"collectionCase" : {
-"id":"3e007cdb-446d-4164-b2d7-8d8bd7b86c49",
+"collectionCase":{
+"id":"${newCaseId}",
 "caseType": "SPG",
 "survey": "CENSUS",
 "fieldCoordinatorId":"SH-TWH1-ZA",
 "fieldOfficerId":"SH-TWH1-ZA-25",
-"collectionExerciseId":"1ebd37b4-484a-4459-b88f-ca6fa4687acf",
 "address":{
-"addressLine1": "Unit name",
-"region": "E",
-"addressType": "SPG",
-"addressLevel": "U"
+"addressLine1":"Unit name",
+"addressLine2":"Some house name",
+"addressLine3":"some road",
+"addressType":"SPG",
+"addressLevel":"U",
+"townName":"some town",
+"postcode":"AA1 2BB",
+"region":"E",
+"latitude":"99.99999999",
+"longitude":"99.99999999"
 }
 }
 }
