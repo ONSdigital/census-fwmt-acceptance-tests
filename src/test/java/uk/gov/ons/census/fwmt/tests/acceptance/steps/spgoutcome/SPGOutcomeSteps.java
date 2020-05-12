@@ -249,6 +249,7 @@ public class SPGOutcomeSteps {
     case "LINKED_QID":
       return TEMP_FIELD_OTHERS_QUEUE;
     case "NEW_UNIT_ADDRESS":
+    case "NEW_UNIT_ADDRESS_LINKED":
       return TEMP_FIELD_OTHERS_QUEUE;
     case "NEW_STANDALONE_ADDRESS":
     case "NEW_STANDALONE_ADDRESS_LINKED":

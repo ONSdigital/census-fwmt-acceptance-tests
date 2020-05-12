@@ -9,11 +9,7 @@
 "outcomeCode":"${outcomeCode}",
 "fulfilmentRequests":[
 {
-"questionnaireType":"HUAC1",
-"requesterForename":null,
-"requesterPhone":"07777000000",
-"requesterSurname":null,
-"requesterTitle":null
+"questionnaireID":"1110000009"
 }
 ],
 "address":{
