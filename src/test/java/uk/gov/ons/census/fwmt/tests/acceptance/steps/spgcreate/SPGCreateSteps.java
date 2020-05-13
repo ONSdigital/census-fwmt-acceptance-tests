@@ -2,7 +2,6 @@ package uk.gov.ons.census.fwmt.tests.acceptance.steps.spgcreate;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
-import cucumber.api.java.After;
 import cucumber.api.java.Before;
 import cucumber.api.java.en.And;
 import cucumber.api.java.en.Given;
@@ -11,6 +10,7 @@ import cucumber.api.java.en.When;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.client.HttpClientErrorException;
 import uk.gov.ons.census.fwmt.common.data.modelcase.ModelCase;
@@ -33,16 +33,9 @@ public class SPGCreateSteps {
   @Autowired
   private QueueClient queueUtils;
 
+  @Autowired
   private GatewayEventMonitor gatewayEventMonitor;
 
-  @Value("${service.rabbit.url}")
-  private String rabbitLocation;
-
-  @Value("${service.rabbit.username}")
-  private String rabbitUsername;
-
-  @Value("${service.rabbit.password}")
-  private String rabbitPassword;
 
   private static final String RM_CREATE_REQUEST_RECEIVED = "RM_CREATE_REQUEST_RECEIVED";
 
@@ -68,26 +61,9 @@ public class SPGCreateSteps {
     ceSpgUnit = Resources.toString(Resources.getResource("files/input/spg/spgUnitCreate.json"), Charsets.UTF_8);
     spgUpdate = Resources.toString(Resources.getResource("files/input/spg/spgUpdate.json"), Charsets.UTF_8);
     spgCancel = Resources.toString(Resources.getResource("files/input/spg/spgCancel.json"), Charsets.UTF_8);
-
-    tmMockUtils.enableRequestRecorder();
-    tmMockUtils.resetMock();
-    tmMockUtils.clearDownDatabase();
-
-    gatewayEventMonitor = new GatewayEventMonitor();
-    gatewayEventMonitor.enableEventMonitor(rabbitLocation, rabbitUsername, rabbitPassword);
   }
 
-  @After
-  public void tearDownGatewayEventMonitor() throws Exception {
-    try{
-      gatewayEventMonitor.tearDownGatewayEventMonitor();
-    }catch(Exception e){
-      System.out.println(e);
-    }
-    tmMockUtils.disableRequestRecorder();
 
-    queueUtils.clearQueues("RM.Field", "RM.FieldDLQ", "Outcome.Preprocessing", "Outcome.PreprocessingDLQ");
-  }
 
   @Given("a TM doesnt have a {string} {string} job with case ID {string} in TM")
   public void aTMDoesntHaveAJobWithCaseIDInTM(String survey, String type, String caseId) {

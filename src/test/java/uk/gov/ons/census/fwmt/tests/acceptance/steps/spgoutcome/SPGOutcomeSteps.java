@@ -57,7 +57,8 @@ public class SPGOutcomeSteps {
 
   private ProductReference productReference = new ProductReference();
 
-  private GatewayEventMonitor gatewayEventMonitor = new GatewayEventMonitor();
+  @Autowired
+  private GatewayEventMonitor gatewayEventMonitor;
 
   private String tmRequest = null;
 
