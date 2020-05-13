@@ -15,11 +15,7 @@
 "eventDate":"2020-04-17T11:53:11.000+0000",
 "fulfilmentRequests":[
 {
-"questionnaireType":"HUAC1",
-"requesterForename":null,
-"requesterPhone":"07777000000",
-"requesterSurname":null,
-"requesterTitle":null
+"questionnaireID":"1110000009"
 }
 ],
 "officerId":"SH-TWH1-ZA-25",
