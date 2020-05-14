@@ -22,7 +22,7 @@
   "handDeliver":true,
   "ceExpectedCapacity":null,
   "ceActualResponses":0,
-  "undeliveredAsAddress":null,
+  "undeliveredAsAddress":false,
   "blankFormReturned":null,
   "secureEstablishment":false
 }

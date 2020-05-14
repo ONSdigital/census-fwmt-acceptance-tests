@@ -8,6 +8,8 @@ Feature: SPG Outcome Tests
     And "<output>" is acknowledged by tm
 
     Examples:
-      | Type               | input             | output           |
-      | CANCEL_FEEDBACK    | COMET_CANCEL_SENT | COMET_CANCEL_ACK |
-      | DELIVERED_FEEDBACK | COMET_UPDATE_SENT | COMET_UPDATE_ACK |
+      | Type               | input                    | output           |
+      | CANCEL_FEEDBACK    | COMET_CANCEL_PRE_SENDING | COMET_CANCEL_ACK |
+      | DELIVERED_FEEDBACK | COMET_UPDATE_PRE_SENDING | COMET_UPDATE_ACK |
+
+      
