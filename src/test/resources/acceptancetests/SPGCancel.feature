@@ -2,7 +2,8 @@
 Feature: SPG Create Tests
 
   Scenario: As Gateway I can receive a cancel job requests from RM for an existing job
-    Given a job has been created a "SPG CE" "Unit" job in TM with case id "bd6345af-d706-43d3-a13b-8c549e081a76" with caseRef "12345678"
+    Given a TM doesnt have a job with case ID "bd6345af-d706-43d3-a13b-8c549e081a76" in TM  
+    And RM sends a create SPG job request with "12345678" "SPG CE" "Unit" "F" "T"
     And RM sends a cancel case request
     Then the cancel job is acknowledged by tm
  
