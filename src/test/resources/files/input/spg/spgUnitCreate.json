@@ -19,7 +19,7 @@
   "latitude":51.497421,
   "longitude":-0.0222139,
   "ce1Complete":false,
-  "handDeliver":true,
+  "handDeliver":false,
   "ceExpectedCapacity":null,
   "ceActualResponses":0,
   "undeliveredAsAddress":false,

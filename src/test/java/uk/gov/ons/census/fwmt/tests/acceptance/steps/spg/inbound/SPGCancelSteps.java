@@ -23,7 +23,7 @@ public class SPGCancelSteps {
 
   @Autowired
   private SPGCommonUtils spgCommonUtils;
-  
+
   @Autowired
   private QueueClient queueUtils;
 
@@ -33,6 +33,7 @@ public class SPGCancelSteps {
   private static final String RM_CANCEL_REQUEST_RECEIVED = "RM_CANCEL_REQUEST_RECEIVED";
 
   private static final String COMET_CANCEL_ACK = "COMET_CANCEL_ACK";
+  private static final String ROUTING_FAILED = "ROUTING_FAILED";
 
   private String spgCancel = null;
 
@@ -64,11 +65,11 @@ public class SPGCancelSteps {
     assertTrue(hasBeenTriggered);
   }
 
-    @Then("the cancel job should fail")
+  @Then("the cancel job should fail")
   public void the_cancel_job_should_fail() {
-  //TODO this functionality needs to be added to events library
-  // boolean hasBeenTriggered = gatewayEventMonitor.hasErrorEventTriggered(caseId, ROUTING_FAILED, 10000L);
-  boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, COMET_CANCEL_ACK, 3000L);
-  assertFalse(hasBeenTriggered);
-}
+    //TODO Move these caseIds
+    String caseId = "bd6345af-d706-43d3-a13b-8c549e081a76";
+    boolean hasBeenTriggered = gatewayEventMonitor.hasErrorEventTriggered(caseId, ROUTING_FAILED, 10000L);
+    assertTrue(hasBeenTriggered);
+  }
 }

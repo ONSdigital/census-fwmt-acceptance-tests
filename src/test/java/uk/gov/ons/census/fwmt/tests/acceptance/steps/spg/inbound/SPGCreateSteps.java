@@ -59,11 +59,8 @@ public class SPGCreateSteps {
 
   private String caseId = null;
 
-  private String caseRef = null;
+  private GatewayEventDTO event_COMET_CREATE_PRE_SENDING;
 
-  private String isSecure = null;
-
-  private GatewayEventDTO event_COMET_CREATE_ACK;
 
   @Before
   public void setup() throws Exception {
@@ -77,12 +74,9 @@ public class SPGCreateSteps {
     spgCommonUtils.clearDown();
   }
 
-  @Given("a TM doesnt have a {string} {string} {string} job with case ID {string} in TM")
-  public void aTMDoesntHaveAJobWithCaseIDInTM(String survey, String type, String isSecure, String caseId) {
+  @Given("a TM doesnt have a job with case ID {string} in TM")
+  public void aTMDoesntHaveAJobWithCaseIDInTM(String caseId) {
     try {
-      this.survey = survey;
-      this.type = type;
-      this.isSecure = isSecure;
       this.caseId = caseId;
       log.info("Looking for "+ caseId + " " + survey + " " + type + "within TM");
       tmMockUtils.getCaseById(caseId);
@@ -92,16 +86,27 @@ public class SPGCreateSteps {
     }
   }
 
-  @And("RM sends a create SPG job request with caseRef {string}")
-  public void rmSendsACreateHouseHoldJobRequest(String caseRef) throws URISyntaxException {
-    this.caseRef = caseRef;
-  
+  @And("RM sends a create SPG job request with {string} {string} {string} {string} {string}")
+  public void rmSendsACreateHouseHoldJobRequest(String caseRef, String survey, String type, String isSecure, String isHandDeliver) throws URISyntaxException {
+    this.survey = survey;
+    this.type = type;
+
     JSONObject json = new JSONObject(getCreateRMJson());
     json.remove("caseId");
     json.put("caseId", caseId);
 
     json.remove("caseRef");
     json.put("caseRef", caseRef);
+
+    if ("T".equals(isSecure)){
+      json.remove("secureEstablishment");
+      json.put("secureEstablishment", true);
+    }
+
+    if ("T".equals(isHandDeliver)){
+      json.remove("handDeliver");
+      json.put("handDeliver", true);
+    }
 
     String request = json.toString(4);
     log.info("Resquest = " + request);
@@ -115,30 +120,18 @@ public class SPGCreateSteps {
     boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, COMET_CREATE_PRE_SENDING, 10000L);
     assertThat(hasBeenTriggered).isTrue();
     List<GatewayEventDTO> events = gatewayEventMonitor.getEventsForEventType(COMET_CREATE_PRE_SENDING, 1);
-    event_COMET_CREATE_ACK = events.get(0);
+    event_COMET_CREATE_PRE_SENDING = events.get(0);
   }
 
-  @Then("a new case is created of the right type")
-  public void a_new_case_is_created_of_the_right_type() {
-    String expectedSurveyType = "";
-    switch (type) {
-      case "Estab" :
-        expectedSurveyType = "SPG Site";
-        break;
-      case "Unit" :
-        expectedSurveyType = "SPG Unit-D";
-        break;
-      default:
-        throw new RuntimeException("Incorrect Survey Type" + survey + " and type " + type);
-    }
-    String actualSurveyType = event_COMET_CREATE_ACK.getMetadata().get("Survey Type");
+  @Then("a new case is created of the right {string}")
+  public void a_new_case_is_created_of_the_right_type(String expectedSurveyType) {
+    String actualSurveyType = event_COMET_CREATE_PRE_SENDING.getMetadata().get("Survey Type");
     assertEquals("Survey Types created for TM", expectedSurveyType, actualSurveyType);
+  }
 
-    String actualCaseRef = event_COMET_CREATE_ACK.getMetadata().get("Case Ref");
-    String expectedCaseRef = caseRef;
-    //if (isSecure.equals("T"))
-    //  expectedCaseRef = "SECSS_" + caseRef;
-    
+  @And("the right caseRef {string}")
+  public void and_the_right_caseref(String expectedCaseRef) {
+    String actualCaseRef = event_COMET_CREATE_PRE_SENDING.getMetadata().get("Case Ref");
     assertEquals("Case Ref created for TM", expectedCaseRef, actualCaseRef);
   }
 

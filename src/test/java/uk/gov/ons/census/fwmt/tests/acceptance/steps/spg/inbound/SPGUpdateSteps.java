@@ -173,11 +173,9 @@ public class SPGUpdateSteps {
   }
 
   @Then("the update job should fail")
-public void the_update_job_should_fail_by_tm() {
-  //TODO this functionality needs to be added to events library
-  // boolean hasBeenTriggered = gatewayEventMonitor.hasErrorEventTriggered(caseId, ROUTING_FAILED, 10000L);
-  boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, COMET_UPDATE_ACK, 10000L);
-  assertThat(hasBeenTriggered).isFalse();
+  public void the_update_job_should_fail_by_tm() {
+  boolean hasBeenTriggered = gatewayEventMonitor.hasErrorEventTriggered(caseId, ROUTING_FAILED, 10000L);
+  assertThat(hasBeenTriggered).isTrue();
 }
 
 @Then("Gateway will reroute it as a create message")
