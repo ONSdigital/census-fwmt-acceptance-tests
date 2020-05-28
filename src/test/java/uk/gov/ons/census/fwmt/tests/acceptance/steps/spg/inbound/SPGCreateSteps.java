@@ -3,6 +3,7 @@ package uk.gov.ons.census.fwmt.tests.acceptance.steps.spg.inbound;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
+import static uk.gov.ons.census.fwmt.tests.acceptance.steps.spg.inbound.SPGCommonUtils.testBucket;
 
 import java.net.URISyntaxException;
 import java.util.List;
@@ -53,14 +54,7 @@ public class SPGCreateSteps {
 
   private String ceSpgUnitCreateJson = null;
 
-  private String survey = null;
-
-  private String type = null;
-
-  private String caseId = null;
-
   private GatewayEventDTO event_COMET_CREATE_PRE_SENDING;
-
 
   @Before
   public void setup() throws Exception {
@@ -77,8 +71,7 @@ public class SPGCreateSteps {
   @Given("a TM doesnt have a job with case ID {string} in TM")
   public void aTMDoesntHaveAJobWithCaseIDInTM(String caseId) {
     try {
-      this.caseId = caseId;
-      log.info("Looking for "+ caseId + " " + survey + " " + type + "within TM");
+      testBucket.put("caseId", caseId);
       tmMockUtils.getCaseById(caseId);
       fail("Case should not exist");
     } catch (HttpClientErrorException e) {
@@ -88,9 +81,10 @@ public class SPGCreateSteps {
 
   @And("RM sends a create SPG job request with {string} {string} {string} {string} {string}")
   public void rmSendsACreateHouseHoldJobRequest(String caseRef, String survey, String type, String isSecure, String isHandDeliver) throws URISyntaxException {
-    this.survey = survey;
-    this.type = type;
+    testBucket.put("survey", survey);
+    testBucket.put("type", type);
 
+    String caseId = testBucket.get("caseId");
     JSONObject json = new JSONObject(getCreateRMJson());
     json.remove("caseId");
     json.put("caseId", caseId);
@@ -109,7 +103,7 @@ public class SPGCreateSteps {
     }
 
     String request = json.toString(4);
-    log.info("Resquest = " + request);
+    log.info("Request = " + request);
     queueUtils.sendToRMFieldQueue(request, "create");
     boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, RM_CREATE_REQUEST_RECEIVED, 10000L);
     assertThat(hasBeenTriggered).isTrue();
@@ -117,6 +111,7 @@ public class SPGCreateSteps {
 
   @When("the Gateway sends a Create Job message to TM")
   public void theGatewaySendsACreateJobMessageToTM() {
+    String caseId = testBucket.get("caseId");
     boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, COMET_CREATE_PRE_SENDING, 10000L);
     assertThat(hasBeenTriggered).isTrue();
     List<GatewayEventDTO> events = gatewayEventMonitor.getEventsForEventType(COMET_CREATE_PRE_SENDING, 1);
@@ -145,6 +140,9 @@ public class SPGCreateSteps {
   }
 
   private String getCreateRMJson() {
+    String type = testBucket.get("type");
+    String survey = testBucket.get("survey");
+    
     switch (type) {
     case "Estab" :
       return ceSpgEstabCreateJson;

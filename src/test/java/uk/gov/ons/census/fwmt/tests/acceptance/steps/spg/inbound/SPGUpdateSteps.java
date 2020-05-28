@@ -1,10 +1,10 @@
 package uk.gov.ons.census.fwmt.tests.acceptance.steps.spg.inbound;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static uk.gov.ons.census.fwmt.tests.acceptance.steps.spg.inbound.SPGCommonUtils.testBucket;
 
 import java.net.URISyntaxException;
-import java.util.List;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
@@ -52,18 +52,10 @@ public class SPGUpdateSteps {
   private String ceSpgEstabUpdateJson = null;
 
   private String ceSpgUnitUpdateJson = null;
-  
+
   private String ceSpgEstabCreateJson = null;
 
   private String ceSpgUnitCreateJson = null;
-
-  private String survey = null;
-
-  private String type = null;
-
-  private String caseId = null;
-
-  private String caseRef = null;
 
   private GatewayEventDTO event_COMET_UPDATE_ACK;
 
@@ -82,139 +74,98 @@ public class SPGUpdateSteps {
     spgCommonUtils.clearDown();
   }
 
-  @Given("a job has been created a {string} {string} job in TM with case id {string} with caseRef {string}")
-  public void aJobHasBeenCreatedAJobInTMWithCaseId(String survey, String type, String caseId, String caseRef)
-      throws URISyntaxException {
-        
-    this.survey = survey;
-    this.type = type;
+  @And("RM sends an update case request for the case")
+  public void rmSendsUpdate() throws URISyntaxException {
+    String caseId = testBucket.get("caseId");
+    String type = testBucket.get("type");
 
-    this.caseId = caseId;
-    this.caseRef = caseRef;
-
-    JSONObject json = new JSONObject(getCreateRMJson());
-    json.remove("caseId");
-    json.put("caseId", caseId);
-
-    json.remove("caseRef");
-    json.put("caseRef", caseRef);
-
-    String request = json.toString(4);
-    log.info("Resquest = " + request);
-    
-    queueUtils.sendToRMFieldQueue(request, "create");
-    boolean jobAcknowledged = gatewayEventMonitor.hasEventTriggered(caseId, COMET_CREATE_ACK, 10000L);
-    assertThat(jobAcknowledged).isTrue();
-  }
-
-
-  @Given("RM sends a update SPG Unit job request as undeliveredAsAddress {string} and case id {string} with caseRef {string}")
-  public void rm_sends_a_update_SPG_job_request_as_undeliveredAsAddress(String undeliveredAsAddress, String caseId, String caseRef) throws URISyntaxException {
-    this.caseId = caseId;
-    this.caseRef = caseRef;
-    type = "Unit";
-    
     JSONObject json = new JSONObject(getUpdateRMJson());
     json.remove("caseId");
     json.put("caseId", caseId);
 
-    json.remove("caseRef");
-    json.put("caseRef", caseRef);
-
-    json.remove("undeliveredAsAddress");
-    json.put("undeliveredAsAddress", undeliveredAsAddress);
-
+    json.remove("addressLevel");
+    if ("Estab".equals(type)) {
+      json.put("addressLevel", "E");
+    }
+    if ("Unit".equals(type)) {
+      json.put("addressLevel", "U");
+    }
     String request = json.toString(4);
     log.info("Request = " + request);
     queueUtils.sendToRMFieldQueue(request, "update");
+  }
+
+  @When("Gateway receives an update message for the case")
+  public void gatewayReceivesTheMessage() {
+    String caseId = testBucket.get("caseId");
     boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, RM_UPDATE_REQUEST_RECEIVED, 10000L);
     assertThat(hasBeenTriggered).isTrue();
   }
-  
-  @And("RM sends a update SPG job request")
-  public void rmSendsAUpdateCaseRequest() throws URISyntaxException {
-    JSONObject json = new JSONObject(getUpdateRMJson());
-    json.remove("caseId");
-    json.put("caseId", caseId);
 
-    json.remove("caseRef");
-    json.put("caseRef", caseRef);
-
-    String request = json.toString(4);
-    log.info("Request = " + request);
-    queueUtils.sendToRMFieldQueue(request, "update");
-    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, RM_UPDATE_REQUEST_RECEIVED, 10000L);
-    assertThat(hasBeenTriggered).isTrue();
-  } 
- 
-  @When("the Gateway sends an Update Job message to TM")
-  public void the_Gateway_sends_anUpdate_Job_message_to_TM() {
+  @Then("it will update the job in TM")
+  public void confirmTmAction() {
+    String caseId = testBucket.get("caseId");
     boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, COMET_UPDATE_PRE_SENDING, 10000L);
     assertThat(hasBeenTriggered).isTrue();
-    List<GatewayEventDTO> events = gatewayEventMonitor.getEventsForEventType(COMET_UPDATE_PRE_SENDING, 1);
-    event_COMET_UPDATE_ACK = events.get(0);  
   }
 
-  @Then("a updated request is created of the right type")
-  public void a_updated_request_is_created_of_the_right_type() {
- 
-    String actualCaseRef = event_COMET_UPDATE_ACK.getMetadata().get("Case Ref");
-    String expectedCaseRef = caseRef;
-    //if (isSecure.equals("T"))
-    //  expectedCaseRef = "SECSS_" + caseRef;
-    
-    assertEquals("Case Ref created for TM", expectedCaseRef, actualCaseRef);
-}
-  
-  @Then("the update job is acknowledged by tm")
-  public void theUpdateJobIsAcknowledgedByTm() {
+  @And("the updated job is acknowledged by TM")
+  public void the_cancel_job_is_acknowledged_by_tm() {
+    String caseId = testBucket.get("caseId");
     boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, COMET_UPDATE_ACK, 10000L);
-   assertThat(hasBeenTriggered).isTrue();
+    assertTrue(hasBeenTriggered);
+  }
+  
+  @Given("RM sends a unit update case request where undeliveredAsAddress is {string}")
+  public void rm_sends_a_cancel_case_request(String undeliveredAsAddress) throws URISyntaxException {
+    JSONObject json = new JSONObject(ceSpgUnitUpdateJson);
+    json.remove("undeliveredAsAddress");
+    json.put("undeliveredAsAddress", "true".equals(undeliveredAsAddress));
+
+    String request = json.toString(4);
+    log.info("Request = " + request);
+    queueUtils.sendToRMFieldQueue(request, "update");
   }
 
   @Then("the update job should fail")
   public void the_update_job_should_fail_by_tm() {
-  boolean hasBeenTriggered = gatewayEventMonitor.hasErrorEventTriggered(caseId, ROUTING_FAILED, 10000L);
-  assertThat(hasBeenTriggered).isTrue();
-}
+    String caseId = testBucket.get("caseId");
+    boolean hasBeenTriggered = gatewayEventMonitor.hasErrorEventTriggered(caseId, ROUTING_FAILED, 10000L);
+    assertThat(hasBeenTriggered).isTrue();
+  }
 
-@Then("Gateway will reroute it as a create message")
-public void gateway_will_reroute_it_as_a_create_message() {
-  boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, CONVERT_SPG_UNIT_UPDATE_TO_CREATE, 10000L);
-  assertThat(hasBeenTriggered).isTrue();
-}
+  @Then("Gateway will reroute it as a create message")
+  public void gateway_will_reroute_it_as_a_create_message() {
+    String caseId = testBucket.get("caseId");
+    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, CONVERT_SPG_UNIT_UPDATE_TO_CREATE, 10000L);
+    assertThat(hasBeenTriggered).isTrue();
+  }
 
-@Then("Gateway will send a create job to TM")
-public void gateway_will_send_a_create_job_to_TM() {
-  boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, COMET_CREATE_PRE_SENDING, 10000L);
-  assertThat(hasBeenTriggered).isTrue();
-}
+  @Then("Gateway will send a create job to TM")
+  public void gateway_will_send_a_create_job_to_TM() {
+    String caseId = testBucket.get("caseId");
+    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, COMET_CREATE_PRE_SENDING, 10000L);
+    assertThat(hasBeenTriggered).isTrue();
+  }
 
-@Then("the create job is acknowledged by tm")
-public void the_create_job_is_acknowledged_by_tm() {
-  boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, COMET_CREATE_ACK, 10000L);
-  assertThat(hasBeenTriggered).isTrue();
-}
+  @Then("the create job is acknowledged by tm")
+  public void the_create_job_is_acknowledged_by_tm() {
+    String caseId = testBucket.get("caseId");
+    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, COMET_CREATE_ACK, 10000L);
+    assertThat(hasBeenTriggered).isTrue();
+  }
 
   private String getUpdateRMJson() {
+    String survey = testBucket.get("survey");
+    String type = testBucket.get("type");
     switch (type) {
-    case "Estab" :
+    case "Estab":
       return ceSpgEstabUpdateJson;
-    case "Unit" :
+    case "Unit":
       return ceSpgUnitUpdateJson;
     default:
       throw new RuntimeException("Incorrect survey " + survey + " and type " + type);
     }
   }
 
-  private String getCreateRMJson() {
-    switch (type) {
-    case "Estab" :
-      return ceSpgEstabCreateJson;
-    case "Unit" :
-      return ceSpgUnitCreateJson;
-    default:
-      throw new RuntimeException("Incorrect survey " + survey + " and type " + type);
-    }
-  }
 }

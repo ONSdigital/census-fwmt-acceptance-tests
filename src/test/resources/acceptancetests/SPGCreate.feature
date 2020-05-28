@@ -16,5 +16,5 @@ Feature: SPG Create Tests
       |SPG CE | Unit  |  F        | 12345678 | F           | SPG Unit-F | 12345678       |
       |SPG CE | Unit  |  T        | 12345678 | F           | SPG Unit-F | SECSU_12345678 |
 
-
+#Add failing route checks like in Cancel
 

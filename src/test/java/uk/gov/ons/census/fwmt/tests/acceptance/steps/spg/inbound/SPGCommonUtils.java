@@ -1,5 +1,8 @@
 package uk.gov.ons.census.fwmt.tests.acceptance.steps.spg.inbound;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -28,7 +31,8 @@ public class SPGCommonUtils {
   
     @Value("${service.rabbit.password}")
     private String rabbitPassword;
-  
+
+    public static Map<String, String> testBucket = new HashMap<>();
   
     public void setup() throws Exception {  
       tmMockUtils.enableRequestRecorder();
