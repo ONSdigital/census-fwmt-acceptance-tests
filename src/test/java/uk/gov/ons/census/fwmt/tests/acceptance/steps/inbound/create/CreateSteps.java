@@ -1,4 +1,4 @@
-package uk.gov.ons.census.fwmt.tests.acceptance.steps.spg.inbound;
+package uk.gov.ons.census.fwmt.tests.acceptance.steps.inbound.create;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
@@ -26,11 +26,12 @@ import lombok.extern.slf4j.Slf4j;
 import uk.gov.ons.census.fwmt.common.data.modelcase.ModelCase;
 import uk.gov.ons.census.fwmt.events.data.GatewayEventDTO;
 import uk.gov.ons.census.fwmt.events.utils.GatewayEventMonitor;
+import uk.gov.ons.census.fwmt.tests.acceptance.steps.spg.inbound.SPGCommonUtils;
 import uk.gov.ons.census.fwmt.tests.acceptance.utils.QueueClient;
 import uk.gov.ons.census.fwmt.tests.acceptance.utils.TMMockUtils;
 
 @Slf4j
-public class SPGCreateSteps {
+public class CreateSteps {
 
   @Autowired
   private SPGCommonUtils spgCommonUtils;
@@ -54,12 +55,24 @@ public class SPGCreateSteps {
 
   private String ceSpgUnitCreateJson = null;
 
+  private String ceEstabCreateJson = null;
+
+  private String ceUnitCreateJson = null;
+
+  private String survey = null;
+
+  private String type = null;
+
+  private String caseId = null;
+
   private GatewayEventDTO event_COMET_CREATE_PRE_SENDING;
 
   @Before
   public void setup() throws Exception {
     ceSpgEstabCreateJson = Resources.toString(Resources.getResource("files/input/spg/spgEstabCreate.json"), Charsets.UTF_8);
     ceSpgUnitCreateJson = Resources.toString(Resources.getResource("files/input/spg/spgUnitCreate.json"), Charsets.UTF_8);
+    ceEstabCreateJson = Resources.toString(Resources.getResource("files.input.ce/ceEstabCreate.json"), Charsets.UTF_8);
+    ceUnitCreateJson = Resources.toString(Resources.getResource("files.input.ce/ceUnitCreate.json"), Charsets.UTF_8);
     spgCommonUtils.setup();
   }
 
@@ -142,14 +155,18 @@ public class SPGCreateSteps {
   private String getCreateRMJson() {
     String type = testBucket.get("type");
     String survey = testBucket.get("survey");
-    
+
     switch (type) {
-    case "Estab" :
-      return ceSpgEstabCreateJson;
-    case "Unit" :
-      return ceSpgUnitCreateJson;
-    default:
-      throw new RuntimeException("Incorrect survey " + survey + " and type " + type);
+      case "Estab" :
+        return ceSpgEstabCreateJson;
+      case "Unit" :
+        return ceSpgUnitCreateJson;
+      case "CE Est" :
+        return ceEstabCreateJson;
+      case "CE Unit" :
+          return ceUnitCreateJson;
+      default:
+        throw new RuntimeException("Incorrect survey " + survey + " and type " + type);
     }
   }
 

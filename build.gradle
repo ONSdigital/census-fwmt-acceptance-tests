@@ -70,11 +70,12 @@ dependencies {
     runtimeOnly('org.postgresql:postgresql:42.2.5')
 
     compile("uk.gov.ons.census.fwmt:census-fwmt-events:1.0.26-RELEASE")
-    compile('uk.gov.ons.census.fwmt:census-fwmt-common:1.1.19-RELEASE')
+    compile('uk.gov.ons.census.fwmt:census-fwmt-common:1.1.22-RELEASE')
     compile("uk.gov.ons.census.ffa:census-ffa-storage-utils:0.0.1-RELEASE")
     compile('uk.gov.ons.ctp.integration.common:product-reference:1.0.2')
 
     compile("com.google.guava:guava:27.0.1-jre")
+    compile 'com.google.cloud:google-cloud-nio:0.30.0-alpha'
 
     implementation group: 'com.google.cloud', name: 'google-cloud-storage', version: '1.2.3'
 
