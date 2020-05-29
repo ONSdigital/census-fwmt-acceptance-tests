@@ -33,8 +33,8 @@ Feature: SPG Outcome Tests
 
       | ADDRESS_TYPE_CHANGED_HH | Engagement - Not-valid | Visit - Property is a household - refused | 6-10-54      | ADDRESS_TYPE_CHANGED_HH,REFUSAL_RECEIVED | ADDRESS_TYPE_CHANGED_HH, REFUSAL_RECEIVED |
       | ADDRESS_TYPE_CHANGED_HH | Engagement - Not-valid | Visit - Property is a household           | 6-10-53      | ADDRESS_TYPE_CHANGED_HH                  | ADDRESS_TYPE_CHANGED_HH                   |
-      | ADDRESS_TYPE_CHANGED_CE | Engagement - Not-valid | Visit - Property is a CE - refused        | 6-10-51      | ADDRESS_TYPE_CHANGED_CE,REFUSAL_RECEIVED | ADDRESS_TYPE_CHANGED_CE,REFUSAL_RECEIVED  |
-      | ADDRESS_TYPE_CHANGED_CE | Engagement - Not-valid | Visit - Property is a CE                  | 6-10-52      | ADDRESS_TYPE_CHANGED_CE                  | ADDRESS_TYPE_CHANGED_CE                   |
+      | ADDRESS_TYPE_CHANGED_CE | Engagement - Not-valid | Visit - Property is a CE - refused        | 6-10-52      | ADDRESS_TYPE_CHANGED_CE,REFUSAL_RECEIVED | ADDRESS_TYPE_CHANGED_CE,REFUSAL_RECEIVED  |
+      | ADDRESS_TYPE_CHANGED_CE | Engagement - Not-valid | Visit - Property is a CE                  | 6-10-51      | ADDRESS_TYPE_CHANGED_CE                  | ADDRESS_TYPE_CHANGED_CE                   |
 
       | ADDRESS_TYPE_CHANGED_HH | Not-valid       | Visit - Property is a household - refused | 7-10-04      | ADDRESS_TYPE_CHANGED_HH,REFUSAL_RECEIVED | ADDRESS_TYPE_CHANGED_HH,REFUSAL_RECEIVED |
       | ADDRESS_TYPE_CHANGED_HH | Not-valid       | Visit - Property is a household           | 7-10-03      | ADDRESS_TYPE_CHANGED_HH                  | ADDRESS_TYPE_CHANGED_HH                  |
