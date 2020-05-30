@@ -14,17 +14,15 @@ import uk.gov.ons.census.fwmt.common.data.modelcase.CasePause;
 import uk.gov.ons.census.fwmt.common.data.modelcase.ModelCase;
 import uk.gov.ons.census.fwmt.data.dto.MockMessage;
 import uk.gov.ons.census.fwmt.tests.acceptance.exceptions.MockInaccessibleException;
-import uk.gov.ons.ctp.response.action.message.instruction.ActionInstruction;
 
 import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.transform.stream.StreamSource;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 @Slf4j
 @Component
@@ -42,6 +40,15 @@ public final class TMMockUtils {
   @Value("${service.outcome.CCSInt.endpoint}")
   private String ccsIntOutcomeEnpoint;
 
+  @Value("${service.outcome.SPG.endpoint}")
+  private String spgOutcomeEndpoint;
+
+  @Value("${service.outcome.SPGNewUnit.endpoint}")
+  private String spgNewUnitOutcomeEndpoint;
+
+  @Value("${service.outcome.SPGStandalone.endpoint}")
+  private String spgStandaloneOutcomeEndpoint;
+
   @Value("${service.outcome.username}")
   private String outcomeServiceUsername;
 
@@ -50,6 +57,15 @@ public final class TMMockUtils {
 
   @Value("${service.mocktm.url}")
   private String mockTmUrl;
+
+  @Value("${spring.datasource.url}")
+  private String url;
+
+  @Value("${spring.datasource.username}")
+  private String username;
+
+  @Value("${spring.datasource.password}")
+  private String password;
 
   private RestTemplate restTemplate = new RestTemplate();
 
@@ -129,6 +145,48 @@ public final class TMMockUtils {
     return response.getStatusCode().value();
   }
 
+  public int sendTMSPGResponseMessage(String data, String caseId) {
+    HttpHeaders headers = createBasicAuthHeaders(outcomeServiceUsername, outcomeServicePassword);
+
+    headers.setContentType(MediaType.APPLICATION_JSON);
+
+    RestTemplate restTemplate = new RestTemplate();
+    String postUrl = outcomeServiceUrl + spgOutcomeEndpoint + caseId;
+
+    HttpEntity<String> post = new HttpEntity<>(data, headers);
+    ResponseEntity<Void> response = restTemplate.exchange(postUrl, HttpMethod.POST, post, Void.class);
+
+    return response.getStatusCode().value();
+  }
+
+  public int sendTMSPGNewStandaloneAddressResponseMessage(String data) {
+    HttpHeaders headers = createBasicAuthHeaders(outcomeServiceUsername, outcomeServicePassword);
+
+    headers.setContentType(MediaType.APPLICATION_JSON);
+
+    RestTemplate restTemplate = new RestTemplate();
+    String postUrl = outcomeServiceUrl + spgStandaloneOutcomeEndpoint;
+
+    HttpEntity<String> post = new HttpEntity<>(data, headers);
+    ResponseEntity<Void> response = restTemplate.exchange(postUrl, HttpMethod.POST, post, Void.class);
+
+    return response.getStatusCode().value();
+  }
+
+  public int sendTMSPGNewUnitAddressResponseMessage(String data) {
+    HttpHeaders headers = createBasicAuthHeaders(outcomeServiceUsername, outcomeServicePassword);
+
+    headers.setContentType(MediaType.APPLICATION_JSON);
+
+    RestTemplate restTemplate = new RestTemplate();
+    String postUrl = outcomeServiceUrl + spgNewUnitOutcomeEndpoint;
+
+    HttpEntity<String> post = new HttpEntity<>(data, headers);
+    ResponseEntity<Void> response = restTemplate.exchange(postUrl, HttpMethod.POST, post, Void.class);
+
+    return response.getStatusCode().value();
+  }
+
   private HttpHeaders createBasicAuthHeaders(String username, String password) {
     HttpHeaders headers = new HttpHeaders();
     final String plainCreds = username + ":" + password;
@@ -159,12 +217,26 @@ public final class TMMockUtils {
     }
   }
 
-  public JAXBElement<ActionInstruction> unmarshalXml(String message) throws JAXBException {
-    jaxbContext = JAXBContext.newInstance(ActionInstruction.class);
-    Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-    ByteArrayInputStream input = new ByteArrayInputStream(message.getBytes());
-    JAXBElement<ActionInstruction> rmActionInstruction = unmarshaller
-        .unmarshal(new StreamSource(input), ActionInstruction.class);
-    return rmActionInstruction;
+  public void clearDownDatabase() throws Exception {
+    System.out.println("CLEARDB" + url + username + password);
+    Statement stmt = null;
+    try (Connection conn = DriverManager.getConnection(url, username, password)) {
+      if (conn != null) {
+        System.out.println("Connected to the database!");
+        stmt = conn.createStatement();
+        String sql = "DELETE FROM gateway_cache";
+        stmt.executeUpdate(sql);
+        sql = "DELETE FROM request_log";
+        stmt.execute(sql);
+      } else {
+        System.out.println("Failed to make connection!");
+      }
+    } finally {
+      try {
+        if (stmt != null)
+          stmt.close();
+      } catch (SQLException ignored) {
+      }
+    }
   }
 }

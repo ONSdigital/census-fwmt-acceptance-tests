@@ -42,23 +42,16 @@ public final class QueueClient {
       return message;
     }
 
-    public void sendToRMFieldQueue(String message) throws URISyntaxException {
+    public void sendToRMFieldQueue(String message, String type) throws URISyntaxException {
         String exchangeName = "";
         String routingKey = "RM.Field";
-        queueUtils.addMessage(exchangeName, routingKey, message);
+        queueUtils.addMessage(exchangeName, routingKey, message, type);
     }
 
-    public void clearQueues() throws URISyntaxException {
-        clearQueue("Field.other");
-        clearQueue("Field.refusals");
-        clearQueue("Gateway.Actions");
-        clearQueue("Gateway.ActionsDLQ");
-        clearQueue("RM.Field");
-        clearQueue("RM.FieldDLQ");
-        clearQueue("Outcome.Preprocessing");
-        clearQueue("Outcome.PreprocessingDLQ");
-        clearQueue("Field.other");
-        clearQueue("Field.refusals");
+    public void clearQueues(String... qnames) throws URISyntaxException {
+      for (String q : qnames) {
+        clearQueue(q);
+      }
     }
 
     public void createQueue() throws IOException, TimeoutException, InterruptedException {

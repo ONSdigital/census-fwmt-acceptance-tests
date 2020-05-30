@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.concurrent.TimeoutException;
 
 @Slf4j
@@ -121,8 +122,7 @@ public class QueueUtils {
     return factory;
   }
 
-  public Boolean addMessage(String exchange,
-      String routingkey, String message) {
+  public Boolean addMessage(String exchange, String routingkey, String message, String type) {
     Connection connection = null;
     Channel channel = null;
     try {
@@ -131,7 +131,15 @@ public class QueueUtils {
       channel = connection.createChannel();
 
       BasicProperties.Builder builder = new BasicProperties.Builder();
-      builder.contentType("text/xml");
+      if (type.equals("create")) {
+        builder.headers(Map.of("__TypeId__", "uk.gov.ons.census.fwmt.common.rm.dto.FwmtActionInstruction"));
+      } else if (type.equals("cancel")) {
+        builder.headers(Map.of("__TypeId__", "uk.gov.ons.census.fwmt.common.rm.dto.FwmtCancelActionInstruction"));
+      } else if (type.equals("update")) {
+        builder.headers(Map.of("__TypeId__", "uk.gov.ons.census.fwmt.common.rm.dto.FwmtActionInstruction"));
+      }
+      builder.contentType("application/json");
+      builder.contentEncoding("UTF-8");
       BasicProperties properties = builder.build();
 
       channel.basicPublish(exchange, routingkey, properties, message.getBytes());

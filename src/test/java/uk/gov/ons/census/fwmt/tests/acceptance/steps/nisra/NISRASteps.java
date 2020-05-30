@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.concurrent.TimeoutException;
 
-import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +28,6 @@ import uk.gov.ons.census.fwmt.common.error.GatewayException;
 import uk.gov.ons.census.fwmt.events.utils.GatewayEventMonitor;
 import uk.gov.ons.census.fwmt.tests.acceptance.utils.QueueClient;
 import uk.gov.ons.census.fwmt.tests.acceptance.utils.TMMockUtils;
-import uk.gov.ons.ctp.response.action.message.instruction.ActionInstruction;
 
 @Slf4j
 @PropertySource("classpath:application.properties")
@@ -80,16 +78,16 @@ public class NISRASteps {
     tmMockUtils.disableRequestRecorder();
   }
 
-  @Given("RM sends a create NISRA job request job which has a case ID of {string} and a field officer ID {string}")
-  public void rmSendsACreateHouseHoldJobRequestJobWhichHasACaseIDOfAndAFieldOfficerID(String caseId,
-      String fieldOfficerId)
-      throws URISyntaxException, InterruptedException, JAXBException {
-    JAXBElement<ActionInstruction> actionInstruction = tmMockUtils.unmarshalXml(nisraHouseholdMessage);
-    queueUtils.sendToRMFieldQueue(nisraHouseholdMessage);
-    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, RM_CREATE_REQUEST_RECEIVED, 10000L);
-    assertEquals(fieldOfficerId, actionInstruction.getValue().getActionRequest().getFieldOfficerId());
-    assertThat(hasBeenTriggered).isTrue();
-  }
+//  @Given("RM sends a create NISRA job request job which has a case ID of {string} and a field officer ID {string}")
+//  public void rmSendsACreateHouseHoldJobRequestJobWhichHasACaseIDOfAndAFieldOfficerID(String caseId,
+//      String fieldOfficerId)
+//      throws URISyntaxException, InterruptedException, JAXBException {
+//    JAXBElement<ActionInstruction> actionInstruction = tmMockUtils.unmarshalXml(nisraHouseholdMessage);
+//    queueUtils.sendToRMFieldQueue(nisraHouseholdMessage);
+//    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, RM_CREATE_REQUEST_RECEIVED, 10000L);
+//    assertEquals(fieldOfficerId, actionInstruction.getValue().getActionRequest().getFieldOfficerId());
+//    assertThat(hasBeenTriggered).isTrue();
+//  }
 
   @And("the Gateway sends a create NISRA Job message to TM with case ID of {string}")
   public void theGatewaySendsACreateJobMessageToTMWithCaseIdOf(String caseId) {
@@ -106,14 +104,14 @@ public class NISRASteps {
   @Given("RM sends a create NISRA job request job which has a case ID of {string}")
   public void rmSendsACreateHouseHoldJobRequestJobWhichHasACaseIDOfAndAnID(String caseId)
       throws URISyntaxException, InterruptedException, JAXBException {
-    queueUtils.sendToRMFieldQueue(nisraNoFieldOfficerMessage);
+    queueUtils.sendToRMFieldQueue(nisraNoFieldOfficerMessage, "update");
     boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, RM_CREATE_REQUEST_RECEIVED, 10000L);
     assertThat(hasBeenTriggered).isTrue();
   }
 
   @Then("RM will throw an exception for case ID {string} for NISRA")
   public void rmWillThrowAnExceptionForCaseID(String caseId) throws URISyntaxException, InterruptedException {
-    queueUtils.sendToRMFieldQueue(nisraNoFieldOfficerMessage);
+    queueUtils.sendToRMFieldQueue(nisraNoFieldOfficerMessage, "update");
     assertThatExceptionOfType(GatewayException.class).isThrownBy(() -> {
       throw new GatewayException(
           GatewayException.Fault.SYSTEM_ERROR);
