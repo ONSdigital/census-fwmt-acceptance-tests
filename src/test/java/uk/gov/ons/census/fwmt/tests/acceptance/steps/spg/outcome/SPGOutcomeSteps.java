@@ -48,6 +48,10 @@ public class SPGOutcomeSteps {
 
   private static final String NEW_UNIT_ADDRESS = "NEW_UNIT_ADDRESS";
 
+  private static final String ADDRESS_TYPE_CHANGED_HH = "ADDRESS_TYPE_CHANGED_HH";
+
+  private static final String ADDRESS_TYPE_CHANGED_CE = "ADDRESS_TYPE_CHANGED_CE";
+
   private static final String REFUSAL_RECEIVED = "REFUSAL_RECEIVED";
 
   private static final String FULFILMENT_REQUESTED = "FULFILMENT_REQUESTED";
@@ -133,7 +137,8 @@ public class SPGOutcomeSteps {
 
   @Given("the Field Officer sends a {string}")
   public void theFieldOfficerSendsA(String outcomeType) {
-    if (outcomeType.equals(NEW_UNIT_ADDRESS) || outcomeType.equals(NEW_STANDALONE_ADDRESS))
+    if (outcomeType.equals(NEW_UNIT_ADDRESS) || outcomeType.equals(NEW_STANDALONE_ADDRESS)
+        || outcomeType.equals(ADDRESS_TYPE_CHANGED_HH) || outcomeType.equals(ADDRESS_TYPE_CHANGED_CE))
       caseIdHasValue = false;
     this.eventType = outcomeType;
   }
@@ -320,6 +325,11 @@ public class SPGOutcomeSteps {
       JSONObject fulfilment = payloadNode.getJSONObject("fulfilmentRequest");
       fulfilment.remove("caseId");
       fulfilment.put("caseId", "bd6345af-d706-43d3-a13b-8c549e081a76");
+    }
+    if (payloadNode.has("addressTypeChange")) {
+      JSONObject addressTypeChange = payloadNode.getJSONObject("addressTypeChange");
+      addressTypeChange.remove("newCaseId");
+      addressTypeChange.put("newCaseId", "e4bf9b3e-df97-4f39-82ff-f44f0c0277a6");
     }
     return wholeMessage.toString();
   }

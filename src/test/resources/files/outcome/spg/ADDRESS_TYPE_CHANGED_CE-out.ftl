@@ -8,6 +8,7 @@
 },
 "payload":{
 "addressTypeChange":{
+"newCaseId":"e4bf9b3e-df97-4f39-82ff-f44f0c0277a6",
 "collectionCase":{
 "id":"bd6345af-d706-43d3-a13b-8c549e081a76",
 "ceExpectedCapacity":"10",
