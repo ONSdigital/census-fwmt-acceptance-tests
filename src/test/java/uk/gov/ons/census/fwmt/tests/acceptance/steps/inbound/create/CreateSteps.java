@@ -7,6 +7,7 @@ import static uk.gov.ons.census.fwmt.tests.acceptance.steps.spg.inbound.SPGCommo
 
 import java.net.URISyntaxException;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
@@ -92,8 +93,8 @@ public class CreateSteps {
     }
   }
 
-  @And("RM sends a create SPG job request with {string} {string} {string} {string} {string}")
-  public void rmSendsACreateHouseHoldJobRequest(String caseRef, String survey, String type, String isSecure, String isHandDeliver) throws URISyntaxException {
+  @And("RM sends a create job request with {string} {string} {string} {string} {string}")
+  public void rmSendsACreateHouseHoldJobRequest(String caseRef, String survey, String type, String isSecure, String isHandDeliver) throws URISyntaxException, InterruptedException {
     testBucket.put("survey", survey);
     testBucket.put("type", type);
 
@@ -113,6 +114,15 @@ public class CreateSteps {
     if ("T".equals(isHandDeliver)){
       json.remove("handDeliver");
       json.put("handDeliver", true);
+    }
+
+    type = testBucket.get("type");
+
+    if (type.equals("CE Site")){
+        queueUtils.sendToRMFieldQueue(ceEstabCreateJson, "create");
+        TimeUnit.SECONDS.sleep(2);
+        json.remove("uprn");
+        json.put("uprn", "6123456");
     }
 
     String request = json.toString(4);
@@ -162,6 +172,7 @@ public class CreateSteps {
       case "Unit" :
         return ceSpgUnitCreateJson;
       case "CE Est" :
+      case "CE Site":
         return ceEstabCreateJson;
       case "CE Unit" :
           return ceUnitCreateJson;
