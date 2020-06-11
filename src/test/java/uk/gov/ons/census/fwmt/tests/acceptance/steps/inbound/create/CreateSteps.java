@@ -7,7 +7,6 @@ import static uk.gov.ons.census.fwmt.tests.acceptance.steps.spg.inbound.SPGCommo
 
 import java.net.URISyntaxException;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
@@ -52,6 +51,8 @@ public class CreateSteps {
 
   private static final String COMET_CREATE_ACK = "COMET_CREATE_ACK";
 
+  public static final String COMET_CLOSE_PRE_SENDING = "COMET_CLOSE_PRE_SENDING";
+
   private String ceSpgEstabCreateJson = null;
 
   private String ceSpgUnitCreateJson = null;
@@ -93,8 +94,26 @@ public class CreateSteps {
     }
   }
 
+  @Given("a job with case ID {string}, exists in FWMT {string}, estabUprn {string} with type of address {string} exists in cache")
+  public void cacheHasCaseIdandEstabUprn(String caseId, String exisitsInFwmt, String estabUprn, String type) throws Exception {
+    boolean exists = Boolean.getBoolean(exisitsInFwmt);
+    boolean ifExists;
+    int establishmentUprn = Integer.parseInt(estabUprn);
+    int typeOfAddress = Integer.parseInt(type);
+    testBucket.put("caseId", caseId);
+    testBucket.put("estabUprn", estabUprn);
+
+    tmMockUtils.addToDatabase(caseId, exists, establishmentUprn, typeOfAddress);
+
+    ifExists = tmMockUtils.checkExists();
+
+    if (!ifExists) {
+      fail("Case does not exist");
+    }
+  }
+
   @And("RM sends a create job request with {string} {string} {string} {string} {string}")
-  public void rmSendsACreateHouseHoldJobRequest(String caseRef, String survey, String type, String isSecure, String isHandDeliver) throws URISyntaxException, InterruptedException {
+  public void rmSendsACreateHouseHoldJobRequest(String caseRef, String survey, String type, String isSecure, String isHandDeliver) throws Exception {
     testBucket.put("survey", survey);
     testBucket.put("type", type);
 
@@ -116,13 +135,9 @@ public class CreateSteps {
       json.put("handDeliver", true);
     }
 
-    type = testBucket.get("type");
-
     if (type.equals("CE Site")){
-        queueUtils.sendToRMFieldQueue(ceEstabCreateJson, "create");
-        TimeUnit.SECONDS.sleep(2);
-        json.remove("uprn");
-        json.put("uprn", "6123456");
+      json.remove("uprn");
+      json.put("uprn", testBucket.get("estabUprn"));
     }
 
     String request = json.toString(4);
@@ -160,6 +175,20 @@ public class CreateSteps {
 
     ModelCase modelCase = tmMockUtils.getCaseById(caseId);
     assertEquals(caseId, modelCase.getId().toString());
+  }
+
+  @When("the existing case is closed by TM")
+  public void closeMatchingCase() {
+    String caseId = testBucket.get("caseId");
+    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, COMET_CLOSE_PRE_SENDING, 10000L);
+    assertThat(hasBeenTriggered).isTrue();
+    List<GatewayEventDTO> events = gatewayEventMonitor.getEventsForEventType(COMET_CLOSE_PRE_SENDING, 1);
+    event_COMET_CREATE_PRE_SENDING = events.get(0);
+  }
+
+  @And("the case is reopened with the right {string}")
+  public void reopendCase(){
+
   }
 
   private String getCreateRMJson() {
