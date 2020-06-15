@@ -51,8 +51,6 @@ public class CreateSteps {
 
   private static final String COMET_CREATE_ACK = "COMET_CREATE_ACK";
 
-  public static final String COMET_CLOSE_PRE_SENDING = "COMET_CLOSE_PRE_SENDING";
-
   private String ceSpgEstabCreateJson = null;
 
   private String ceSpgUnitCreateJson = null;
@@ -60,12 +58,6 @@ public class CreateSteps {
   private String ceEstabCreateJson = null;
 
   private String ceUnitCreateJson = null;
-
-  private String survey = null;
-
-  private String type = null;
-
-  private String caseId = null;
 
   private GatewayEventDTO event_COMET_CREATE_PRE_SENDING;
 
@@ -177,17 +169,11 @@ public class CreateSteps {
     assertEquals(caseId, modelCase.getId().toString());
   }
 
-  @When("the existing case is closed by TM")
-  public void closeMatchingCase() {
-    String caseId = testBucket.get("caseId");
-    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, COMET_CLOSE_PRE_SENDING, 10000L);
-    assertThat(hasBeenTriggered).isTrue();
-    List<GatewayEventDTO> events = gatewayEventMonitor.getEventsForEventType(COMET_CLOSE_PRE_SENDING, 1);
-    event_COMET_CREATE_PRE_SENDING = events.get(0);
-  }
+  @And("the existing case is updated and put back on the queue with caseId {string}")
+  public void sendBackToQueue(String caseId){
 
-  @And("the case is reopened with the right {string}")
-  public void reopendCase(){
+    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, RM_CREATE_REQUEST_RECEIVED, 10000L);
+    assertThat(hasBeenTriggered).isTrue();
 
   }
 

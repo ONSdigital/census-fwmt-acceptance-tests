@@ -1,4 +1,4 @@
-@Census @Acceptance @Create
+@Census @Acceptance @Inbound @Create
 Feature: Create Tests
 
   Scenario Outline: As Gateway I can receive a create job requests from RM
@@ -24,7 +24,6 @@ Feature: Create Tests
       |CE     | CE Unit  | F        | 12345678 | F           | CE Unit-F  | 12345678       |
       |CE     | CE Unit  | T        | 12345678 | F           | CE Unit-F  | SECCU_12345678 |
 
-#Add failing route checks like in Cancel
 
   Scenario Outline: As Gateway I can receive a create CE Site job request from RM after a CE Estab has been processed
     Given a job with case ID "bd6345af-d706-43d3-a13b-8c549e081a76", exists in FWMT "false", estabUprn "6123456" with type of address "1" exists in cache
@@ -38,13 +37,8 @@ Feature: Create Tests
       |CE     | CE Site  | F        | 12345678 | F           | CE Site    | 12345678       |
       |CE     | CE Site  | T        | 12345678 | F           | CE Site    | SECCS_12345678 |
 
-#  Scenario Outline: As Gateway I can switch a CE survey type that has a matching estabUprn and address type
-#    Given a job with case ID "bd6345af-d706-43d3-a13b-8c549e081a76", exists in FWMT "true", estabUprn "6123456" with type of address "1" exists in cache
-#    And RM sends a create job request with "<CaseRef>" "<Survey>" "<Type>" "<IsSecure>" "<HandDeliver>"
-#    When the existing case is closed by TM
-#    And the case is reopened with the right "<SurveyType>"
-#    And the right caseRef "<TmCaseRef>"
-#    And a new case with id of "bd6345af-d706-43d3-a13b-8c549e081a76" is created in TM
-#    Examples:
-#      |Survey | Type     | IsSecure | CaseRef  | HandDeliver | SurveyType | TmCaseRef      |
-#      |CE     | CE Unit  | F        | 12345678 | T           | CE Site    | 12345678       |
+
+  Scenario: As Gateway I can switch a CE survey type that has a matching estabUprn and address type
+    Given a job with case ID "bd6345af-d706-43d3-a13b-8c549e081a76", exists in FWMT "false", estabUprn "6123456" with type of address "1" exists in cache
+    And RM sends a create job request with "12345678" "CE" "CE Unit" "F" "T"
+    Then the existing case is updated and put back on the queue with caseId "bd6345af-d706-43d3-a13b-8c549e081a76"
