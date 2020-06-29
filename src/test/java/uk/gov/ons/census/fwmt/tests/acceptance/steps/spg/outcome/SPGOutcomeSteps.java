@@ -352,4 +352,12 @@ public class SPGOutcomeSteps {
     }
     return outcomeMessage;
   }
+
+  @And("QID is NOT defined")
+  public void qidIsNOTDefined() {
+  }
+
+  @And("QID is defined")
+  public void qidIsDefined() {
+  }
 }
