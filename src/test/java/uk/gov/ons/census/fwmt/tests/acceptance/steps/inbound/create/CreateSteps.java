@@ -6,6 +6,8 @@ import static org.junit.Assert.fail;
 import static uk.gov.ons.census.fwmt.tests.acceptance.steps.spg.inbound.SPGCommonUtils.testBucket;
 
 import java.net.URISyntaxException;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import com.google.common.base.Charsets;
@@ -51,6 +53,12 @@ public class CreateSteps {
 
   private static final String COMET_CREATE_ACK = "COMET_CREATE_ACK";
 
+  private static final String RM_CREATE_SWITCH_REQUEST_RECEIVED = "RM_CREATE_SWITCH_REQUEST_RECEIVED";
+
+  public static final String COMET_CLOSE_ACK = "COMET_CLOSE_ACK";
+
+  public static final String COMET_REOPEN_ACK = "COMET_REOPEN_ACK";
+
   private String ceSpgEstabCreateJson = null;
 
   private String ceSpgUnitCreateJson = null;
@@ -88,7 +96,7 @@ public class CreateSteps {
 
   @Given("a job with case ID {string}, exists in FWMT {string}, estabUprn {string} with type of address {string} exists in cache")
   public void cacheHasCaseIdandEstabUprn(String caseId, String exisitsInFwmt, String estabUprn, String type) throws Exception {
-    boolean exists = Boolean.getBoolean(exisitsInFwmt);
+    boolean exists = Boolean.parseBoolean(exisitsInFwmt);
     boolean ifExists;
     int establishmentUprn = Integer.parseInt(estabUprn);
     int typeOfAddress = Integer.parseInt(type);
@@ -104,12 +112,11 @@ public class CreateSteps {
     }
   }
 
-  @And("RM sends a create job request with {string} {string} {string} {string} {string}")
-  public void rmSendsACreateHouseHoldJobRequest(String caseRef, String survey, String type, String isSecure, String isHandDeliver) throws Exception {
+  @And("RM sends a create job request with {string} {string} {string} {string} {string} {string}")
+  public void rmSendsACreateHouseHoldJobRequest(String caseId, String caseRef, String survey, String type, String isSecure, String isHandDeliver) throws Exception {
     testBucket.put("survey", survey);
     testBucket.put("type", type);
 
-    String caseId = testBucket.get("caseId");
     JSONObject json = new JSONObject(getCreateRMJson());
     json.remove("caseId");
     json.put("caseId", caseId);
@@ -169,12 +176,22 @@ public class CreateSteps {
     assertEquals(caseId, modelCase.getId().toString());
   }
 
-  @And("the existing case is updated and put back on the queue with caseId {string}")
+  @And("the existing case is updated to a switch and put back on the queue with caseId {string}")
   public void sendBackToQueue(String caseId){
-
-    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, RM_CREATE_REQUEST_RECEIVED, 10000L);
+    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, RM_CREATE_SWITCH_REQUEST_RECEIVED, 10000L);
     assertThat(hasBeenTriggered).isTrue();
+  }
 
+  @Then("the related case will be closed with case ID {string}")
+  public void sendCloseToQueue(String caseId) {
+    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, COMET_CLOSE_ACK, 10000L);
+    assertThat(hasBeenTriggered).isTrue();
+  }
+
+  @And("then reopened with the new SurveyType {string} and case ID {string}")
+  public void sendReopenToQueue(String surveyType, String caseId) {
+    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, COMET_REOPEN_ACK, 10000L);
+    assertThat(hasBeenTriggered).isTrue();
   }
 
   private String getCreateRMJson() {

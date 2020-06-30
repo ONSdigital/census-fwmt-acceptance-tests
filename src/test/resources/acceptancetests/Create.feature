@@ -3,7 +3,7 @@ Feature: Create Tests
 
   Scenario Outline: As Gateway I can receive a create job requests from RM
     Given a TM doesnt have a job with case ID "bd6345af-d706-43d3-a13b-8c549e081a76" in TM
-    And RM sends a create job request with "<CaseRef>" "<Survey>" "<Type>" "<IsSecure>" "<HandDeliver>"
+    And RM sends a create job request with "bd6345af-d706-43d3-a13b-8c549e081a76" "<CaseRef>" "<Survey>" "<Type>" "<IsSecure>" "<HandDeliver>"
     When the Gateway sends a Create Job message to TM
     Then a new case is created of the right "<SurveyType>"
     And the right caseRef "<TmCaseRef>"
@@ -27,7 +27,7 @@ Feature: Create Tests
 
   Scenario Outline: As Gateway I can receive a create CE Site job request from RM after a CE Estab has been processed
     Given a job with case ID "bd6345af-d706-43d3-a13b-8c549e081a76", exists in FWMT "false", estabUprn "6123456" with type of address "1" exists in cache
-    And RM sends a create job request with "<CaseRef>" "<Survey>" "<Type>" "<IsSecure>" "<HandDeliver>"
+    And RM sends a create job request with "bd6345af-d706-43d3-a13b-8c549e081a76" "<CaseRef>" "<Survey>" "<Type>" "<IsSecure>" "<HandDeliver>"
     When the Gateway sends a Create Job message to TM
     Then a new case is created of the right "<SurveyType>"
     And the right caseRef "<TmCaseRef>"
@@ -39,6 +39,8 @@ Feature: Create Tests
 
 
   Scenario: As Gateway I can switch a CE survey type that has a matching estabUprn and address type
-    Given a job with case ID "bd6345af-d706-43d3-a13b-8c549e081a76", exists in FWMT "false", estabUprn "6123456" with type of address "1" exists in cache
-    And RM sends a create job request with "12345678" "CE" "CE Unit" "F" "T"
-    Then the existing case is updated and put back on the queue with caseId "bd6345af-d706-43d3-a13b-8c549e081a76"
+    Given a job with case ID "f78607a6-bab4-11ea-b3de-0242ac130004", exists in FWMT "true", estabUprn "6123456" with type of address "1" exists in cache
+    And RM sends a create job request with "bd6345af-d706-43d3-a13b-8c549e081a76" "12345678" "CE" "CE Unit" "F" "T"
+    Then the existing case is updated to a switch and put back on the queue with caseId "f78607a6-bab4-11ea-b3de-0242ac130004"
+    Then the related case will be closed with case ID "f78607a6-bab4-11ea-b3de-0242ac130004"
+    And then reopened with the new SurveyType "CE Site" and case ID "f78607a6-bab4-11ea-b3de-0242ac130004"
