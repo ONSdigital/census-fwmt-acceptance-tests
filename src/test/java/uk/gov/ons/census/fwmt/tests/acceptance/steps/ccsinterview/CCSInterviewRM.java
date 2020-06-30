@@ -92,8 +92,8 @@ public class CCSInterviewRM {
 
   @After
   public void tearDownGatewayEventMonitor() throws IOException, TimeoutException {
-    gatewayEventMonitor.tearDownGatewayEventMonitor();
-    tmMockUtils.disableRequestRecorder();
+//    gatewayEventMonitor.tearDownGatewayEventMonitor();
+//    tmMockUtils.disableRequestRecorder();
   }
 
   @Given("TM doesn't have an existing job CCS Interview with case ID {string}")
