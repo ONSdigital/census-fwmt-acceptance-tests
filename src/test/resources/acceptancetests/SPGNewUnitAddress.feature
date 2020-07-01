@@ -42,4 +42,4 @@ Feature: SPG Outcome Tests
     Examples:
       | Type                    | Primary Outcome | Secondary Outcome                       | Outcome Code | Operation List                     | Output Message List             |
        # Linked Qid
-#      | NEW_UNIT_ADDRESS_LINKED | Contact made    | HICL or Paper H Questionnaire delivered | 9-20-05      | NEW_UNIT_ADDRESS_LINKED,LINKED_QID | NEW_ADDRESS_REPORTED,LINKED_QID |
+      | NEW_UNIT_ADDRESS_LINKED | Contact made    | HICL or Paper H Questionnaire delivered | 9-20-05      | NEW_UNIT_ADDRESS_LINKED,LINKED_QID | NEW_ADDRESS_REPORTED,LINKED_QID |

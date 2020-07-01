@@ -279,8 +279,7 @@ public class SPGOutcomeSteps {
 
       JsonNode actualMessageRootNode;
       if (!caseIdHasValue) {
-        actualMessageRootNode = jsonObjectMapper.readTree(addNewCaseId(
-            actualMessage, "3e007cdb-446d-4164-b2d7-8d8bd7b86c49", "3e007cdb-446d-4164-b2d7-8d8bd7b86c49"));
+        actualMessageRootNode = jsonObjectMapper.readTree(addNewCaseId(actualMessage));
       } else {
         actualMessageRootNode = jsonObjectMapper.readTree(actualMessage);
       }
@@ -298,7 +297,7 @@ public class SPGOutcomeSteps {
     }
   }
 
-  private String addNewCaseId(String actualMessage, String newCaseId, String collectionCaseId) {
+  private String addNewCaseId(String actualMessage) {
     JSONObject wholeMessage = new JSONObject(actualMessage);
     JSONObject payloadNode = wholeMessage.getJSONObject("payload");
     if (payloadNode.has("newAddress")) {
@@ -306,10 +305,10 @@ public class SPGOutcomeSteps {
       if (newAddressNode.has("collectionCase")) {
         JSONObject collectionCaseNode = newAddressNode.getJSONObject("collectionCase");
         collectionCaseNode.remove("id");
-        collectionCaseNode.put("id", newCaseId);
+        collectionCaseNode.put("id", "3e007cdb-446d-4164-b2d7-8d8bd7b86c49");
         if (collectionCaseNode.has("collectionExerciseId")) {
           collectionCaseNode.remove("collectionExerciseId");
-          collectionCaseNode.put("collectionExerciseId", collectionCaseId);
+          collectionCaseNode.put("collectionExerciseId", "3e007cdb-446d-4164-b2d7-8d8bd7b86c49");
         }
       }
     }
