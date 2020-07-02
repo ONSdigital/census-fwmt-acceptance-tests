@@ -48,6 +48,8 @@ public class SPGOutcomeSteps {
 
   private static final String NEW_UNIT_ADDRESS = "NEW_UNIT_ADDRESS";
 
+  private static final String NEW_UNIT_ADDRESS_LINKED = "NEW_UNIT_ADDRESS_LINKED";
+
   private static final String REFUSAL_RECEIVED = "REFUSAL_RECEIVED";
 
   private static final String FULFILMENT_REQUESTED = "FULFILMENT_REQUESTED";
@@ -133,7 +135,8 @@ public class SPGOutcomeSteps {
 
   @Given("the Field Officer sends a {string}")
   public void theFieldOfficerSendsA(String outcomeType) {
-    if (outcomeType.equals(NEW_UNIT_ADDRESS) || outcomeType.equals(NEW_STANDALONE_ADDRESS))
+    if (outcomeType.equals(NEW_UNIT_ADDRESS) || outcomeType.equals(NEW_STANDALONE_ADDRESS)
+    || outcomeType.equals(NEW_UNIT_ADDRESS_LINKED))
       caseIdHasValue = false;
     this.eventType = outcomeType;
   }
@@ -276,8 +279,7 @@ public class SPGOutcomeSteps {
 
       JsonNode actualMessageRootNode;
       if (!caseIdHasValue) {
-        actualMessageRootNode = jsonObjectMapper.readTree(addNewCaseId(
-            actualMessage, "3e007cdb-446d-4164-b2d7-8d8bd7b86c49", "1ebd37b4-484a-4459-b88f-ca6fa4687acf"));
+        actualMessageRootNode = jsonObjectMapper.readTree(addNewCaseId(actualMessage));
       } else {
         actualMessageRootNode = jsonObjectMapper.readTree(actualMessage);
       }
@@ -295,7 +297,7 @@ public class SPGOutcomeSteps {
     }
   }
 
-  private String addNewCaseId(String actualMessage, String newCaseId, String collectionCaseId) {
+  private String addNewCaseId(String actualMessage) {
     JSONObject wholeMessage = new JSONObject(actualMessage);
     JSONObject payloadNode = wholeMessage.getJSONObject("payload");
     if (payloadNode.has("newAddress")) {
@@ -303,10 +305,10 @@ public class SPGOutcomeSteps {
       if (newAddressNode.has("collectionCase")) {
         JSONObject collectionCaseNode = newAddressNode.getJSONObject("collectionCase");
         collectionCaseNode.remove("id");
-        collectionCaseNode.put("id", newCaseId);
+        collectionCaseNode.put("id", "3e007cdb-446d-4164-b2d7-8d8bd7b86c49");
         if (collectionCaseNode.has("collectionExerciseId")) {
           collectionCaseNode.remove("collectionExerciseId");
-          collectionCaseNode.put("collectionExerciseId", collectionCaseId);
+          collectionCaseNode.put("collectionExerciseId", "3e007cdb-446d-4164-b2d7-8d8bd7b86c49");
         }
       }
     }

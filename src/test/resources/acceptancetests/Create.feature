@@ -9,20 +9,20 @@ Feature: Create Tests
     And the right caseRef "<TmCaseRef>"
     And a new case with id of "bd6345af-d706-43d3-a13b-8c549e081a76" is created in TM
     Examples:
-      |Survey | Type     | IsSecure | CaseRef  | HandDeliver | SurveyType | TmCaseRef      |
-      |SPG CE | Estab    | F        | 12345678 | F           | SPG Site   | 12345678       |
-      |SPG CE | Estab    | T        | 12345678 | F           | SPG Site   | SECSS_12345678 |
-      |SPG CE | Unit     | F        | 12345678 | T           | SPG Unit-D | 12345678       |
-      |SPG CE | Unit     | F        | 12345678 | F           | SPG Unit-F | 12345678       |
-      |SPG CE | Unit     | T        | 12345678 | F           | SPG Unit-F | SECSU_12345678 |
-      |CE     | CE Est   | F        | 12345678 | T           | CE Est-D   | 12345678       |
-      |CE     | CE Est   | T        | 12345678 | T           | CE Est-D   | SECCE_12345678 |
-      |CE     | CE Est   | F        | 12345678 | F           | CE Est-F   | 12345678       |
-      |CE     | CE Est   | T        | 12345678 | F           | CE Est-F   | SECCE_12345678 |
-      |CE     | CE Unit  | F        | 12345678 | T           | CE Unit-D  | 12345678       |
-      |CE     | CE Unit  | T        | 12345678 | T           | CE Unit-D  | SECCU_12345678 |
-      |CE     | CE Unit  | F        | 12345678 | F           | CE Unit-F  | 12345678       |
-      |CE     | CE Unit  | T        | 12345678 | F           | CE Unit-F  | SECCU_12345678 |
+      | MessageTypeLabel            | Survey | Type     | IsSecure | CaseRef  | HandDeliver | SurveyType | TmCaseRef      |
+      | SPG Site                    | SPG CE | Estab    | F        | 12345678 | F           | SPG Site   | 12345678       |
+      | SPG Site (Secure)           | SPG CE | Estab    | T        | 12345678 | F           | SPG Site   | SECSS_12345678 |
+      | SPG Unit Deliver            | SPG CE | Unit     | F        | 12345678 | T           | SPG Unit-D | 12345678       |
+      | SPG Unit Follow-up          | SPG CE | Unit     | F        | 12345678 | F           | SPG Unit-F | 12345678       |
+      | SPG Unit Follow-up (Secure) | SPG CE | Unit     | T        | 12345678 | F           | SPG Unit-F | SECSU_12345678 |
+      | CE Est Deliver              | CE     | CE Est   | F        | 12345678 | T           | CE Est-D   | 12345678       |
+      | CE Est Deliver (Secure)     | CE     | CE Est   | T        | 12345678 | T           | CE Est-D   | SECCE_12345678 |
+      | CE Est Follow-up            | CE     | CE Est   | F        | 12345678 | F           | CE Est-F   | 12345678       |
+      | CE Est Follow-up (Secure)   | CE     | CE Est   | T        | 12345678 | F           | CE Est-F   | SECCE_12345678 |
+      | CE Unit Deliver             | CE     | CE Unit  | F        | 12345678 | T           | CE Unit-D  | 12345678       |
+      | CE Unit Deliver (Secure)    | CE     | CE Unit  | T        | 12345678 | T           | CE Unit-D  | SECCU_12345678 |
+      | CE Unit Follow-up           | CE     | CE Unit  | F        | 12345678 | F           | CE Unit-F  | 12345678       |
+      | CE Unit Follow-up (Secure)  | CE     | CE Unit  | T        | 12345678 | F           | CE Unit-F  | SECCU_12345678 |
 
   Scenario Outline: As Gateway I can receive a create CE Site job request from RM after a CE Estab has been processed
     Given a TM doesnt have a job with case ID "bd6345af-d706-43d3-a13b-8c549e081a76" in TM
