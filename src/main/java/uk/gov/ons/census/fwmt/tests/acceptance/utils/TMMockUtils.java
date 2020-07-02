@@ -239,4 +239,49 @@ public final class TMMockUtils {
       }
     }
   }
+
+  public void addToDatabase(String caseId, boolean existInFwmt, int estabUprn, int type) throws Exception {
+    Statement stmt = null;
+    try (Connection conn = DriverManager.getConnection(url, username, password)) {
+      if (conn != null) {
+        System.out.println("Connected to the database!");
+        stmt = conn.createStatement();
+        String sql = "INSERT INTO fwmtg.gateway_cache (case_id, is_delivered, exists_in_fwmt, estab_uprn, type)\n" +
+                "VALUES ('" + caseId + "', false, " + existInFwmt +  ", " + estabUprn + ", " + type + ")";
+        stmt.executeUpdate(sql);
+      } else {
+        System.out.println("Failed to make connection!");
+      }
+    } finally {
+      try {
+        if (stmt != null)
+          stmt.close();
+      } catch (SQLException ignored) {
+      }
+    }
+  }
+
+  public boolean checkExists() throws Exception {
+    boolean exists = false;
+    Statement stmt = null;
+    try (Connection conn = DriverManager.getConnection(url, username, password)) {
+      if (conn != null) {
+        System.out.println("Connected to the database!");
+        stmt = conn.createStatement();
+        String sql = "SELECT * FROM fwmtg.gateway_cache WHERE case_Id = 'bd6345af-d706-43d3-a13b-8c549e081a76'\n " +
+                "AND estab_uprn = '6123456'";
+        exists = stmt.execute(sql);
+
+      } else {
+        System.out.println("Failed to make connection!");
+      }
+    } finally {
+      try {
+        if (stmt != null)
+          stmt.close();
+      } catch (SQLException ignored) {
+      }
+    }
+    return exists;
+  }
 }
