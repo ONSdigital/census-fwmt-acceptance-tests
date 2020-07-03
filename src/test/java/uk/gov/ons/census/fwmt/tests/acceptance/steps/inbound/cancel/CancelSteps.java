@@ -1,9 +1,9 @@
-package uk.gov.ons.census.fwmt.tests.acceptance.steps.spg.inbound;
+package uk.gov.ons.census.fwmt.tests.acceptance.steps.inbound.cancel;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static uk.gov.ons.census.fwmt.tests.acceptance.steps.spg.inbound.SPGCommonUtils.testBucket;
+import static uk.gov.ons.census.fwmt.tests.acceptance.steps.inbound.common.CommonUtils.testBucket;
 
 import java.net.URISyntaxException;
 import java.util.List;
@@ -23,13 +23,14 @@ import cucumber.api.java.en.When;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.ons.census.fwmt.events.data.GatewayEventDTO;
 import uk.gov.ons.census.fwmt.events.utils.GatewayEventMonitor;
+import uk.gov.ons.census.fwmt.tests.acceptance.steps.inbound.common.CommonUtils;
 import uk.gov.ons.census.fwmt.tests.acceptance.utils.QueueClient;
 
 @Slf4j
-public class SPGCancelSteps {
+public class CancelSteps {
 
   @Autowired
-  private SPGCommonUtils spgCommonUtils;
+  private CommonUtils commonUtils;
 
   @Autowired
   private QueueClient queueUtils;
@@ -40,6 +41,8 @@ public class SPGCancelSteps {
   private GatewayEventDTO event_COMET_CANCEL_PRE_SENDING;
 
   private String spgCancel;
+  private String ceEstabCancel;
+  private String ceUnitCancel;
 
   private static final String RM_CANCEL_REQUEST_RECEIVED = "RM_CANCEL_REQUEST_RECEIVED";
 
@@ -50,13 +53,16 @@ public class SPGCancelSteps {
 
   @Before
   public void setup() throws Exception {
-    spgCommonUtils.setup();
+    commonUtils.setup();
     spgCancel = Resources.toString(Resources.getResource("files/input/spg/spgCancel.json"), Charsets.UTF_8);
+    ceEstabCancel = Resources.toString(Resources.getResource("files/input/ce/ceEstabCancel.json"), Charsets.UTF_8);
+    ceUnitCancel = Resources.toString(Resources.getResource("files/input/ce/ceUnitCancel.json"), Charsets.UTF_8);
+
   }
 
   @After
   public void clearDown() throws Exception {
-    spgCommonUtils.clearDown();
+    commonUtils.clearDown();
   }
 
   @And("RM sends a cancel case request for the case")
@@ -64,17 +70,18 @@ public class SPGCancelSteps {
     String caseId = testBucket.get("caseId");
     String type = testBucket.get("type");
 
-    JSONObject json = new JSONObject(spgCancel);
+    JSONObject json = new JSONObject(getCreateRMJson());
     json.remove("caseId");
     json.put("caseId", caseId);
 
     json.remove("addressLevel");
-    if ("Estab".equals(type)) {
+    if ("Estab".equals(type) || "CE Est".equals(type) || "CE Site".equals(type)) {
       json.put("addressLevel", "E");
     }
-    if ("Unit".equals(type)) {
+    if ("Unit".equals(type) || "CE Unit".equals(type)) {
       json.put("addressLevel", "U");
     }
+
     String request = json.toString(4);
     log.info("Request = " + request);
     queueUtils.sendToRMFieldQueue(request, "cancel");
@@ -122,5 +129,23 @@ public class SPGCancelSteps {
     String request = json.toString(4);
     log.info("Request = " + request);
     queueUtils.sendToRMFieldQueue(request, "cancel");
+  }
+
+  private String getCreateRMJson() {
+    String type = testBucket.get("type");
+    String survey = testBucket.get("survey");
+
+    switch (type) {
+      case "Estab":
+      case "Unit":
+        return spgCancel;
+      case "CE Est":
+      case "CE Site":
+        return ceEstabCancel;
+      case "CE Unit":
+        return ceUnitCancel;
+      default:
+        throw new RuntimeException("Incorrect survey " + survey + " and type " + type);
+    }
   }
 }

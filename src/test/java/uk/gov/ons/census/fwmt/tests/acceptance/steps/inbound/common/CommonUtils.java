@@ -1,4 +1,4 @@
-package uk.gov.ons.census.fwmt.tests.acceptance.steps.spg.inbound;
+package uk.gov.ons.census.fwmt.tests.acceptance.steps.inbound.common;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,7 +12,7 @@ import uk.gov.ons.census.fwmt.tests.acceptance.utils.QueueClient;
 import uk.gov.ons.census.fwmt.tests.acceptance.utils.TMMockUtils;
 
 @Component
-public class SPGCommonUtils {
+public class CommonUtils {
 
     @Autowired
     private TMMockUtils tmMockUtils;

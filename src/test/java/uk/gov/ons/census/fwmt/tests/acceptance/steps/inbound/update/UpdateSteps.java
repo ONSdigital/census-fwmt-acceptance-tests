@@ -1,17 +1,7 @@
-package uk.gov.ons.census.fwmt.tests.acceptance.steps.spg.inbound;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertTrue;
-import static uk.gov.ons.census.fwmt.tests.acceptance.steps.spg.inbound.SPGCommonUtils.testBucket;
-
-import java.net.URISyntaxException;
+package uk.gov.ons.census.fwmt.tests.acceptance.steps.inbound.update;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
-
-import org.json.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import cucumber.api.java.After;
 import cucumber.api.java.Before;
 import cucumber.api.java.en.And;
@@ -19,21 +9,34 @@ import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
 import lombok.extern.slf4j.Slf4j;
+import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import uk.gov.ons.census.fwmt.events.data.GatewayEventDTO;
 import uk.gov.ons.census.fwmt.events.utils.GatewayEventMonitor;
+import uk.gov.ons.census.fwmt.tests.acceptance.steps.inbound.common.CommonUtils;
 import uk.gov.ons.census.fwmt.tests.acceptance.utils.QueueClient;
+import uk.gov.ons.census.fwmt.tests.acceptance.utils.TMMockUtils;
+
+import java.net.URISyntaxException;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertTrue;
+import static uk.gov.ons.census.fwmt.tests.acceptance.steps.inbound.common.CommonUtils.testBucket;
 
 @Slf4j
-public class SPGUpdateSteps {
+public class UpdateSteps {
 
   @Autowired
-  private SPGCommonUtils spgCommonUtils;
+  private CommonUtils commonUtils;
 
   @Autowired
   private QueueClient queueUtils;
 
   @Autowired
   private GatewayEventMonitor gatewayEventMonitor;
+
+  @Autowired
+  private TMMockUtils tmMockUtils;
 
   private static final String RM_UPDATE_REQUEST_RECEIVED = "RM_UPDATE_REQUEST_RECEIVED";
 
@@ -53,6 +56,10 @@ public class SPGUpdateSteps {
 
   private String ceSpgUnitUpdateJson = null;
 
+  private String ceEstabUpdateJson = null;
+
+  private String ceUnitUpdateJson = null;
+
   private String ceSpgEstabCreateJson = null;
 
   private String ceSpgUnitCreateJson = null;
@@ -66,12 +73,16 @@ public class SPGUpdateSteps {
 
     ceSpgEstabUpdateJson = Resources.toString(Resources.getResource("files/input/spg/spgEstabUpdate.json"), Charsets.UTF_8);
     ceSpgUnitUpdateJson = Resources.toString(Resources.getResource("files/input/spg/spgUnitUpdate.json"), Charsets.UTF_8);
-    spgCommonUtils.setup();
+    ceEstabUpdateJson = Resources.toString(Resources.getResource("files/input/ce/ceEstabUpdate.json"), Charsets.UTF_8);
+    ceUnitUpdateJson = Resources.toString(Resources.getResource("files/input/ce/ceUnitUpdate.json"), Charsets.UTF_8);
+    commonUtils.setup();
+    tmMockUtils.clearDownDatabase();
   }
 
   @After
   public void clearDown() throws Exception {
-    spgCommonUtils.clearDown();
+    commonUtils.clearDown();
+    tmMockUtils.clearDownDatabase();
   }
 
   @And("RM sends an update case request for the case")
@@ -84,11 +95,20 @@ public class SPGUpdateSteps {
     json.put("caseId", caseId);
 
     json.remove("addressLevel");
-    if ("Estab".equals(type)) {
+    if ("Estab".equals(type) || "CE Est".equals(type)) {
       json.put("addressLevel", "E");
     }
-    if ("Unit".equals(type)) {
+    if ("Unit".equals(type) || "CE Unit".equals(type)) {
       json.put("addressLevel", "U");
+    }
+    if ("CE Site".equals(type)){
+      json.remove("uprn");
+      json.put("uprn", json.get("estabUprn"));
+      json.remove("caseId");
+      json.put("caseId", "f78607a6-bab4-11ea-b3de-0242ac130004");
+      caseId = "f78607a6-bab4-11ea-b3de-0242ac130004";
+      testBucket.put("caseId", caseId);
+      json.put("addressLevel", "E");
     }
     String request = json.toString(4);
     log.info("Request = " + request);
@@ -121,6 +141,7 @@ public class SPGUpdateSteps {
     JSONObject json = new JSONObject(ceSpgUnitUpdateJson);
     json.remove("undeliveredAsAddress");
     json.put("undeliveredAsAddress", "true".equals(undeliveredAsAddress));
+    testBucket.put("caseId", json.get("caseId").toString());
 
     String request = json.toString(4);
     log.info("Request = " + request);
@@ -163,6 +184,11 @@ public class SPGUpdateSteps {
       return ceSpgEstabUpdateJson;
     case "Unit":
       return ceSpgUnitUpdateJson;
+    case "CE Est":
+    case "CE Site":
+      return ceEstabUpdateJson;
+    case "CE Unit":
+      return ceUnitUpdateJson;
     default:
       throw new RuntimeException("Incorrect survey " + survey + " and type " + type);
     }

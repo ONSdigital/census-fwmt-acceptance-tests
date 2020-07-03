@@ -3,9 +3,8 @@ package uk.gov.ons.census.fwmt.tests.acceptance.steps.inbound.create;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
-import static uk.gov.ons.census.fwmt.tests.acceptance.steps.spg.inbound.SPGCommonUtils.testBucket;
+import static uk.gov.ons.census.fwmt.tests.acceptance.steps.inbound.common.CommonUtils.testBucket;
 
-import java.net.URISyntaxException;
 import java.util.List;
 
 import com.google.common.base.Charsets;
@@ -26,7 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 import uk.gov.ons.census.fwmt.common.data.modelcase.ModelCase;
 import uk.gov.ons.census.fwmt.events.data.GatewayEventDTO;
 import uk.gov.ons.census.fwmt.events.utils.GatewayEventMonitor;
-import uk.gov.ons.census.fwmt.tests.acceptance.steps.spg.inbound.SPGCommonUtils;
+import uk.gov.ons.census.fwmt.tests.acceptance.steps.inbound.common.CommonUtils;
 import uk.gov.ons.census.fwmt.tests.acceptance.utils.QueueClient;
 import uk.gov.ons.census.fwmt.tests.acceptance.utils.TMMockUtils;
 
@@ -34,7 +33,7 @@ import uk.gov.ons.census.fwmt.tests.acceptance.utils.TMMockUtils;
 public class CreateSteps {
 
   @Autowired
-  private SPGCommonUtils spgCommonUtils;
+  private CommonUtils commonUtils;
 
   @Autowired
   private TMMockUtils tmMockUtils;
@@ -51,6 +50,12 @@ public class CreateSteps {
 
   private static final String COMET_CREATE_ACK = "COMET_CREATE_ACK";
 
+  private static final String RM_CREATE_SWITCH_REQUEST_RECEIVED = "RM_CREATE_SWITCH_REQUEST_RECEIVED";
+
+  public static final String COMET_CLOSE_ACK = "COMET_CLOSE_ACK";
+
+  public static final String COMET_REOPEN_ACK = "COMET_REOPEN_ACK";
+
   private String ceSpgEstabCreateJson = null;
 
   private String ceSpgUnitCreateJson = null;
@@ -65,14 +70,16 @@ public class CreateSteps {
   public void setup() throws Exception {
     ceSpgEstabCreateJson = Resources.toString(Resources.getResource("files/input/spg/spgEstabCreate.json"), Charsets.UTF_8);
     ceSpgUnitCreateJson = Resources.toString(Resources.getResource("files/input/spg/spgUnitCreate.json"), Charsets.UTF_8);
-    ceEstabCreateJson = Resources.toString(Resources.getResource("files.input.ce/ceEstabCreate.json"), Charsets.UTF_8);
-    ceUnitCreateJson = Resources.toString(Resources.getResource("files.input.ce/ceUnitCreate.json"), Charsets.UTF_8);
-    spgCommonUtils.setup();
+    ceEstabCreateJson = Resources.toString(Resources.getResource("files/input/ce/ceEstabCreate.json"), Charsets.UTF_8);
+    ceUnitCreateJson = Resources.toString(Resources.getResource("files/input/ce/ceUnitCreate.json"), Charsets.UTF_8);
+    commonUtils.setup();
+    tmMockUtils.clearDownDatabase();
   }
 
   @After
   public void clearDown() throws Exception {
-    spgCommonUtils.clearDown();
+    commonUtils.clearDown();
+    tmMockUtils.clearDownDatabase();
   }
 
   @Given("a TM doesnt have a job with case ID {string} in TM")
@@ -88,10 +95,11 @@ public class CreateSteps {
 
   @Given("a job with case ID {string}, exists in FWMT {string}, estabUprn {string} with type of address {string} exists in cache")
   public void cacheHasCaseIdandEstabUprn(String caseId, String exisitsInFwmt, String estabUprn, String type) throws Exception {
-    boolean exists = Boolean.getBoolean(exisitsInFwmt);
+    boolean exists = Boolean.parseBoolean(exisitsInFwmt);
     boolean ifExists;
     int establishmentUprn = Integer.parseInt(estabUprn);
     int typeOfAddress = Integer.parseInt(type);
+
     testBucket.put("caseId", caseId);
     testBucket.put("estabUprn", estabUprn);
 
@@ -105,32 +113,52 @@ public class CreateSteps {
   }
 
   @And("RM sends a create job request with {string} {string} {string} {string} {string}")
-  public void rmSendsACreateHouseHoldJobRequest(String caseRef, String survey, String type, String isSecure, String isHandDeliver) throws Exception {
+  public void rmSendsACECreateJobRequest(String caseRef, String survey, String type, String isSecure, String isHandDeliver) throws Exception {
     testBucket.put("survey", survey);
     testBucket.put("type", type);
 
     String caseId = testBucket.get("caseId");
+
     JSONObject json = new JSONObject(getCreateRMJson());
-    json.remove("caseId");
-    json.put("caseId", caseId);
 
-    json.remove("caseRef");
-    json.put("caseRef", caseRef);
+    commonRMMessageObjects(json, caseId, caseRef, isSecure, isHandDeliver, false);
 
-    if ("T".equals(isSecure)){
-      json.remove("secureEstablishment");
-      json.put("secureEstablishment", true);
-    }
+    String request = json.toString(4);
+    log.info("Request = " + request);
+    queueUtils.sendToRMFieldQueue(request, "create");
+    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, RM_CREATE_REQUEST_RECEIVED, 10000L);
+    assertThat(hasBeenTriggered).isTrue();
+  }
 
-    if ("T".equals(isHandDeliver)){
-      json.remove("handDeliver");
-      json.put("handDeliver", true);
-    }
+  @And("RM sends a create CE Site job request with {string} {string} {string} {string} {string}")
+  public void rmSendsACECreateSiteJobRequest(String caseRef, String survey, String type, String isSecure, String isHandDeliver) throws Exception {
+    String caseId = "f78607a6-bab4-11ea-b3de-0242ac130004";
 
-    if (type.equals("CE Site")){
-      json.remove("uprn");
-      json.put("uprn", testBucket.get("estabUprn"));
-    }
+    testBucket.put("survey", survey);
+    testBucket.put("type", type);
+
+    JSONObject json = new JSONObject(getCreateRMJson());
+
+    commonRMMessageObjects(json, caseId, caseRef, isSecure, isHandDeliver, true);
+
+    String request = json.toString(4);
+    log.info("Request = " + request);
+    queueUtils.sendToRMFieldQueue(request, "create");
+    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, RM_CREATE_REQUEST_RECEIVED, 10000L);
+    assertThat(hasBeenTriggered).isTrue();
+  }
+
+  @And("RM sends a create CE Unit with the same estabUPRN as the above CE Est request with {string} {string} {string} {string} {string}")
+  public void rmSendsACEUnitWithMatchingEstabUPRNJobRequest(String caseRef, String survey, String type, String isSecure, String isHandDeliver) throws Exception {
+    String caseId = "f78607a6-bab4-11ea-b3de-0242ac130004";
+
+    testBucket.put("survey", survey);
+    testBucket.put("type", type);
+    testBucket.put("caseId", caseId);
+
+    JSONObject json = new JSONObject(getCreateRMJson());
+
+    commonRMMessageObjects(json, caseId, caseRef, isSecure, isHandDeliver, true);
 
     String request = json.toString(4);
     log.info("Request = " + request);
@@ -145,7 +173,11 @@ public class CreateSteps {
     boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, COMET_CREATE_PRE_SENDING, 10000L);
     assertThat(hasBeenTriggered).isTrue();
     List<GatewayEventDTO> events = gatewayEventMonitor.getEventsForEventType(COMET_CREATE_PRE_SENDING, 1);
-    event_COMET_CREATE_PRE_SENDING = events.get(0);
+    if (testBucket.get("type").equals("CE Site")) {
+      event_COMET_CREATE_PRE_SENDING = events.get(1);
+    } else {
+      event_COMET_CREATE_PRE_SENDING = events.get(0);
+    }
   }
 
   @Then("a new case is created of the right {string}")
@@ -169,12 +201,22 @@ public class CreateSteps {
     assertEquals(caseId, modelCase.getId().toString());
   }
 
-  @And("the existing case is updated and put back on the queue with caseId {string}")
+  @And("the existing case is updated to a switch and put back on the queue with caseId {string}")
   public void sendBackToQueue(String caseId){
-
-    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, RM_CREATE_REQUEST_RECEIVED, 10000L);
+    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, RM_CREATE_SWITCH_REQUEST_RECEIVED, 10000L);
     assertThat(hasBeenTriggered).isTrue();
+  }
 
+  @Then("the related case will be closed with case ID {string}")
+  public void sendCloseToQueue(String caseId) {
+    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, COMET_CLOSE_ACK, 10000L);
+    assertThat(hasBeenTriggered).isTrue();
+  }
+
+  @And("then reopened with the new SurveyType {string} and case ID {string}")
+  public void sendReopenToQueue(String surveyType, String caseId) {
+    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, COMET_REOPEN_ACK, 10000L);
+    assertThat(hasBeenTriggered).isTrue();
   }
 
   private String getCreateRMJson() {
@@ -194,6 +236,49 @@ public class CreateSteps {
       default:
         throw new RuntimeException("Incorrect survey " + survey + " and type " + type);
     }
+  }
+
+  private JSONObject updateSecure(JSONObject json, String isSecure) {
+    if ("T".equals(isSecure)) {
+      json.remove("secureEstablishment");
+      json.put("secureEstablishment", true);
+    }
+    return json;
+  }
+
+  private JSONObject updateHandDeliver(JSONObject json, String isHandDeliver) {
+    if ("T".equals(isHandDeliver)){
+      json.remove("handDeliver");
+      json.put("handDeliver", true);
+    }
+    return json;
+  }
+
+  private JSONObject commonRMMessageObjects(JSONObject json, String caseId, String caseRef, String isSecure, String isHandDeliver, boolean extraObjects){
+    if ("T".equals(isSecure)) {
+      json.remove("secureEstablishment");
+      json.put("secureEstablishment", true);
+    }
+    if ("T".equals(isHandDeliver)){
+      json.remove("handDeliver");
+      json.put("handDeliver", true);
+    }
+
+    json.remove("caseRef");
+    json.put("caseRef", caseRef);
+
+    if (extraObjects == true) {
+      json.remove("caseRef");
+      json.put("caseRef", caseRef);
+
+      json.remove("uprn");
+      json.put("uprn", json.get("estabUprn"));
+
+      json.remove("caseId");
+      json.put("caseId", caseId);
+    }
+
+    return json;
   }
 
 }

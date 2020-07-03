@@ -24,10 +24,10 @@ Feature: Create Tests
       | CE Unit Follow-up           | CE     | CE Unit  | F        | 12345678 | F           | CE Unit-F  | 12345678       |
       | CE Unit Follow-up (Secure)  | CE     | CE Unit  | T        | 12345678 | F           | CE Unit-F  | SECCU_12345678 |
 
-
   Scenario Outline: As Gateway I can receive a create CE Site job request from RM after a CE Estab has been processed
-    Given a job with case ID "bd6345af-d706-43d3-a13b-8c549e081a76", exists in FWMT "false", estabUprn "6123456" with type of address "1" exists in cache
-    And RM sends a create job request with "<CaseRef>" "<Survey>" "<Type>" "<IsSecure>" "<HandDeliver>"
+    Given a TM doesnt have a job with case ID "bd6345af-d706-43d3-a13b-8c549e081a76" in TM
+    And RM sends a create job request with "12345678" "CE" "CE Est" "F" "T"
+    And RM sends a create CE Site job request with "<CaseRef>" "<Survey>" "<Type>" "<IsSecure>" "<HandDeliver>"
     When the Gateway sends a Create Job message to TM
     Then a new case is created of the right "<SurveyType>"
     And the right caseRef "<TmCaseRef>"
@@ -37,10 +37,14 @@ Feature: Create Tests
       |CE     | CE Site  | F        | 12345678 | F           | CE Site    | 12345678       |
       |CE     | CE Site  | T        | 12345678 | F           | CE Site    | SECCS_12345678 |
 
-
-  Scenario: As Gateway I can switch a CE survey type that has a matching estabUprn and address type
-    Given a job with case ID "bd6345af-d706-43d3-a13b-8c549e081a76", exists in FWMT "false", estabUprn "6123456" with type of address "1" exists in cache
-    And RM sends a create job request with "12345678" "CE" "CE Unit" "F" "T" 
-    Then the existing case is updated and put back on the queue with caseId "bd6345af-d706-43d3-a13b-8c549e081a76"
-    #CE Unit Deliver
-    
+  Scenario Outline: As Gateway I can switch a CE survey type that has a matching estabUprn and address type
+    Given a TM doesnt have a job with case ID "bd6345af-d706-43d3-a13b-8c549e081a76" in TM
+    And RM sends a create job request with "12345678" "CE" "CE Est" "F" "T"
+    And RM sends a create CE Unit with the same estabUPRN as the above CE Est request with "<CaseRef>" "<Survey>" "<Type>" "<IsSecure>" "<HandDeliver>"
+    Then the existing case is updated to a switch and put back on the queue with caseId "bd6345af-d706-43d3-a13b-8c549e081a76"
+    Then the related case will be closed with case ID "bd6345af-d706-43d3-a13b-8c549e081a76"
+    And then reopened with the new SurveyType "<SurveyType>" and case ID "bd6345af-d706-43d3-a13b-8c549e081a76"
+    Examples:
+      |Survey | Type     | IsSecure | HandDeliver | CaseRef  |  SurveyType |
+      |CE     | CE Unit  | F        | T           | 12345678 |  CE Site    |
+      |CE     | CE Unit  | F        | F           | 12345678 |  CE Site    |
