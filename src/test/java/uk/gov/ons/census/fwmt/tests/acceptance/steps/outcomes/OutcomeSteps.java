@@ -346,8 +346,14 @@ public class OutcomeSteps {
                 request = createOutcomeMessage("ADDRESS_TYPE_CHANGED_CE", root);
                 break;
             case "Address Type Changed SPG":
-                request = createOutcomeMessage("ADDRESS_TYPE_CHANGED_SPG", root);
-                break;
+              request = createOutcomeMessage("ADDRESS_TYPE_CHANGED_SPG", root);
+              break;
+            case "Cancel Feedback":
+              request = createOutcomeMessage("CANCEL_FEEDBACK", root);
+              break;
+            case "Delivered Feedback":
+              request = createOutcomeMessage("DELIVERED_FEEDBACK", root);
+              break;
 
             default:
                 break;
