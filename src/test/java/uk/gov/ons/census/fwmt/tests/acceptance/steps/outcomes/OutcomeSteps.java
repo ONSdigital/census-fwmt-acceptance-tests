@@ -18,6 +18,7 @@ import org.json.JSONObject;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,7 +52,8 @@ public class OutcomeSteps {
     private List<String> expectedProcessors;
     private List<String> expectedRmMessages;
     private List<String> expectedJsMessages;
-    Map<String, String> rmMessageMap = new HashMap<>();
+    Map<String, String> actualRmMessageMap = new HashMap<>();
+    Map<String, String> expectedRmMessageMap = new HashMap<>();
 
 
     private Collection<GatewayEventDTO> processingEvents;
@@ -106,6 +108,8 @@ public class OutcomeSteps {
 
     @Autowired
     private SpgReasonCodeLookup spgReasonCodeLookup;
+    private String addressTypeChangeMsg;
+    private String newCaseId;
 
     @Before
     public void setup() throws IOException, URISyntaxException, TimeoutException {
@@ -157,9 +161,6 @@ public class OutcomeSteps {
     public void gateway_processes_the_outcome() throws Exception {
         sendTMOutcomeMessage();
         confirmOutcomeServiceReceivesMessage();
-        collectProcessingEvents();
-        collectRmOutcomeEvents();
-        collectJsOutcomeEvents();
     }
 
     private void collectProcessingEvents() {
@@ -169,6 +170,7 @@ public class OutcomeSteps {
     private void collectRmOutcomeEvents() {
         rmOutcomeEvents = gatewayEventMonitor.grabEventsTriggered(OUTCOME_SENT, expectedRmMessages.size(), 5000L);
     }
+
     private void collectJsOutcomeEvents() {
         jsOutcomeEvents = gatewayEventMonitor.grabEventsTriggered(RM_FIELD_REPUBLISH, expectedJsMessages.size(), 5000L);
     }
@@ -178,6 +180,7 @@ public class OutcomeSteps {
     public void it_will_run_the_following_processors(String processors) {
         String[] processorsArray = (!Strings.isBlank(processors)) ? processors.split(",") : new String[0];
         expectedProcessors = Arrays.asList(processorsArray);
+        collectProcessingEvents();
         confirmProcessorsAreExcecuted();
     }
 
@@ -185,30 +188,83 @@ public class OutcomeSteps {
     public void create_the_following_messages_to_RM(String rmMessages) throws Exception{
         String[] rmMessagesArray = (!Strings.isBlank(rmMessages)) ? rmMessages.split(",") : new String[0];
         expectedRmMessages = Arrays.asList(rmMessagesArray);
+        collectRmOutcomeEvents();
         collectRmMessages();
         confirmRmMessagesAreSent();
+        createExpectedRmMessages();
+    }
+
+    private void createExpectedRmMessages() throws Exception{
+      expectedRmMessageMap.clear();
+      for (String rmMessageType : expectedRmMessages) {
+        Map<String, Object> root = new HashMap();
+        UUID newCaseId = UUID.randomUUID();
+
+        root.clear();
+        root.put("reason", spgReasonCodeLookup.getLookup(outcomeCode));
+        root.put("fulfilmentCode", outcomeCode);
+        root.put("newCaseId", newCaseId.toString());
+        String expectedRmMessage = createExpectedRmMessage(rmMessageType, root);
+        expectedRmMessageMap.put(rmMessageType, expectedRmMessage);
+      }
     }
 
     @Then("the caseId of the {string} message will be the original caseid")
     public void the_caseId_of_the_message_will_be_the_original_caseid(String messageType) throws Exception{
-        String message = rmMessageMap.get(messageType);
-        JsonNode actualJson = jsonObjectMapper.readTree(message);
-        JsonNode caseIdNode = actualJson.findPath("caseId");
+        addressTypeChangeMsg = actualRmMessageMap.get(messageType);
+        JsonNode actualJson = jsonObjectMapper.readTree(addressTypeChangeMsg);
+        JsonNode caseIdNode = actualJson.findPath("id");
         assertThat(caseIdNode!=null && !caseIdNode.isMissingNode()).isTrue();
-        assertThat(caseId, caseIdNode.asText()).isTrue();
+        assertThat(caseId.equals(caseIdNode.asText())).isTrue();
     }
-    
+
     private void collectRmMessages() throws Exception{
     for (String rmMessageType : expectedRmMessages) {
         String msg = queueClient.getMessage(operationToQueue(rmMessageType));
 
         JsonNode actualMessageRootNode = jsonObjectMapper.readTree(msg);
         JsonNode typeNode = actualMessageRootNode.path("event").path("type");
-        rmMessageMap.put(typeNode.asText(), msg);
+        actualRmMessageMap.put(typeNode.asText(), msg);
     }
     }
 
-    
+    @Then("it will include a new caseId")
+    public void it_will_include_a_new_caseId() throws Exception{
+      JsonNode actualJson = jsonObjectMapper.readTree(addressTypeChangeMsg);
+      JsonNode newCaseIdNode = actualJson.findPath("newCaseId");
+      assertThat(newCaseIdNode!=null && !newCaseIdNode.isMissingNode()).isTrue();
+      assertThat(!caseId.equals(newCaseIdNode.asText())).isTrue();
+      newCaseId = newCaseIdNode.asText();
+    }
+
+    @Then("every other message will use the new caseId as its caseId")
+    public void every_other_message_will_use_the_new_caseId_as_its_caseId() throws Exception{
+      for (String messageType : expectedRmMessageMap.keySet()) {
+        String atcMsg = expectedRmMessageMap.get(messageType);
+
+        switch (messageType) {
+        case "ADDRESS_TYPE_CHANGED":
+          atcMsg = replaceValueInJson(atcMsg, "newCaseId", newCaseId);
+          break;
+        case "QUESTIONNAIRE_LINKED":
+        case "FULFILMENT_REQUESTED":
+          atcMsg = replaceValueInJson(atcMsg, "caseId", newCaseId);
+          break;
+        default:
+          atcMsg = replaceValueInJson(atcMsg, "id", newCaseId);
+          break;
+        }
+        expectedRmMessageMap.put(messageType, atcMsg);
+      }
+    }
+
+    private String replaceValueInJson(String msg, String keyName, String newValue) throws Exception{
+      JsonNode actualJson = jsonObjectMapper.readTree(msg);
+      msg = actualJson.toPrettyString();
+      String docturedJson = msg.replaceAll("(?<=\"" + keyName + "\" : \")[^\\\"]+", newValue);
+      return docturedJson;
+    }
+
     @Then("each message has the correct values")
     public void each_message_has_the_correct_values() throws Exception {
         confirmMessagesAreValid();
@@ -218,6 +274,7 @@ public class OutcomeSteps {
     public void it_will_create_the_following_messages_to_JobService(String jsMessages) {
         String[] jsMessagesArray = (!Strings.isBlank(jsMessages)) ? jsMessages.split(",") : new String[0];
         expectedJsMessages = Arrays.asList(jsMessagesArray);
+        collectJsOutcomeEvents();
         confirmJsMessagesAreSent();
     }
 
@@ -231,7 +288,7 @@ public class OutcomeSteps {
     private void confirmRmMessagesAreSent() {
         List<String> actualMessages = rmOutcomeEvents.stream().filter(e -> e.getMetadata().get("survey type").equals(surveyType)).map(e -> e.getMetadata().get("type"))
                 .collect(Collectors.toList());
-                assertEquals(expectedRmMessages.size(), rmMessageMap.size());
+                assertEquals(expectedRmMessages.size(), actualRmMessageMap.size());
                 assertEquals(expectedRmMessages.size(), actualMessages.size());
                 assertThat(expectedRmMessages.containsAll(actualMessages));
     }
@@ -245,7 +302,7 @@ public class OutcomeSteps {
 
     private void sendTMOutcomeMessage() throws Exception {
         int response = -1;
-        String originalRequest = getTmOutcomeRequest();
+        String request = getTmOutcomeRequest();
         switch (surveyType) {
         case "SPG":
             response = tmMockUtils.sendTMSPGResponseMessage(request, caseId);
@@ -400,24 +457,17 @@ public class OutcomeSteps {
     }
 
     private void confirmMessagesAreValid() throws Exception {
-        assertEquals(expectedRmMessages.size(), rmMessageMap.size());
-        assertThat(expectedRmMessages.containsAll(rmMessageMap.keySet()));
+        assertEquals(expectedRmMessages.size(), actualRmMessageMap.size());
+        assertThat(expectedRmMessages.containsAll(actualRmMessageMap.keySet()));
 
         Map<String, Object> root = new HashMap();
         for (String rmMessageType : expectedRmMessages) {
-            UUID newCaseId = UUID.randomUUID();
-
-            root.clear();
-            root.put("reason", spgReasonCodeLookup.getLookup(outcomeCode));
-            root.put("fulfilmentCode", outcomeCode);
-            root.put("newCaseId", newCaseId.toString());
-            String expectedRmMessage = createExpectedRmMessage(rmMessageType, root);
-            expectedRmMessage = addNewCaseId(expectedRmMessage, newCaseId);
-
+            String expectedRmMessage = expectedRmMessageMap.get(rmMessageType);
             JsonNode expectedJson = jsonObjectMapper.readTree(expectedRmMessage);
-            String actualRmMessage = rmMessageMap.get(rmMessageType);
-            actualRmMessage = addNewCaseId(actualRmMessage, newCaseId);
+
+            String actualRmMessage = actualRmMessageMap.get(rmMessageType);
             JsonNode actualJson = jsonObjectMapper.readTree(actualRmMessage);
+
             boolean isEqual = expectedJson.equals(actualJson);
             if (!isEqual) {
                 log.info("expected and actual caseEvents are not the same: \n expected:\n {} \n\n actual: \n {}",
@@ -427,27 +477,5 @@ public class OutcomeSteps {
         }
     }
 
-    private String addNewCaseId(String actualRmMessage, UUID newCaseId) {
-        String modifiedJson = actualRmMessage;
-        JSONObject jsonObject = new JSONObject(actualRmMessage);
-        if (jsonObject.has("payload")) {
-            JSONObject payload = jsonObject.getJSONObject("payload");
-            if (payload.has("addressTypeChange")) {
-                JSONObject addressTypeChange = payload.getJSONObject("addressTypeChange");
 
-                if (addressTypeChange.has("newCaseId")) {
-                    addressTypeChange.remove("newCaseId");
-                    addressTypeChange.put("newCaseId", newCaseId.toString());
-                    modifiedJson = jsonObject.toString();
-                }
-            }
-        }
-        return modifiedJson;
-    }
-
-    @Then("will create a {string} message")
-    public void will_create_a_message(String string) {
-    // Write code here that turns the phrase above into concrete actions
-    throw new cucumber.api.PendingException();
-    }
 }
