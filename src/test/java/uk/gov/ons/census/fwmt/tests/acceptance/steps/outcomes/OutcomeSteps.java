@@ -51,6 +51,14 @@ public class OutcomeSteps {
     private List<String> expectedProcessors;
     private List<String> expectedRmMessages;
     private List<String> expectedJsMessages;
+    Map<String, String> rmMessageMap = new HashMap<>();
+
+
+    private Collection<GatewayEventDTO> processingEvents;
+
+    private Collection<GatewayEventDTO> rmOutcomeEvents;
+
+    private Collection<GatewayEventDTO> jsOutcomeEvents;
 
     private final static String caseId = "bd6345af-d706-43d3-a13b-8c549e081a76";
 
@@ -149,7 +157,22 @@ public class OutcomeSteps {
     public void gateway_processes_the_outcome() throws Exception {
         sendTMOutcomeMessage();
         confirmOutcomeServiceReceivesMessage();
+        collectProcessingEvents();
+        collectRmOutcomeEvents();
+        collectJsOutcomeEvents();
     }
+
+    private void collectProcessingEvents() {
+        processingEvents = gatewayEventMonitor.grabEventsTriggered(PROCESSING_OUTCOME, expectedProcessors.size(), 5000L);
+    }
+
+    private void collectRmOutcomeEvents() {
+        rmOutcomeEvents = gatewayEventMonitor.grabEventsTriggered(OUTCOME_SENT, expectedRmMessages.size(), 5000L);
+    }
+    private void collectJsOutcomeEvents() {
+        jsOutcomeEvents = gatewayEventMonitor.grabEventsTriggered(RM_FIELD_REPUBLISH, expectedJsMessages.size(), 5000L);
+    }
+
 
     @Then("It will run the following processors {string}")
     public void it_will_run_the_following_processors(String processors) {
@@ -159,12 +182,33 @@ public class OutcomeSteps {
     }
 
     @Then("create the following messages to RM {string}")
-    public void create_the_following_messages_to_RM(String rmMessages) {
+    public void create_the_following_messages_to_RM(String rmMessages) throws Exception{
         String[] rmMessagesArray = (!Strings.isBlank(rmMessages)) ? rmMessages.split(",") : new String[0];
         expectedRmMessages = Arrays.asList(rmMessagesArray);
+        collectRmMessages();
         confirmRmMessagesAreSent();
     }
 
+    @Then("the caseId of the {string} message will be the original caseid")
+    public void the_caseId_of_the_message_will_be_the_original_caseid(String messageType) throws Exception{
+        String message = rmMessageMap.get(messageType);
+        JsonNode actualJson = jsonObjectMapper.readTree(message);
+        JsonNode caseIdNode = actualJson.findPath("caseId");
+        assertThat(caseIdNode!=null && !caseIdNode.isMissingNode()).isTrue();
+        assertThat(caseId, caseIdNode.asText()).isTrue();
+    }
+    
+    private void collectRmMessages() throws Exception{
+    for (String rmMessageType : expectedRmMessages) {
+        String msg = queueClient.getMessage(operationToQueue(rmMessageType));
+
+        JsonNode actualMessageRootNode = jsonObjectMapper.readTree(msg);
+        JsonNode typeNode = actualMessageRootNode.path("event").path("type");
+        rmMessageMap.put(typeNode.asText(), msg);
+    }
+    }
+
+    
     @Then("each message has the correct values")
     public void each_message_has_the_correct_values() throws Exception {
         confirmMessagesAreValid();
@@ -178,24 +222,22 @@ public class OutcomeSteps {
     }
 
     private void confirmProcessorsAreExcecuted() {
-        Collection<GatewayEventDTO> events = gatewayEventMonitor.grabEventsTriggered(PROCESSING_OUTCOME, expectedProcessors.size(), 5000L);
-        List<String> actualProcessors = events.stream().filter(e -> e.getMetadata().get("survey type").equals(surveyType))
+        List<String> actualProcessors = processingEvents.stream().filter(e -> e.getMetadata().get("survey type").equals(surveyType))
                 .map(e -> e.getMetadata().get("processor")).collect(Collectors.toList());
         assertEquals(expectedProcessors.size(), actualProcessors.size());
         assertThat(expectedProcessors.containsAll(actualProcessors));
     }
 
     private void confirmRmMessagesAreSent() {
-        Collection<GatewayEventDTO> events = gatewayEventMonitor.grabEventsTriggered(OUTCOME_SENT, expectedRmMessages.size(), 5000L);
-        List<String> actualMessages = events.stream().filter(e -> e.getMetadata().get("survey type").equals(surveyType)).map(e -> e.getMetadata().get("type"))
+        List<String> actualMessages = rmOutcomeEvents.stream().filter(e -> e.getMetadata().get("survey type").equals(surveyType)).map(e -> e.getMetadata().get("type"))
                 .collect(Collectors.toList());
-        assertEquals(expectedRmMessages.size(), actualMessages.size());
-        assertThat(expectedRmMessages.containsAll(actualMessages));
+                assertEquals(expectedRmMessages.size(), rmMessageMap.size());
+                assertEquals(expectedRmMessages.size(), actualMessages.size());
+                assertThat(expectedRmMessages.containsAll(actualMessages));
     }
 
     private void confirmJsMessagesAreSent() {
-        Collection<GatewayEventDTO> events = gatewayEventMonitor.grabEventsTriggered(RM_FIELD_REPUBLISH, expectedJsMessages.size(), 5000L);
-        List<String> actualMessages = events.stream().filter(e -> e.getMetadata().get("survey type").equals(surveyType))
+        List<String> actualMessages = jsOutcomeEvents.stream().filter(e -> e.getMetadata().get("survey type").equals(surveyType))
                 .map(e -> e.getMetadata().get("action instruction")).collect(Collectors.toList());
         assertEquals(expectedJsMessages.size(), actualMessages.size());
         assertThat(expectedJsMessages.containsAll(actualMessages));
@@ -203,7 +245,7 @@ public class OutcomeSteps {
 
     private void sendTMOutcomeMessage() throws Exception {
         int response = -1;
-        String request = getTmOutcomeRequest();
+        String originalRequest = getTmOutcomeRequest();
         switch (surveyType) {
         case "SPG":
             response = tmMockUtils.sendTMSPGResponseMessage(request, caseId);
@@ -358,14 +400,6 @@ public class OutcomeSteps {
     }
 
     private void confirmMessagesAreValid() throws Exception {
-        Map<String, String> rmMessageMap = new HashMap<>();
-        for (String rmMessageType : expectedRmMessages) {
-            String msg = queueClient.getMessage(operationToQueue(rmMessageType));
-
-            JsonNode actualMessageRootNode = jsonObjectMapper.readTree(msg);
-            JsonNode typeNode = actualMessageRootNode.path("event").path("type");
-            rmMessageMap.put(typeNode.asText(), msg);
-        }
         assertEquals(expectedRmMessages.size(), rmMessageMap.size());
         assertThat(expectedRmMessages.containsAll(rmMessageMap.keySet()));
 
@@ -409,5 +443,11 @@ public class OutcomeSteps {
             }
         }
         return modifiedJson;
+    }
+
+    @Then("will create a {string} message")
+    public void will_create_a_message(String string) {
+    // Write code here that turns the phrase above into concrete actions
+    throw new cucumber.api.PendingException();
     }
 }
