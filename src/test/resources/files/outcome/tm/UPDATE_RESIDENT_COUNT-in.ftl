@@ -1,19 +1,19 @@
 {
-"transactionId":"3e007cdb-446d-4164-b2d7-8d8bd7b86c49",
-"siteCaseId":"3e007cdb-446d-4164-b2d7-8d8bd7b86c49",
+"caseId":"${caseId}",
+"transactionId":"b1646499-c5d8-4fbe-bb21-8e057601a3c2",
 "eventDate":"2020-04-17T11:53:11.000+0000",
 "officerId":"SH-TWH1-ZA-25",
 "coordinatorId":"SH-TWH1-ZA",
 "primaryOutcomeDescription":"${primaryOutcomeDescription}",
 "secondaryOutcomeDescription":"${secondaryOutcomeDescription}",
 "outcomeCode":"${outcomeCode}",
-
-
-"address":{
-"addressLine1":"Unit name"
-},
+"address":null,
 "accessInfo":null,
-"careCodes":["CAT","DOG"],
+"careCodes":null,
+"accompanyingOfficerId":null,
+"ceDetails": {
+    "usualResidents": 5
+  },
  <#if (linkedQid??) || (fulfilmentRequested??)>
     "fulfilmentRequests":[
     <#if linkedQid??>

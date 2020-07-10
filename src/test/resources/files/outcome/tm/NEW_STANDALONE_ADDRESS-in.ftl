@@ -1,20 +1,25 @@
 {
-"transactionId":"3e007cdb-446d-4164-b2d7-8d8bd7b86c49",
-"siteCaseId":"3e007cdb-446d-4164-b2d7-8d8bd7b86c49",
-"eventDate":"2020-04-17T11:53:11.000+0000",
-"officerId":"SH-TWH1-ZA-25",
+"accessInfo":"Jump the gate!",
+"address":{
+"addressLine1":"Unit name",
+"addressLine2":"Some house name",
+"addressLine3":"some road",
+"locality":"some town",
+"postcode":"AA1 2BB",
+"latitude":99.99999999,
+"longitude":99.99999999
+},
+"careCodes":["Big Angry Dog","Slippery when wet"],
 "coordinatorId":"SH-TWH1-ZA",
+"dummyInfo":true,
+"eventDate":"2020-04-17T11:53:11.000+0000",
+
+"officerId":"SH-TWH1-ZA-25",
+"outcomeCode":"${outcomeCode}",
 "primaryOutcomeDescription":"${primaryOutcomeDescription}",
 "secondaryOutcomeDescription":"${secondaryOutcomeDescription}",
-"outcomeCode":"${outcomeCode}",
-
-
-"address":{
-"addressLine1":"Unit name"
-},
-"accessInfo":null,
-"careCodes":["CAT","DOG"],
- <#if (linkedQid??) || (fulfilmentRequested??)>
+"transactionId":"b1646499-c5d8-4fbe-bb21-8e057601a3c2",
+<#if (linkedQid??) || (fulfilmentRequested??)>
     "fulfilmentRequests":[
     <#if linkedQid??>
        ${linkedQid}

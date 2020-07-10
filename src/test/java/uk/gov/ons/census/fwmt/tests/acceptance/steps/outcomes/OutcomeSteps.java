@@ -2,6 +2,10 @@ package uk.gov.ons.census.fwmt.tests.acceptance.steps.outcomes;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
+import static uk.gov.ons.census.fwmt.outcomeservice.config.GatewayEventsConfig.COMET_CE_STANDALONE_OUTCOME_RECEIVED;
+import static uk.gov.ons.census.fwmt.outcomeservice.config.GatewayEventsConfig.COMET_CE_UNITADDRESS_OUTCOME_RECEIVED;
+import static uk.gov.ons.census.fwmt.outcomeservice.config.GatewayEventsConfig.COMET_SPG_STANDALONE_OUTCOME_RECEIVED;
+import static uk.gov.ons.census.fwmt.outcomeservice.config.GatewayEventsConfig.COMET_SPG_UNITADDRESS_OUTCOME_RECEIVED;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -64,7 +68,7 @@ public class OutcomeSteps {
 
     private final static String caseId = "bd6345af-d706-43d3-a13b-8c549e081a76";
 
-    private final static String COMET_CESPG_OUTCOME_RECEIVED = "COMET_CESPG_OUTCOME_RECEIVED";
+    private final static String COMET_SPG_OUTCOME_RECEIVED = "COMET_SPG_OUTCOME_RECEIVED";
 
     private final static String COMET_CE_OUTCOME_RECEIVED = "COMET_CE_OUTCOME_RECEIVED";
 
@@ -85,6 +89,14 @@ public class OutcomeSteps {
     private static final String OUTCOME_PRE_PROCESSING = "Outcome.Preprocessing";
 
     private static final String OUTCOME_PRE_PROCESSING_DLQ = "Outcome.PreprocessingDLQ";
+
+    private static final String COMET_SPG_UNITADDRESS_OUTCOME_RECEIVED = "COMET_SPG_UNITADDRESS_OUTCOME_RECEIVED";
+
+    private static final String COMET_SPG_STANDALONE_OUTCOME_RECEIVED = "COMET_SPG_STANDALONE_OUTCOME_RECEIVED";
+
+    private static final String COMET_CE_UNITADDRESS_OUTCOME_RECEIVED = "COMET_CE_UNITADDRESS_OUTCOME_RECEIVED";
+
+    private static final String COMET_CE_STANDALONE_OUTCOME_RECEIVED = "COMET_CE_STANDALONE_OUTCOME_RECEIVED";
 
     @Autowired
     private QueueClient queueClient;
@@ -305,10 +317,10 @@ public class OutcomeSteps {
         String request = getTmOutcomeRequest();
         switch (surveyType) {
         case "SPG":
-            response = tmMockUtils.sendTMSPGResponseMessage(request, caseId);
+          response = sendTmSpg(request);
             break;
         case "CE":
-            response = tmMockUtils.sendTMCEResponseMessage(request, caseId);
+          response = sendCeSpg(request);
             break;
         default:
             break;
@@ -316,7 +328,37 @@ public class OutcomeSteps {
         assertEquals(200, response);
     }
 
-    private String getTmOutcomeRequest() throws Exception {
+    private int sendCeSpg(String request) {
+      int response;
+      switch (businessFunction) {
+      case "New Unit Reported":
+        response = tmMockUtils.sendTMCENewUnitAddressResponseMessage(request);
+        break;
+      case "New Standalone Address":
+        response = tmMockUtils.sendTMCENewStandaloneAddressResponseMessage(request);
+        break;
+      default:
+        response = tmMockUtils.sendTMCEResponseMessage(request, caseId);
+      }
+      return response;
+    }
+
+    private int sendTmSpg(String request) {
+      int response;
+      switch (businessFunction) {
+      case "New Unit Reported":
+        response = tmMockUtils.sendTMSPGNewUnitAddressResponseMessage(request);
+        break;
+      case "New Standalone Address":
+        response = tmMockUtils.sendTMSPGNewStandaloneAddressResponseMessage(request);
+        break;
+      default:
+        response = tmMockUtils.sendTMSPGResponseMessage(request, caseId);
+      }
+      return response;
+    }
+
+   private String getTmOutcomeRequest() throws Exception {
         Map<String, Object> root = new HashMap();
 
         String linkedQid = (hasLinkedQid) ? createOutcomeMessage("LINKED_QID", root) : null;
@@ -354,7 +396,15 @@ public class OutcomeSteps {
             case "Delivered Feedback":
               request = createOutcomeMessage("DELIVERED_FEEDBACK", root);
               break;
-
+            case "Update Resident Count":
+              request = createOutcomeMessage("UPDATE_RESIDENT_COUNT", root);
+              break;
+            case "New Unit Reported":
+              request = createOutcomeMessage("NEW_UNIT_ADDRESS", root);
+              break;
+            case "New Standalone Address":
+              request = createOutcomeMessage("NEW_STANDALONE_ADDRESS", root);
+              break;
             default:
                 break;
             }
@@ -369,16 +419,46 @@ public class OutcomeSteps {
         String event = null;
         switch (surveyType) {
         case "SPG":
-            event = COMET_CESPG_OUTCOME_RECEIVED;
+          event = getSpgRequestReceivedEventName();
             break;
         case "CE":
-            event = COMET_CE_OUTCOME_RECEIVED;
+          event = getCeRequestReceivedEventName();
             break;
         default:
             break;
         }
         boolean isMsgRecieved = gatewayEventMonitor.hasEventTriggered(caseId, event, 2000L);
         assertThat(isMsgRecieved).isTrue();
+    }
+
+    private String getSpgRequestReceivedEventName() {
+      String event;
+      switch (businessFunction) {
+      case "New Unit Reported":
+        event = COMET_SPG_UNITADDRESS_OUTCOME_RECEIVED;
+        break;
+      case "New Standalone Address":
+        event = COMET_SPG_STANDALONE_OUTCOME_RECEIVED;
+        break;
+      default:
+        event = COMET_SPG_OUTCOME_RECEIVED;
+      }
+      return event;
+    }
+
+    private String getCeRequestReceivedEventName() {
+      String event;
+      switch (businessFunction) {
+      case "New Unit Reported":
+        event = COMET_CE_UNITADDRESS_OUTCOME_RECEIVED;
+        break;
+      case "New Standalone Address":
+        event = COMET_CE_STANDALONE_OUTCOME_RECEIVED;
+        break;
+      default:
+        event = COMET_CE_OUTCOME_RECEIVED;
+      }
+      return event;
     }
 
     private String createOutcomeMessage(String eventType, Map<String, Object> root)
@@ -415,6 +495,7 @@ public class OutcomeSteps {
         case "FULFILMENT_REQUESTED":
         case "QUESTIONNAIRE_LINKED":
         case "NEW_ADDRESS_REPORTED":
+        case "FIELD_CASE_UPDATED":
             return TEMP_FIELD_OTHERS_QUEUE;
         default:
             throw new RuntimeException("Problem matching operation");
