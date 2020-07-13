@@ -2,14 +2,11 @@ package uk.gov.ons.census.fwmt.tests.acceptance.steps.outcomes;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
-import static uk.gov.ons.census.fwmt.outcomeservice.config.GatewayEventsConfig.COMET_CE_STANDALONE_OUTCOME_RECEIVED;
-import static uk.gov.ons.census.fwmt.outcomeservice.config.GatewayEventsConfig.COMET_CE_UNITADDRESS_OUTCOME_RECEIVED;
-import static uk.gov.ons.census.fwmt.outcomeservice.config.GatewayEventsConfig.COMET_SPG_STANDALONE_OUTCOME_RECEIVED;
-import static uk.gov.ons.census.fwmt.outcomeservice.config.GatewayEventsConfig.COMET_SPG_UNITADDRESS_OUTCOME_RECEIVED;
 
 import java.io.IOException;
 import java.io.StringWriter;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -18,15 +15,15 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
-import org.json.JSONObject;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import cucumber.api.java.After;
 import cucumber.api.java.Before;
@@ -53,11 +50,13 @@ public class OutcomeSteps {
     private String outcomeCode;
     private boolean hasLinkedQid;
     private boolean hasFulfillmentRequest;
-    private List<String> expectedProcessors;
-    private List<String> expectedRmMessages;
-    private List<String> expectedJsMessages;
-    Map<String, String> actualRmMessageMap = new HashMap<>();
-    Map<String, String> expectedRmMessageMap = new HashMap<>();
+    private List<String> expectedProcessors = new ArrayList<>();
+    private List<String> expectedRmMessages = new ArrayList<>();
+    private List<String> expectedJsMessages = new ArrayList<>();
+    private Map<String, String> actualRmMessageMap = new HashMap<>();
+    private Map<String, String> expectedRmMessageMap = new HashMap<>();
+    private String addressTypeChangeMsg;
+    private String newCaseId;
 
 
     private Collection<GatewayEventDTO> processingEvents;
@@ -120,8 +119,7 @@ public class OutcomeSteps {
 
     @Autowired
     private SpgReasonCodeLookup spgReasonCodeLookup;
-    private String addressTypeChangeMsg;
-    private String newCaseId;
+
 
     @Before
     public void setup() throws IOException, URISyntaxException, TimeoutException {
@@ -131,6 +129,22 @@ public class OutcomeSteps {
 
         gatewayEventMonitor = new GatewayEventMonitor();
         gatewayEventMonitor.enableEventMonitor(rabbitLocation, rabbitUsername, rabbitPassword);
+
+        surveyType = null;
+        businessFunction = null;
+        primaryOutcome = null;
+        secondaryOutcome = null;
+        outcomeCode = null;
+        hasLinkedQid = false;
+        hasFulfillmentRequest = false;
+        expectedProcessors.clear();
+        expectedRmMessages.clear();
+        expectedJsMessages.clear();
+        actualRmMessageMap.clear();
+        expectedRmMessageMap.clear();
+        addressTypeChangeMsg = null;
+        newCaseId = null;
+
     }
 
     @After
@@ -216,6 +230,7 @@ public class OutcomeSteps {
         root.put("reason", spgReasonCodeLookup.getLookup(outcomeCode));
         root.put("fulfilmentCode", outcomeCode);
         root.put("newCaseId", newCaseId.toString());
+        root.put("surveyType", surveyType);
         String expectedRmMessage = createExpectedRmMessage(rmMessageType, root);
         expectedRmMessageMap.put(rmMessageType, expectedRmMessage);
       }
@@ -224,6 +239,7 @@ public class OutcomeSteps {
     @Then("the caseId of the {string} message will be the original caseid")
     public void the_caseId_of_the_message_will_be_the_original_caseid(String messageType) throws Exception{
         addressTypeChangeMsg = actualRmMessageMap.get(messageType);
+        System.out.println("Actual:" + addressTypeChangeMsg);
         JsonNode actualJson = jsonObjectMapper.readTree(addressTypeChangeMsg);
         JsonNode caseIdNode = actualJson.findPath("id");
         assertThat(caseIdNode!=null && !caseIdNode.isMissingNode()).isTrue();
@@ -320,7 +336,7 @@ public class OutcomeSteps {
           response = sendTmSpg(request);
             break;
         case "CE":
-          response = sendCeSpg(request);
+          response = sendCe(request);
             break;
         default:
             break;
@@ -328,7 +344,7 @@ public class OutcomeSteps {
         assertEquals(200, response);
     }
 
-    private int sendCeSpg(String request) {
+    private int sendCe(String request) {
       int response;
       switch (businessFunction) {
       case "New Unit Reported":
@@ -427,8 +443,23 @@ public class OutcomeSteps {
         default:
             break;
         }
-        boolean isMsgRecieved = gatewayEventMonitor.hasEventTriggered(caseId, event, 2000L);
+
+        String messageCaseId = getMessageCaseId();
+        boolean isMsgRecieved = gatewayEventMonitor.hasEventTriggered(messageCaseId, event, 2000L);
         assertThat(isMsgRecieved).isTrue();
+    }
+
+    private String getMessageCaseId() {
+      String messageCaseId;
+      switch (businessFunction) {
+      case "New Standalone Address":
+      case "New Unit Reported":
+        messageCaseId = "N/A";
+        break;
+      default:
+        messageCaseId = caseId;
+      }
+      return messageCaseId;
     }
 
     private String getSpgRequestReceivedEventName() {
@@ -489,6 +520,7 @@ public class OutcomeSteps {
     private String operationToQueue(String operation) {
         switch (operation) {
         case "REFUSAL_RECEIVED":
+        case "HARD_REFUSAL_RECEIVED":
             return FIELD_REFUSALS_QUEUE;
         case "ADDRESS_NOT_VALID":
         case "ADDRESS_TYPE_CHANGED":
@@ -505,20 +537,33 @@ public class OutcomeSteps {
     private String createExpectedRmMessage(String rmMessageType, Map<String, Object> root) throws Exception {
         String inputMessage = "";
         if ("ADDRESS_TYPE_CHANGED".equals(rmMessageType)) {
-            switch (businessFunction) {
-            case "Address Type Changed HH":
-                rmMessageType = rmMessageType + "_HH";
-                break;
-            case "Address Type Changed CE":
-                rmMessageType = rmMessageType + "_CE";
-                break;
-            case "Address Type Changed SPG":
-                rmMessageType = rmMessageType + "_SPG";
-                break;
-            default:
-                break;
-            }
-        }
+          switch (businessFunction) {
+          case "Address Type Changed HH":
+              rmMessageType = rmMessageType + "_HH";
+              break;
+          case "Address Type Changed CE":
+              rmMessageType = rmMessageType + "_CE";
+              break;
+          case "Address Type Changed SPG":
+              rmMessageType = rmMessageType + "_SPG";
+              break;
+          default:
+              break;
+          }
+      }
+        if ("NEW_ADDRESS_REPORTED".equals(rmMessageType)) {
+          switch (businessFunction) {
+          case "New Unit Reported":
+              rmMessageType = rmMessageType + "_UNIT";
+              break;
+          case "New Standalone Address":
+              rmMessageType = rmMessageType + "_STANDALONE";
+              break;
+
+          default:
+              break;
+          }
+      }
 
         Configuration configuration = new Configuration(Configuration.VERSION_2_3_28);
         configuration.setClassForTemplateLoading(OutcomeSteps.class, "/files/outcome/rm/");
@@ -564,5 +609,14 @@ public class OutcomeSteps {
         }
     }
 
-
+    @Then("the caseId of the {string} message will be a new caseId")
+    public void the_caseId_of_the_message_will_be_a_new_caseId(String messageType) throws Exception {
+      addressTypeChangeMsg = actualRmMessageMap.get(messageType);
+      System.out.println("Actual:" + addressTypeChangeMsg);
+      JsonNode actualJson = jsonObjectMapper.readTree(addressTypeChangeMsg);
+      JsonNode caseIdNode = actualJson.findPath("id");
+      assertThat(caseIdNode!=null && !caseIdNode.isMissingNode()).isTrue();
+      assertThat(caseId.equals(caseIdNode.asText())).isFalse();
+      newCaseId = caseIdNode.asText();
+    }
 }
