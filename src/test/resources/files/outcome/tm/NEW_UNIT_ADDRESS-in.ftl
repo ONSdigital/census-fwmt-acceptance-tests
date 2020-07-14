@@ -7,8 +7,12 @@
 "primaryOutcomeDescription":"${primaryOutcomeDescription}",
 "secondaryOutcomeDescription":"${secondaryOutcomeDescription}",
 "outcomeCode":"${outcomeCode}",
-
-
+<#if usualResidents??>
+     ${usualResidents}
+     ,
+<#else>
+     "ceDetails":null,
+</#if>
 "address":{
 "addressLine1":"Unit name"
 },

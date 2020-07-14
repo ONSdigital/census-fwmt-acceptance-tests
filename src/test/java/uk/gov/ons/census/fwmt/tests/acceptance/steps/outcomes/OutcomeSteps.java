@@ -50,6 +50,7 @@ public class OutcomeSteps {
     private String outcomeCode;
     private boolean hasLinkedQid;
     private boolean hasFulfillmentRequest;
+    private boolean hasUsualResidentsCount;
     private List<String> expectedProcessors = new ArrayList<>();
     private List<String> expectedRmMessages = new ArrayList<>();
     private List<String> expectedJsMessages = new ArrayList<>();
@@ -137,6 +138,7 @@ public class OutcomeSteps {
         outcomeCode = null;
         hasLinkedQid = false;
         hasFulfillmentRequest = false;
+        hasUsualResidentsCount = false;
         expectedProcessors.clear();
         expectedRmMessages.clear();
         expectedJsMessages.clear();
@@ -144,7 +146,6 @@ public class OutcomeSteps {
         expectedRmMessageMap.clear();
         addressTypeChangeMsg = null;
         newCaseId = null;
-
     }
 
     @After
@@ -379,6 +380,7 @@ public class OutcomeSteps {
 
         String linkedQid = (hasLinkedQid) ? createOutcomeMessage("LINKED_QID", root) : null;
         String fulfilmentRequested = (hasFulfillmentRequest) ? createOutcomeMessage("FULFILMENT_REQUESTED", root) : null;
+        String usualResidents = (hasUsualResidentsCount) ? createOutcomeMessage("USUAL_RESIDENTS", root) : null;
 
         root.put("caseId", caseId);
         root.put("primaryOutcomeDescription", primaryOutcome);
@@ -386,6 +388,7 @@ public class OutcomeSteps {
         root.put("outcomeCode", outcomeCode);
         root.put("linkedQid", linkedQid);
         root.put("fulfilmentRequested", fulfilmentRequested);
+        root.put("usualResidents", usualResidents);
 
         try {
             String request = null;
@@ -619,4 +622,8 @@ public class OutcomeSteps {
       assertThat(caseId.equals(caseIdNode.asText())).isFalse();
       newCaseId = caseIdNode.asText();
     }
+
+    @Given("the message includes Usual Residents Count {string}")
+    public void the_message_includes_Usual_Residents_Count(String hasUsualResidentsCount) {
+      this.hasUsualResidentsCount = "T".equals(hasUsualResidentsCount);    }
 }
