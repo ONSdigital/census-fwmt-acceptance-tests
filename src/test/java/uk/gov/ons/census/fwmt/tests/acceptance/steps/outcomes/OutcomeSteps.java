@@ -323,7 +323,7 @@ public class OutcomeSteps {
     }
 
     private void confirmJsMessagesAreSent() {
-        List<String> actualMessages = jsOutcomeEvents.stream().filter(e -> e.getMetadata().get("survey type").equals(surveyType))
+        List<String> actualMessages = jsOutcomeEvents.stream().filter(e -> e.getMetadata().get("address type").equals(surveyType))
                 .map(e -> e.getMetadata().get("action instruction")).collect(Collectors.toList());
         assertEquals(expectedJsMessages.size(), actualMessages.size());
         assertThat(expectedJsMessages.containsAll(actualMessages));
@@ -426,6 +426,12 @@ public class OutcomeSteps {
               break;
             case "No Action":
               request = createOutcomeMessage("NO_ACTION", root);
+              break;
+            case "Switch Feedback Estab":
+              request = createOutcomeMessage("SWITCH_FEEDBACK_CE_EST_F", root);
+              break;
+            case "Switch Feedback Unit":
+              request = createOutcomeMessage("SWITCH_FEEDBACK_CE_UNIT_F", root);
               break;
             default:
                 break;
