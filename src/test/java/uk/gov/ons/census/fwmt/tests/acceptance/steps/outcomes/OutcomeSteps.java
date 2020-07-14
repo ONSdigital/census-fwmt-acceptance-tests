@@ -424,6 +424,9 @@ public class OutcomeSteps {
             case "New Standalone Address":
               request = createOutcomeMessage("NEW_STANDALONE_ADDRESS", root);
               break;
+            case "No Action":
+              request = createOutcomeMessage("NO_ACTION", root);
+              break;
             default:
                 break;
             }
