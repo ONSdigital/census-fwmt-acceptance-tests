@@ -4,16 +4,16 @@ include 'shared', 'api', 'services:webservice'
 
 ext.isPush = getProperty('gradle.cache.push')
 
-buildCache {
-    local {
-        enabled = false
-    }
-    remote(HttpBuildCache) {
-        url = 'http://artifactory-sdc.onsdigital.uk/artifactory/libs-snapshot-local/'
-        credentials {
-            username = System.getenv('artifactory_user')
-            password = System.getenv('artifactory_password')
-        }
-        push = isPush
-    }
-}
+//buildCache {
+//    local {
+//        enabled = false
+//    }
+//    remote(HttpBuildCache) {
+//        url = 'http://artifactory-sdc.onsdigital.uk/artifactory/libs-snapshot-local/'
+//        credentials {
+//            username = System.getenv('artifactory_user')
+//            password = System.getenv('artifactory_password')
+//        }
+//        push = isPush
+//    }
+//}
