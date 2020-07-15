@@ -2,7 +2,8 @@
 Feature: Outcome Address Type Change Tests
 
   Scenario Outline: As a Gateway I can receive an outcome from TM and create Census Events
-    Given an "<SurveyType>" "<BusinessFunction>" outcome message
+    Given a parent case exists
+    And an "<SurveyType>" "<BusinessFunction>" outcome message
     And its Primary Outcome is "<Primary Outcome>"
     And its secondary Outcome "<Secondary Outcome>"
     And its Outcome code is "<Outcome Code>"

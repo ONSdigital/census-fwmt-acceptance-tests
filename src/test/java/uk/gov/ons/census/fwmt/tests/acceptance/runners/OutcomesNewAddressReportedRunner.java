@@ -10,6 +10,6 @@ import org.springframework.context.annotation.ComponentScan;
     features = {"src/test/resources/acceptancetests/OutcomeNewAddressReported.feature"},
     glue = {"uk.gov.ons.census.fwmt.tests.acceptance.steps.outcomes"})
 @ComponentScan({"uk.gov.census.ffa.storage.utils","uk.gov.ons.ctp.integration.common.product","uk.gov.ons.census.fwmt.tests.acceptance.steps.outcomes"})
-public class OutcomesNewAddressReported {
+public class OutcomesNewAddressReportedRunner {
 
 }

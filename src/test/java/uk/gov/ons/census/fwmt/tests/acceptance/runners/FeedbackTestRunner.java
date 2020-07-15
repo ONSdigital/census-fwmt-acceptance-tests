@@ -7,8 +7,8 @@ import org.springframework.context.annotation.ComponentScan;
 
 //@RunWith(Cucumber.class)
 @CucumberOptions(plugin = {"pretty", "json:build/cucumber-report.json"},
-    features = {"src/test/resources/acceptancetests/SPGNewUnitAddress.feature"},
-    glue = {"uk.gov.ons.census.fwmt.tests.acceptance.steps.spg.outcome"})
+    features = {"src/test/resources/acceptancetests/Feedback.feature"},
+    glue = {"uk.gov.ons.census.fwmt.tests.acceptance.steps.inbound.feedback"})
 @ComponentScan({"uk.gov.census.ffa.storage.utils"})
-public class SPGNewUnitAddressTestRunner {
+public class FeedbackTestRunner {
 }

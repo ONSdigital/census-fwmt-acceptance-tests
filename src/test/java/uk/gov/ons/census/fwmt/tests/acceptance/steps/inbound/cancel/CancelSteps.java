@@ -33,9 +33,6 @@ public class CancelSteps {
   private CommonUtils commonUtils;
 
   @Autowired
-  private QueueClient queueUtils;
-
-  @Autowired
   private GatewayEventMonitor gatewayEventMonitor;
 
   private GatewayEventDTO event_COMET_CANCEL_PRE_SENDING;
@@ -47,9 +44,14 @@ public class CancelSteps {
   private static final String RM_CANCEL_REQUEST_RECEIVED = "RM_CANCEL_REQUEST_RECEIVED";
 
   private static final String COMET_CANCEL_ACK = "COMET_CANCEL_ACK";
+
   private static final String ROUTING_FAILED = "ROUTING_FAILED";
 
   private static final String COMET_CANCEL_PRE_SENDING = "COMET_CANCEL_PRE_SENDING";
+
+
+  @Autowired
+  private QueueClient queueClient;
 
   @Before
   public void setup() throws Exception {
@@ -57,7 +59,6 @@ public class CancelSteps {
     spgCancel = Resources.toString(Resources.getResource("files/input/spg/spgCancel.json"), Charsets.UTF_8);
     ceEstabCancel = Resources.toString(Resources.getResource("files/input/ce/ceEstabCancel.json"), Charsets.UTF_8);
     ceUnitCancel = Resources.toString(Resources.getResource("files/input/ce/ceUnitCancel.json"), Charsets.UTF_8);
-
   }
 
   @After
@@ -84,20 +85,20 @@ public class CancelSteps {
 
     String request = json.toString(4);
     log.info("Request = " + request);
-    queueUtils.sendToRMFieldQueue(request, "cancel");
+    queueClient.sendToRMFieldQueue(request, "cancel");
   }
 
   @When("Gateway receives a cancel message for the case")
   public void gatewayReceivesTheMessage() {
     String caseId = testBucket.get("caseId");
-    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, RM_CANCEL_REQUEST_RECEIVED, 10000L);
+    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, RM_CANCEL_REQUEST_RECEIVED, CommonUtils.TIMEOUT);
     assertThat(hasBeenTriggered).isTrue();
   }
 
   @Then("it will Cancel the job with with the correct TM Action {string}")
   public void confirmTmAction(String expectedTmAction) {
     String caseId = testBucket.get("caseId");
-    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, COMET_CANCEL_PRE_SENDING, 10000L);
+    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, COMET_CANCEL_PRE_SENDING, CommonUtils.TIMEOUT);
     assertThat(hasBeenTriggered).isTrue();
     List<GatewayEventDTO> events = gatewayEventMonitor.getEventsForEventType(COMET_CANCEL_PRE_SENDING, 1);
     event_COMET_CANCEL_PRE_SENDING = events.get(0);
@@ -108,14 +109,14 @@ public class CancelSteps {
   @Then("the cancel job is acknowledged by TM")
   public void the_cancel_job_is_acknowledged_by_tm() {
     String caseId = testBucket.get("caseId");
-    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, COMET_CANCEL_ACK, 10000L);
+    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, COMET_CANCEL_ACK, CommonUtils.TIMEOUT);
     assertTrue(hasBeenTriggered);
   }
 
   @Then("the cancel job should fail")
   public void the_cancel_job_should_fail() {
     String caseId = testBucket.get("caseId");
-    boolean hasBeenTriggered = gatewayEventMonitor.hasErrorEventTriggered(caseId, ROUTING_FAILED, 10000L);
+    boolean hasBeenTriggered = gatewayEventMonitor.hasErrorEventTriggered(caseId, ROUTING_FAILED, CommonUtils.TIMEOUT);
     assertTrue(hasBeenTriggered);
   }
 
@@ -124,11 +125,11 @@ public class CancelSteps {
     JSONObject json = new JSONObject(spgCancel);
     json.remove("addressLevel");
     json.put("addressLevel", "E");
-    
+
 
     String request = json.toString(4);
     log.info("Request = " + request);
-    queueUtils.sendToRMFieldQueue(request, "cancel");
+    queueClient.sendToRMFieldQueue(request, "cancel");
   }
 
   private String getCreateRMJson() {

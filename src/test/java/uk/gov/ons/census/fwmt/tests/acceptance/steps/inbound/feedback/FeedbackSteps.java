@@ -1,4 +1,4 @@
-package uk.gov.ons.census.fwmt.tests.acceptance.steps.spg.inbound;
+package uk.gov.ons.census.fwmt.tests.acceptance.steps.inbound.feedback;
 
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -15,6 +15,8 @@ import com.google.common.io.Resources;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
+import cucumber.api.java.After;
+import cucumber.api.java.Before;
 import cucumber.api.java.en.And;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
@@ -24,18 +26,22 @@ import freemarker.template.TemplateException;
 import freemarker.template.TemplateExceptionHandler;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.ons.census.fwmt.events.utils.GatewayEventMonitor;
+import uk.gov.ons.census.fwmt.tests.acceptance.steps.inbound.common.CommonUtils;
 import uk.gov.ons.census.fwmt.tests.acceptance.steps.spg.outcome.SPGOutcomeSteps;
 import uk.gov.ons.census.fwmt.tests.acceptance.utils.QueueClient;
 import uk.gov.ons.census.fwmt.tests.acceptance.utils.TMMockUtils;
 
 @Slf4j
-public class SPGFeedbackSteps {
+public class FeedbackSteps {
 
   @Autowired
   private TMMockUtils tmMockUtils;
 
   @Autowired
-  private QueueClient queueUtils;
+  private QueueClient queueClient;
+
+  @Autowired
+  private CommonUtils commonUtils;
 
   @Autowired
   private GatewayEventMonitor gatewayEventMonitor;
@@ -48,12 +54,22 @@ public class SPGFeedbackSteps {
 
   private static final String COMET_CREATE_ACK = "COMET_CREATE_ACK";
 
+  @Before
+  public void setup() throws Exception {
+    commonUtils.setup();
+  }
+
+  @After
+  public void clearDown() throws Exception {
+    commonUtils.clearDown();
+  }
+
   @Given("a job has been created in TM with case id {string}")
   public void aJobHasBeenCreatedInTMWithCaseId(String caseId) throws IOException, URISyntaxException {
     this.caseId = caseId;
     String request = Resources.toString(Resources.getResource("files/input/spg/spgUnitCreate.json"), Charsets.UTF_8);
-    queueUtils.sendToRMFieldQueue(request, "create");
-    boolean jobAcknowledged = gatewayEventMonitor.hasEventTriggered(caseId, COMET_CREATE_ACK, 10000L);
+    queueClient.sendToRMFieldQueue(request, "create");
+    boolean jobAcknowledged = gatewayEventMonitor.hasEventTriggered(caseId, COMET_CREATE_ACK, CommonUtils.TIMEOUT);
     assertThat(jobAcknowledged).isTrue();
   }
 
@@ -82,14 +98,14 @@ public class SPGFeedbackSteps {
   @Then("a {string} feedback message is sent to tm")
   public void aFeedbackMessageIsSentToTm(String message) {
     log.info("Sending job type :" + message);
-    boolean jobSent = gatewayEventMonitor.hasEventTriggered(caseId, message, 10000L);
+    boolean jobSent = gatewayEventMonitor.hasEventTriggered(caseId, message, CommonUtils.TIMEOUT);
     assertThat(jobSent).isTrue();
   }
 
   @And("{string} is acknowledged by tm")
   public void isAcknowledgedByTm(String message) {
     log.info("Confirming tm recieved " + message);
-    boolean jobAcknowledged = gatewayEventMonitor.hasEventTriggered(caseId, message, 10000L);
+    boolean jobAcknowledged = gatewayEventMonitor.hasEventTriggered(caseId, message, CommonUtils.TIMEOUT);
     assertThat(jobAcknowledged).isTrue();
   }
 

@@ -17,6 +17,7 @@ import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.util.Strings;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -24,6 +25,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Charsets;
+import com.google.common.io.Resources;
 
 import cucumber.api.java.After;
 import cucumber.api.java.Before;
@@ -36,6 +39,7 @@ import freemarker.template.TemplateExceptionHandler;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.ons.census.fwmt.events.data.GatewayEventDTO;
 import uk.gov.ons.census.fwmt.events.utils.GatewayEventMonitor;
+import uk.gov.ons.census.fwmt.tests.acceptance.steps.inbound.common.CommonUtils;
 import uk.gov.ons.census.fwmt.tests.acceptance.utils.QueueClient;
 import uk.gov.ons.census.fwmt.tests.acceptance.utils.SpgReasonCodeLookup;
 import uk.gov.ons.census.fwmt.tests.acceptance.utils.TMMockUtils;
@@ -82,14 +86,6 @@ public class OutcomeSteps {
 
     private static final String TEMP_FIELD_OTHERS_QUEUE = "Field.other";
 
-    private static final String RM_FIELD_QUEUE = "RM.Field";
-
-    private static final String RM_FIELD_QUEUE_DLQ = "RM.FieldDLQ";
-
-    private static final String OUTCOME_PRE_PROCESSING = "Outcome.Preprocessing";
-
-    private static final String OUTCOME_PRE_PROCESSING_DLQ = "Outcome.PreprocessingDLQ";
-
     private static final String COMET_SPG_UNITADDRESS_OUTCOME_RECEIVED = "COMET_SPG_UNITADDRESS_OUTCOME_RECEIVED";
 
     private static final String COMET_SPG_STANDALONE_OUTCOME_RECEIVED = "COMET_SPG_STANDALONE_OUTCOME_RECEIVED";
@@ -98,8 +94,13 @@ public class OutcomeSteps {
 
     private static final String COMET_CE_STANDALONE_OUTCOME_RECEIVED = "COMET_CE_STANDALONE_OUTCOME_RECEIVED";
 
+    private static final String RM_CREATE_REQUEST_RECEIVED = "RM_CREATE_REQUEST_RECEIVED";
+
     @Autowired
     private QueueClient queueClient;
+
+    @Autowired
+    private CommonUtils commonUtils;
 
     @Autowired
     private GatewayEventMonitor gatewayEventMonitor;
@@ -123,13 +124,9 @@ public class OutcomeSteps {
 
 
     @Before
-    public void setup() throws IOException, URISyntaxException, TimeoutException {
-        gatewayEventMonitor.tearDownGatewayEventMonitor();
-        queueClient.clearQueues(FIELD_REFUSALS_QUEUE, TEMP_FIELD_OTHERS_QUEUE, RM_FIELD_QUEUE, RM_FIELD_QUEUE_DLQ, OUTCOME_PRE_PROCESSING,
-                OUTCOME_PRE_PROCESSING_DLQ);
+    public void setup() throws Exception {
 
-        gatewayEventMonitor = new GatewayEventMonitor();
-        gatewayEventMonitor.enableEventMonitor(rabbitLocation, rabbitUsername, rabbitPassword);
+        commonUtils.setup();
 
         surveyType = null;
         businessFunction = null;
@@ -149,8 +146,8 @@ public class OutcomeSteps {
     }
 
     @After
-    public void tearDownGatewayEventMonitor() throws IOException {
-        gatewayEventMonitor.tearDownGatewayEventMonitor();
+    public void tearDownGatewayEventMonitor() throws Exception {
+      commonUtils.clearDown();
     }
 
     @Given("an {string} {string} outcome message")
@@ -191,15 +188,15 @@ public class OutcomeSteps {
     }
 
     private void collectProcessingEvents() {
-        processingEvents = gatewayEventMonitor.grabEventsTriggered(PROCESSING_OUTCOME, expectedProcessors.size(), 5000L);
+        processingEvents = gatewayEventMonitor.grabEventsTriggered(PROCESSING_OUTCOME, expectedProcessors.size(), CommonUtils.TIMEOUT);
     }
 
     private void collectRmOutcomeEvents() {
-        rmOutcomeEvents = gatewayEventMonitor.grabEventsTriggered(OUTCOME_SENT, expectedRmMessages.size(), 5000L);
+        rmOutcomeEvents = gatewayEventMonitor.grabEventsTriggered(OUTCOME_SENT, expectedRmMessages.size(), CommonUtils.TIMEOUT);
     }
 
     private void collectJsOutcomeEvents() {
-        jsOutcomeEvents = gatewayEventMonitor.grabEventsTriggered(RM_FIELD_REPUBLISH, expectedJsMessages.size(), 5000L);
+        jsOutcomeEvents = gatewayEventMonitor.grabEventsTriggered(RM_FIELD_REPUBLISH, expectedJsMessages.size(), CommonUtils.TIMEOUT);
     }
 
 
@@ -457,7 +454,7 @@ public class OutcomeSteps {
         }
 
         String messageCaseId = getMessageCaseId();
-        boolean isMsgRecieved = gatewayEventMonitor.hasEventTriggered(messageCaseId, event, 2000L);
+        boolean isMsgRecieved = gatewayEventMonitor.hasEventTriggered(messageCaseId, event, CommonUtils.TIMEOUT);
         assertThat(isMsgRecieved).isTrue();
     }
 
@@ -635,4 +632,55 @@ public class OutcomeSteps {
     @Given("the message includes Usual Residents Count {string}")
     public void the_message_includes_Usual_Residents_Count(String hasUsualResidentsCount) {
       this.hasUsualResidentsCount = "T".equals(hasUsualResidentsCount);    }
+
+    @Given("a parent case exists")
+    public void a_parent_case_exists() throws Exception {
+      String ceSpgEstabCreateJson = Resources.toString(Resources.getResource("files/input/spg/spgEstabCreate.json"), Charsets.UTF_8);
+      JSONObject json = new JSONObject(ceSpgEstabCreateJson);
+
+      commonRMMessageObjects(json, caseId, "1234", "F", "F", false);
+
+      String request = json.toString(4);
+      log.info("Request = " + request);
+      queueClient.sendToRMFieldQueue(request, "create");
+      boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, RM_CREATE_REQUEST_RECEIVED, CommonUtils.TIMEOUT);
+      assertThat(hasBeenTriggered).isTrue();
+
+
+    }
+
+    private JSONObject commonRMMessageObjects(JSONObject json, String caseId, String caseRef, String isSecure, String isHandDeliver, boolean extraObjects){
+      if ("T".equals(isSecure)) {
+        json.remove("secureEstablishment");
+        json.put("secureEstablishment", true);
+      }else {
+        json.remove("secureEstablishment");
+        json.put("secureEstablishment", false);
+      }
+
+
+      if ("T".equals(isHandDeliver)){
+        json.remove("handDeliver");
+        json.put("handDeliver", true);
+      }else {
+        json.remove("handDeliver");
+        json.put("handDeliver", false);
+      }
+
+      json.remove("caseRef");
+      json.put("caseRef", caseRef);
+
+      if (extraObjects == true) {
+        json.remove("caseRef");
+        json.put("caseRef", caseRef);
+
+        json.remove("uprn");
+        json.put("uprn", json.get("estabUprn"));
+
+        json.remove("caseId");
+        json.put("caseId", caseId);
+      }
+
+      return json;
+    }
 }
