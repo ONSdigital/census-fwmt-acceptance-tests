@@ -49,6 +49,15 @@ public final class TMMockUtils {
   @Value("${service.outcome.SPGStandalone.endpoint}")
   private String spgStandaloneOutcomeEndpoint;
 
+  @Value("${service.outcome.CE.endpoint}")
+  private String ceOutcomeEndpoint;
+
+  @Value("${service.outcome.CENewUnit.endpoint}")
+  private String ceNewUnitOutcomeEndpoint;
+
+  @Value("${service.outcome.CEStandalone.endpoint}")
+  private String ceStandaloneOutcomeEndpoint;
+
   @Value("${service.outcome.username}")
   private String outcomeServiceUsername;
 
@@ -157,7 +166,7 @@ public final class TMMockUtils {
     ResponseEntity<Void> response = restTemplate.exchange(postUrl, HttpMethod.POST, post, Void.class);
 
     return response.getStatusCode().value();
-  }
+  }  
 
   public int sendTMSPGNewStandaloneAddressResponseMessage(String data) {
     HttpHeaders headers = createBasicAuthHeaders(outcomeServiceUsername, outcomeServicePassword);
@@ -186,6 +195,49 @@ public final class TMMockUtils {
 
     return response.getStatusCode().value();
   }
+
+  public int sendTMCEResponseMessage(String data, String caseId) {
+    HttpHeaders headers = createBasicAuthHeaders(outcomeServiceUsername, outcomeServicePassword);
+
+    headers.setContentType(MediaType.APPLICATION_JSON);
+
+    RestTemplate restTemplate = new RestTemplate();
+    String postUrl = outcomeServiceUrl + ceOutcomeEndpoint + caseId;
+
+    HttpEntity<String> post = new HttpEntity<>(data, headers);
+    ResponseEntity<Void> response = restTemplate.exchange(postUrl, HttpMethod.POST, post, Void.class);
+
+    return response.getStatusCode().value();
+  }
+
+  public int sendTMCENewStandaloneAddressResponseMessage(String data) {
+    HttpHeaders headers = createBasicAuthHeaders(outcomeServiceUsername, outcomeServicePassword);
+
+    headers.setContentType(MediaType.APPLICATION_JSON);
+
+    RestTemplate restTemplate = new RestTemplate();
+    String postUrl = outcomeServiceUrl + ceStandaloneOutcomeEndpoint;
+
+    HttpEntity<String> post = new HttpEntity<>(data, headers);
+    ResponseEntity<Void> response = restTemplate.exchange(postUrl, HttpMethod.POST, post, Void.class);
+
+    return response.getStatusCode().value();
+  }
+
+  public int sendTMCENewUnitAddressResponseMessage(String data) {
+    HttpHeaders headers = createBasicAuthHeaders(outcomeServiceUsername, outcomeServicePassword);
+
+    headers.setContentType(MediaType.APPLICATION_JSON);
+
+    RestTemplate restTemplate = new RestTemplate();
+    String postUrl = outcomeServiceUrl + ceNewUnitOutcomeEndpoint;
+
+    HttpEntity<String> post = new HttpEntity<>(data, headers);
+    ResponseEntity<Void> response = restTemplate.exchange(postUrl, HttpMethod.POST, post, Void.class);
+
+    return response.getStatusCode().value();
+  }
+
 
   private HttpHeaders createBasicAuthHeaders(String username, String password) {
     HttpHeaders headers = new HttpHeaders();

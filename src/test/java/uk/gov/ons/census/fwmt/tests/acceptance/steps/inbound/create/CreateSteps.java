@@ -33,13 +33,7 @@ import uk.gov.ons.census.fwmt.tests.acceptance.utils.TMMockUtils;
 public class CreateSteps {
 
   @Autowired
-  private CommonUtils commonUtils;
-
-  @Autowired
   private TMMockUtils tmMockUtils;
-
-  @Autowired
-  private QueueClient queueUtils;
 
   @Autowired
   private GatewayEventMonitor gatewayEventMonitor;
@@ -66,6 +60,13 @@ public class CreateSteps {
 
   private GatewayEventDTO event_COMET_CREATE_PRE_SENDING;
 
+  @Autowired
+  private QueueClient queueClient;
+
+  @Autowired
+  private CommonUtils commonUtils;
+
+
   @Before
   public void setup() throws Exception {
     ceSpgEstabCreateJson = Resources.toString(Resources.getResource("files/input/spg/spgEstabCreate.json"), Charsets.UTF_8);
@@ -73,13 +74,11 @@ public class CreateSteps {
     ceEstabCreateJson = Resources.toString(Resources.getResource("files/input/ce/ceEstabCreate.json"), Charsets.UTF_8);
     ceUnitCreateJson = Resources.toString(Resources.getResource("files/input/ce/ceUnitCreate.json"), Charsets.UTF_8);
     commonUtils.setup();
-    tmMockUtils.clearDownDatabase();
   }
 
   @After
   public void clearDown() throws Exception {
     commonUtils.clearDown();
-    tmMockUtils.clearDownDatabase();
   }
 
   @Given("a TM doesnt have a job with case ID {string} in TM")
@@ -125,8 +124,8 @@ public class CreateSteps {
 
     String request = json.toString(4);
     log.info("Request = " + request);
-    queueUtils.sendToRMFieldQueue(request, "create");
-    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, RM_CREATE_REQUEST_RECEIVED, 10000L);
+    queueClient.sendToRMFieldQueue(request, "create");
+    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, RM_CREATE_REQUEST_RECEIVED, CommonUtils.TIMEOUT);
     assertThat(hasBeenTriggered).isTrue();
   }
 
@@ -143,8 +142,8 @@ public class CreateSteps {
 
     String request = json.toString(4);
     log.info("Request = " + request);
-    queueUtils.sendToRMFieldQueue(request, "create");
-    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, RM_CREATE_REQUEST_RECEIVED, 10000L);
+    queueClient.sendToRMFieldQueue(request, "create");
+    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, RM_CREATE_REQUEST_RECEIVED, CommonUtils.TIMEOUT);
     assertThat(hasBeenTriggered).isTrue();
   }
 
@@ -162,15 +161,15 @@ public class CreateSteps {
 
     String request = json.toString(4);
     log.info("Request = " + request);
-    queueUtils.sendToRMFieldQueue(request, "create");
-    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, RM_CREATE_REQUEST_RECEIVED, 10000L);
+    queueClient.sendToRMFieldQueue(request, "create");
+    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, RM_CREATE_REQUEST_RECEIVED, CommonUtils.TIMEOUT);
     assertThat(hasBeenTriggered).isTrue();
   }
 
   @When("the Gateway sends a Create Job message to TM")
   public void theGatewaySendsACreateJobMessageToTM() {
     String caseId = testBucket.get("caseId");
-    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, COMET_CREATE_PRE_SENDING, 10000L);
+    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, COMET_CREATE_PRE_SENDING, CommonUtils.TIMEOUT);
     assertThat(hasBeenTriggered).isTrue();
     List<GatewayEventDTO> events = gatewayEventMonitor.getEventsForEventType(COMET_CREATE_PRE_SENDING, 1);
     if (testBucket.get("type").equals("CE Site")) {
@@ -194,7 +193,7 @@ public class CreateSteps {
 
   @Then("a new case with id of {string} is created in TM")
   public void aNewCaseIsCreatedInTm(String caseId) throws InterruptedException {
-    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, COMET_CREATE_ACK, 10000L);
+    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, COMET_CREATE_ACK, CommonUtils.TIMEOUT);
     assertThat(hasBeenTriggered).isTrue();
 
     ModelCase modelCase = tmMockUtils.getCaseById(caseId);
@@ -203,19 +202,19 @@ public class CreateSteps {
 
   @And("the existing case is updated to a switch and put back on the queue with caseId {string}")
   public void sendBackToQueue(String caseId){
-    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, RM_CREATE_SWITCH_REQUEST_RECEIVED, 10000L);
+    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, RM_CREATE_SWITCH_REQUEST_RECEIVED, CommonUtils.TIMEOUT);
     assertThat(hasBeenTriggered).isTrue();
   }
 
   @Then("the related case will be closed with case ID {string}")
   public void sendCloseToQueue(String caseId) {
-    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, COMET_CLOSE_ACK, 10000L);
+    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, COMET_CLOSE_ACK, CommonUtils.TIMEOUT);
     assertThat(hasBeenTriggered).isTrue();
   }
 
   @And("then reopened with the new SurveyType {string} and case ID {string}")
   public void sendReopenToQueue(String surveyType, String caseId) {
-    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, COMET_REOPEN_ACK, 10000L);
+    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, COMET_REOPEN_ACK, CommonUtils.TIMEOUT);
     assertThat(hasBeenTriggered).isTrue();
   }
 
@@ -258,10 +257,18 @@ public class CreateSteps {
     if ("T".equals(isSecure)) {
       json.remove("secureEstablishment");
       json.put("secureEstablishment", true);
+    }else {
+      json.remove("secureEstablishment");
+      json.put("secureEstablishment", false);
     }
+
+
     if ("T".equals(isHandDeliver)){
       json.remove("handDeliver");
       json.put("handDeliver", true);
+    }else {
+      json.remove("handDeliver");
+      json.put("handDeliver", false);
     }
 
     json.remove("caseRef");

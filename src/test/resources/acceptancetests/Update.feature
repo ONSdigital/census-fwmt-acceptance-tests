@@ -46,5 +46,5 @@ Feature: SPG Update Tests
     And Gateway will send a create job to TM
     And the create job is acknowledged by tm
 
- 
+
 

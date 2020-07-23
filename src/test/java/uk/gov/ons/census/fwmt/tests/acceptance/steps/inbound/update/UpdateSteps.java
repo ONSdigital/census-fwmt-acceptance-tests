@@ -30,13 +30,10 @@ public class UpdateSteps {
   private CommonUtils commonUtils;
 
   @Autowired
-  private QueueClient queueUtils;
+  private QueueClient queueClient;
 
   @Autowired
   private GatewayEventMonitor gatewayEventMonitor;
-
-  @Autowired
-  private TMMockUtils tmMockUtils;
 
   private static final String RM_UPDATE_REQUEST_RECEIVED = "RM_UPDATE_REQUEST_RECEIVED";
 
@@ -76,13 +73,11 @@ public class UpdateSteps {
     ceEstabUpdateJson = Resources.toString(Resources.getResource("files/input/ce/ceEstabUpdate.json"), Charsets.UTF_8);
     ceUnitUpdateJson = Resources.toString(Resources.getResource("files/input/ce/ceUnitUpdate.json"), Charsets.UTF_8);
     commonUtils.setup();
-    tmMockUtils.clearDownDatabase();
-  }
+ }
 
   @After
   public void clearDown() throws Exception {
     commonUtils.clearDown();
-    tmMockUtils.clearDownDatabase();
   }
 
   @And("RM sends an update case request for the case")
@@ -112,30 +107,30 @@ public class UpdateSteps {
     }
     String request = json.toString(4);
     log.info("Request = " + request);
-    queueUtils.sendToRMFieldQueue(request, "update");
+    queueClient.sendToRMFieldQueue(request, "update");
   }
 
   @When("Gateway receives an update message for the case")
   public void gatewayReceivesTheMessage() {
     String caseId = testBucket.get("caseId");
-    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, RM_UPDATE_REQUEST_RECEIVED, 10000L);
+    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, RM_UPDATE_REQUEST_RECEIVED, CommonUtils.TIMEOUT);
     assertThat(hasBeenTriggered).isTrue();
   }
 
   @Then("it will update the job in TM")
   public void confirmTmAction() {
     String caseId = testBucket.get("caseId");
-    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, COMET_UPDATE_PRE_SENDING, 10000L);
+    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, COMET_UPDATE_PRE_SENDING, CommonUtils.TIMEOUT);
     assertThat(hasBeenTriggered).isTrue();
   }
 
   @And("the updated job is acknowledged by TM")
   public void the_cancel_job_is_acknowledged_by_tm() {
     String caseId = testBucket.get("caseId");
-    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, COMET_UPDATE_ACK, 10000L);
+    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, COMET_UPDATE_ACK, CommonUtils.TIMEOUT);
     assertTrue(hasBeenTriggered);
   }
-  
+
   @Given("RM sends a unit update case request where undeliveredAsAddress is {string}")
   public void rm_sends_a_cancel_case_request(String undeliveredAsAddress) throws URISyntaxException {
     JSONObject json = new JSONObject(ceSpgUnitUpdateJson);
@@ -145,34 +140,34 @@ public class UpdateSteps {
 
     String request = json.toString(4);
     log.info("Request = " + request);
-    queueUtils.sendToRMFieldQueue(request, "update");
+    queueClient.sendToRMFieldQueue(request, "update");
   }
 
   @Then("the update job should fail")
   public void the_update_job_should_fail_by_tm() {
     String caseId = testBucket.get("caseId");
-    boolean hasBeenTriggered = gatewayEventMonitor.hasErrorEventTriggered(caseId, ROUTING_FAILED, 10000L);
+    boolean hasBeenTriggered = gatewayEventMonitor.hasErrorEventTriggered(caseId, ROUTING_FAILED, CommonUtils.TIMEOUT);
     assertThat(hasBeenTriggered).isTrue();
   }
 
   @Then("Gateway will reroute it as a create message")
   public void gateway_will_reroute_it_as_a_create_message() {
     String caseId = testBucket.get("caseId");
-    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, CONVERT_SPG_UNIT_UPDATE_TO_CREATE, 10000L);
+    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, CONVERT_SPG_UNIT_UPDATE_TO_CREATE, CommonUtils.TIMEOUT);
     assertThat(hasBeenTriggered).isTrue();
   }
 
   @Then("Gateway will send a create job to TM")
   public void gateway_will_send_a_create_job_to_TM() {
     String caseId = testBucket.get("caseId");
-    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, COMET_CREATE_PRE_SENDING, 10000L);
+    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, COMET_CREATE_PRE_SENDING, CommonUtils.TIMEOUT);
     assertThat(hasBeenTriggered).isTrue();
   }
 
   @Then("the create job is acknowledged by tm")
   public void the_create_job_is_acknowledged_by_tm() {
     String caseId = testBucket.get("caseId");
-    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, COMET_CREATE_ACK, 10000L);
+    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, COMET_CREATE_ACK, CommonUtils.TIMEOUT);
     assertThat(hasBeenTriggered).isTrue();
   }
 
