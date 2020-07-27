@@ -72,12 +72,12 @@ public class UpdateSteps {
     ceSpgUnitUpdateJson = Resources.toString(Resources.getResource("files/input/spg/spgUnitUpdate.json"), Charsets.UTF_8);
     ceEstabUpdateJson = Resources.toString(Resources.getResource("files/input/ce/ceEstabUpdate.json"), Charsets.UTF_8);
     ceUnitUpdateJson = Resources.toString(Resources.getResource("files/input/ce/ceUnitUpdate.json"), Charsets.UTF_8);
-    commonUtils.setup();
+//    commonUtils.setup();
  }
 
   @After
   public void clearDown() throws Exception {
-    commonUtils.clearDown();
+//    commonUtils.clearDown();
   }
 
   @And("RM sends an update case request for the case")
