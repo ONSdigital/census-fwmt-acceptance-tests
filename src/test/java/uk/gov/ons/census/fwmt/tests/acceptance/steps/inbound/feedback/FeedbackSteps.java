@@ -80,12 +80,13 @@ public class FeedbackSteps {
       inputRoot.put("primaryOutcomeDescription", "Engagement - Contact made");
       inputRoot.put("secondaryOutcomeDescription", "Visit - Hard refusal");
       inputRoot.put("outcomeCode", "6-20-53");
-      eventType = "REFUSAL_RECEIVED";
+      eventType = "CANCEL_FEEDBACK";
     } else if (type.equals("DELIVERED_FEEDBACK")) {
       inputRoot.put("primaryOutcomeDescription", "Contact made");
       inputRoot.put("secondaryOutcomeDescription", "HUAC required by text ");
       inputRoot.put("outcomeCode", "7-20-04");
-      eventType = "FULFILMENT_REQUESTED";
+//      eventType = "FULFILMENT_REQUESTED";
+      eventType = "DELIVERED_FEEDBACK";
     }
 
     String TMRequest = createOutcomeMessage(eventType + "-in", inputRoot, surveyType);
@@ -120,7 +121,7 @@ public class FeedbackSteps {
       configuration.setLogTemplateExceptions(false);
       configuration.setWrapUncheckedExceptions(true);
 
-      Template temp = configuration.getTemplate(surveyType + "/" + eventType + ".ftl");
+      Template temp = configuration.getTemplate("tm/" + eventType + ".ftl");
       try (StringWriter out = new StringWriter(); StringWriter outcomeEventMessage = new StringWriter()) {
 
         temp.process(root, out);
@@ -131,9 +132,11 @@ public class FeedbackSteps {
 
       } catch (TemplateException e) {
         log.error("Error: ", e);
+        throw new RuntimeException(e);
       }
     } catch (IOException e) {
       log.error("Error: ", e);
+      throw new RuntimeException(e);
     }
     return outcomeMessage;
   }

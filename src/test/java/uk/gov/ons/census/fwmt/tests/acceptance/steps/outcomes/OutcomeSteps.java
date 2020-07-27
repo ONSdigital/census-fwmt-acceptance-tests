@@ -346,6 +346,7 @@ public class OutcomeSteps {
       int response;
       switch (businessFunction) {
       case "New Unit Reported":
+      case "Switch Feedback Site":
         response = tmMockUtils.sendTMCENewUnitAddressResponseMessage(request);
         break;
       case "New Standalone Address":
@@ -430,6 +431,9 @@ public class OutcomeSteps {
             case "Switch Feedback Unit":
               request = createOutcomeMessage("SWITCH_FEEDBACK_CE_UNIT_F", root);
               break;
+            case "Switch Feedback Site":
+              request = createOutcomeMessage("SWITCH_FEEDBACK_CE_SITE", root);
+              break;
             default:
                 break;
             }
@@ -463,6 +467,7 @@ public class OutcomeSteps {
       switch (businessFunction) {
       case "New Standalone Address":
       case "New Unit Reported":
+      case "Switch Feedback Site":
         messageCaseId = "N/A";
         break;
       default:
@@ -490,6 +495,7 @@ public class OutcomeSteps {
       String event;
       switch (businessFunction) {
       case "New Unit Reported":
+      case "Switch Feedback Site":
         event = COMET_CE_UNITADDRESS_OUTCOME_RECEIVED;
         break;
       case "New Standalone Address":
@@ -563,6 +569,7 @@ public class OutcomeSteps {
         if ("NEW_ADDRESS_REPORTED".equals(rmMessageType)) {
           switch (businessFunction) {
           case "New Unit Reported":
+          case "Switch Feedback Site":
               rmMessageType = rmMessageType + "_UNIT";
               break;
           case "New Standalone Address":

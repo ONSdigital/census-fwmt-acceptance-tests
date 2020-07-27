@@ -55,15 +55,15 @@ public class CancelSteps {
 
   @Before
   public void setup() throws Exception {
-    commonUtils.setup();
     spgCancel = Resources.toString(Resources.getResource("files/input/spg/spgCancel.json"), Charsets.UTF_8);
     ceEstabCancel = Resources.toString(Resources.getResource("files/input/ce/ceEstabCancel.json"), Charsets.UTF_8);
     ceUnitCancel = Resources.toString(Resources.getResource("files/input/ce/ceUnitCancel.json"), Charsets.UTF_8);
+//    commonUtils.setup();
   }
 
   @After
   public void clearDown() throws Exception {
-    commonUtils.clearDown();
+//    commonUtils.clearDown();
   }
 
   @And("RM sends a cancel case request for the case")
