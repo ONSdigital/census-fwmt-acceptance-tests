@@ -189,4 +189,8 @@ public class UpdateSteps {
     }
   }
 
+  @And("the Gateway sends a update HH job message to TM with {string} {string}")
+  public void theGatewaySendsAUpdateHHJobMessageToTMWith(String undeliveredAsAddressed, String blankQuestionnaire) {
+
+  }
 }

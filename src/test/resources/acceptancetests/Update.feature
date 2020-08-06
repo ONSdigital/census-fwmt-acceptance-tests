@@ -46,5 +46,16 @@ Feature: SPG Update Tests
     And Gateway will send a create job to TM
     And the create job is acknowledged by tm
 
+  Scenario Outline: As Gateway I can receive an update to a HH job requests from RM for an existing job
+    Given a TM doesnt have a job with case ID "bd6345af-d706-43d3-a13b-8c549e081a76" in TM
+    And RM sends a create job request with "<CaseRef>" "<Survey>" "<Type>" "<IsSecure>" "<HandDeliver>"
+    And the Gateway sends a update HH job message to TM with "<UndeliveredAsAddressed>" "<BlankQuestionnaire>"
+    When Gateway receives an update message for the case
+    Then it will update the job in TM
+    And the updated job is acknowledged by TM
+    And if the update was "<UndeliveredAsAddressed>" "<BlankQuestionnaire>" a cancel pause is acknowledged by TM
+    Examples:
+      | CaseRef | Survey | Type | IsSecure | HandDeliver | UndeliveredAsAddressed | BlankQuestionnaire |
+
 
 
