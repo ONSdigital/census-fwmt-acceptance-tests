@@ -1,7 +1,21 @@
 package uk.gov.ons.census.fwmt.tests.acceptance.steps.inbound.update;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static uk.gov.ons.census.fwmt.tests.acceptance.steps.inbound.common.CommonUtils.testBucket;
+
+import java.net.URISyntaxException;
+import java.text.SimpleDateFormat;
+import java.util.Collection;
+import java.util.Date;
+
+import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
+
 import cucumber.api.java.After;
 import cucumber.api.java.Before;
 import cucumber.api.java.en.And;
@@ -9,24 +23,17 @@ import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
 import lombok.extern.slf4j.Slf4j;
-import org.json.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
 import uk.gov.ons.census.fwmt.events.data.GatewayEventDTO;
 import uk.gov.ons.census.fwmt.events.utils.GatewayEventMonitor;
 import uk.gov.ons.census.fwmt.tests.acceptance.steps.inbound.common.CommonUtils;
 import uk.gov.ons.census.fwmt.tests.acceptance.utils.QueueClient;
-import uk.gov.ons.census.fwmt.tests.acceptance.utils.TMMockUtils;
 
-import java.net.URISyntaxException;
+import java.time.OffsetDateTime;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertTrue;
-import static uk.gov.ons.census.fwmt.tests.acceptance.steps.inbound.common.CommonUtils.testBucket;
 
 @Slf4j
 public class UpdateSteps {
 
-  @Autowired
   private CommonUtils commonUtils;
 
   @Autowired
@@ -48,6 +55,20 @@ public class UpdateSteps {
   private static final String CONVERT_SPG_UNIT_UPDATE_TO_CREATE = "CONVERT_SPG_UNIT_UPDATE_TO_CREATE";
 
   private static final String COMET_CREATE_PRE_SENDING = "COMET_CREATE_PRE_SENDING";
+
+  private static final String PROCESSING = "PROCESSING";
+
+  private static final String COMET_DELETE_ACK = "COMET_DELETE_ACK";
+
+  private static final String RM_PAUSE_REQUEST_RECEIVED = "RM_PAUSE_REQUEST_RECEIVED";
+
+  private static final String COMET_PAUSE_PRE_SENDING = "COMET_PAUSE_PRE_SENDING";
+
+  private static final String COMET_PAUSE_ACK = "COMET_PAUSE_ACK";
+  
+  private static String hhUpdateJson = null;
+  
+  private static String hhPauseCaseJson = null;
 
   private String ceSpgEstabUpdateJson = null;
 
@@ -72,7 +93,10 @@ public class UpdateSteps {
     ceSpgUnitUpdateJson = Resources.toString(Resources.getResource("files/input/spg/spgUnitUpdate.json"), Charsets.UTF_8);
     ceEstabUpdateJson = Resources.toString(Resources.getResource("files/input/ce/ceEstabUpdate.json"), Charsets.UTF_8);
     ceUnitUpdateJson = Resources.toString(Resources.getResource("files/input/ce/ceUnitUpdate.json"), Charsets.UTF_8);
-//    commonUtils.setup();
+    
+    hhUpdateJson = Resources.toString(Resources.getResource("files/input/hh/hhUpdate.json"), Charsets.UTF_8);
+    hhPauseCaseJson = Resources.toString(Resources.getResource("files/input/hh/hhPauseCase.json"), Charsets.UTF_8);
+    //    commonUtils.setup();
  }
 
   @After
@@ -96,6 +120,7 @@ public class UpdateSteps {
     if ("Unit".equals(type) || "CE Unit".equals(type)) {
       json.put("addressLevel", "U");
     }
+    
     if ("CE Site".equals(type)){
       json.remove("uprn");
       json.put("uprn", json.get("estabUprn"));
@@ -110,13 +135,97 @@ public class UpdateSteps {
     queueClient.sendToRMFieldQueue(request, "update");
   }
 
+  @Given("RM sends a HH Pause Case request for the case")
+  public void rm_sends_a_HH_Pause_Case_request_for_the_case() throws URISyntaxException {
+    String caseId = testBucket.get("caseId");
+
+    JSONObject json = new JSONObject(hhPauseCaseJson);
+    json.remove("caseId");
+    json.put("caseId", caseId);
+  
+    OffsetDateTime now = OffsetDateTime.now();
+
+    String pauseFrom = now.toString();
+    json.remove("pauseFrom");
+    json.put("pauseFrom", pauseFrom);
+    
+    String request = json.toString(4);
+    log.info("Request = " + request);
+    queueClient.sendToRMFieldQueue(request, "update");  
+  }
+
+  
+  @Given("RM sends a HH update case request for the case {string} {string}")
+  public void rm_sends_a_HH_update_case_request_for_the_case(String isBlankFormReturned, String isUndeliveredAsAddress) throws URISyntaxException {
+    String caseId = testBucket.get("caseId");
+    String type = testBucket.get("type");
+    String survey = testBucket.get("survey");
+    String oa = testBucket.get("oa");
+
+    JSONObject json = new JSONObject(getUpdateRMJson());
+    json.remove("caseId");
+    json.put("caseId", caseId);
+    json.remove("oa");
+    json.put("oa", oa);
+
+    if ("T".equals(isBlankFormReturned)){
+      json.remove("blankFormReturned");
+      json.put("blankFormReturned", true);
+    }else {
+      json.remove("blankFormReturned");
+      json.put("blankFormReturned", false);
+    }
+    
+    if ("T".equals(isUndeliveredAsAddress)){
+      json.remove("undeliveredAsAddress");
+      json.put("undeliveredAsAddress", true);
+    }else {
+      json.remove("undeliveredAsAddress");
+      json.put("undeliveredAsAddress", false);
+    }
+  
+    String request = json.toString(4);
+    log.info("Request = " + request);
+    queueClient.sendToRMFieldQueue(request, "update");
+  }
+  
   @When("Gateway receives an update message for the case")
   public void gatewayReceivesTheMessage() {
     String caseId = testBucket.get("caseId");
     boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, RM_UPDATE_REQUEST_RECEIVED, CommonUtils.TIMEOUT);
     assertThat(hasBeenTriggered).isTrue();
   }
+  
+  @When("Gateway receives an HH Pause Case message for the case")
+  public void gateway_receives_an_HH_Pause_Case_message_for_the_case() {
+    String caseId = testBucket.get("caseId");
+    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, RM_PAUSE_REQUEST_RECEIVED, CommonUtils.TIMEOUT);
+    assertThat(hasBeenTriggered).isTrue();
+  }  
+  
+  @When("is Processed as {string}")
+  public void is_Processed_as(String processedAs) {
+    String caseId = testBucket.get("caseId");
+    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, PROCESSING, CommonUtils.TIMEOUT);
+    assertThat(hasBeenTriggered).isTrue();
 
+    Collection<GatewayEventDTO> processed = gatewayEventMonitor.grabEventsTriggered(PROCESSING, 1, CommonUtils.TIMEOUT);
+    GatewayEventDTO event = processed.iterator().next();
+        
+    String actualType = event.getMetadata().get("type");
+    String actualAction = event.getMetadata().get("action");
+    assertEquals(processedAs, actualType);
+    assertEquals("Update", actualAction);
+  }
+  
+  @Then("an associated a Pause is deleted {string}")
+  public void an_associated_a_Pause_is_deleted(String isDeleted) {
+    boolean expectedIsDeleted = "T".equals(isDeleted);
+    String caseId = testBucket.get("caseId");
+    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, COMET_DELETE_ACK, CommonUtils.TIMEOUT);
+    assertEquals(expectedIsDeleted, hasBeenTriggered);
+  }
+  
   @Then("it will update the job in TM")
   public void confirmTmAction() {
     String caseId = testBucket.get("caseId");
@@ -164,6 +273,13 @@ public class UpdateSteps {
     assertThat(hasBeenTriggered).isTrue();
   }
 
+  @Then("it will Pause the job in TM")
+  public void it_will_Pause_the_job_in_TM() {
+    String caseId = testBucket.get("caseId");
+    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, COMET_PAUSE_PRE_SENDING, CommonUtils.TIMEOUT);
+    assertThat(hasBeenTriggered).isTrue();
+  }
+  
   @Then("the create job is acknowledged by tm")
   public void the_create_job_is_acknowledged_by_tm() {
     String caseId = testBucket.get("caseId");
@@ -171,9 +287,20 @@ public class UpdateSteps {
     assertThat(hasBeenTriggered).isTrue();
   }
 
+  @Then("the Paused job is acknowledged by TM")
+  public void the_Paused_job_is_acknowledged_by_TM() {
+    String caseId = testBucket.get("caseId");
+    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, COMET_PAUSE_ACK, CommonUtils.TIMEOUT);
+    assertThat(hasBeenTriggered).isTrue();
+  }
+  
   private String getUpdateRMJson() {
     String survey = testBucket.get("survey");
     String type = testBucket.get("type");
+    
+    if (survey.equals("HH"))
+      return hhUpdateJson;
+    
     switch (type) {
     case "Estab":
       return ceSpgEstabUpdateJson;

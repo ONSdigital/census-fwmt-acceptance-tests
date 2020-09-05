@@ -18,6 +18,9 @@ Feature: SPG Update Tests
       | CE     | CE Est   |  F        | 12345678 | F           |
       | CE     | CE Unit  |  F        | 12345678 | T           |
       | CE     | CE Unit  |  F        | 12345678 | F           |
+      | CE     | CE Unit  |  F        | 12345678 | F           |
+
+
 
   Scenario Outline: As Gateway I can receive a create CE Site job request from RM after a CE Estab has been processed
     Given a TM doesnt have a job with case ID "bd6345af-d706-43d3-a13b-8c549e081a76" in TM
@@ -46,16 +49,33 @@ Feature: SPG Update Tests
     And Gateway will send a create job to TM
     And the create job is acknowledged by tm
 
-  Scenario Outline: As Gateway I can receive an update to a HH job requests from RM for an existing job
+  Scenario Outline: As Gateway I can receive an update to a request from RM for an existing Household job
     Given a TM doesnt have a job with case ID "bd6345af-d706-43d3-a13b-8c549e081a76" in TM
-    And RM sends a create job request with "<CaseRef>" "<Survey>" "<Type>" "<IsSecure>" "<HandDeliver>"
-    And the Gateway sends a update HH job message to TM with "<UndeliveredAsAddressed>" "<BlankQuestionnaire>"
+    And RM sends a HH create job request with "<CaseRef>" "<Survey>" "<oa>"  
+    And RM sends a HH update case request for the case "<isBlankFormReturned>" "<isUndeliveredAsAddress>"
     When Gateway receives an update message for the case
+		And is Processed as "<ProcessedAs>" 
     Then it will update the job in TM
     And the updated job is acknowledged by TM
-    And if the update was "<UndeliveredAsAddressed>" "<BlankQuestionnaire>" a cancel pause is acknowledged by TM
-    Examples:
-      | CaseRef | Survey | Type | IsSecure | HandDeliver | UndeliveredAsAddressed | BlankQuestionnaire |
+    And an associated a Pause is deleted "<IsPauseDeleted>"
+   Examples:
+      | Survey | oa          |  CaseRef  | isBlankFormReturned | isUndeliveredAsAddress | ProcessedAs | IsPauseDeleted |
+      | HH     | E00167164   |  12345678 | F                   | F                      | HH E & W    | F              |
+      | HH     | E00167164   |  12345678 | T                   | F                      | HH E & W    | T              |
+      | HH     | E00167164   |  12345678 | F                   | T                      | HH E & W    | T              |
+      | HH     | E00167164   |  12345678 | T                   | T                      | HH E & W    | T              |
+      | HH     | N00167164   |  12345678 | F                   | F                      | NISRA       | F              |
+      | HH     | N00167164   |  12345678 | T                   | F                      | NISRA       | T              |
+      | HH     | N00167164   |  12345678 | F                   | T                      | NISRA       | T              |
+      | HH     | N00167164   |  12345678 | T                   | T                      | NISRA       | T              |
 
 
-
+#  Scenario: As Gateway I can receive an Pause Case to a request from RM for an existing Household job
+#    Given a TM doesnt have a job with case ID "bd6345af-d706-43d3-a13b-8c549e081a76" in TM
+#    And RM sends a HH create job request with 
+#    And RM sends a HH Pause Case request for the case
+#    When Gateway receives an HH Pause Case message for the case
+#		And is Processed as "HH Pause Case"
+#    Then it will Pause the job in TM
+#    And the Paused job is acknowledged by TM
+#  
