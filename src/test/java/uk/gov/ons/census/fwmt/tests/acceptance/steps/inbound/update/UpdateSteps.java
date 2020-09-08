@@ -6,6 +6,7 @@ import static org.junit.Assert.assertTrue;
 import static uk.gov.ons.census.fwmt.tests.acceptance.steps.inbound.common.CommonUtils.testBucket;
 
 import java.net.URISyntaxException;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
@@ -137,15 +138,17 @@ public class UpdateSteps {
 
   @Given("RM sends a HH Pause Case request for the case")
   public void rm_sends_a_HH_Pause_Case_request_for_the_case() throws URISyntaxException {
+    DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSX");
+    
     String caseId = testBucket.get("caseId");
 
     JSONObject json = new JSONObject(hhPauseCaseJson);
     json.remove("caseId");
     json.put("caseId", caseId);
   
-    OffsetDateTime now = OffsetDateTime.now();
-
-    String pauseFrom = now.toString();
+    Date now = new Date();
+    String pauseFrom = dateFormat.format(now);
+    
     json.remove("pauseFrom");
     json.put("pauseFrom", pauseFrom);
     
@@ -213,9 +216,8 @@ public class UpdateSteps {
     GatewayEventDTO event = processed.iterator().next();
         
     String actualType = event.getMetadata().get("type");
-    String actualAction = event.getMetadata().get("action");
     assertEquals(processedAs, actualType);
-    assertEquals("Update", actualAction);
+
   }
   
   @Then("an associated a Pause is deleted {string}")

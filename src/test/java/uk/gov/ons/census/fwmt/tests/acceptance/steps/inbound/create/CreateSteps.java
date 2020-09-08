@@ -6,15 +6,18 @@ import static org.junit.Assert.fail;
 import static uk.gov.ons.census.fwmt.tests.acceptance.steps.inbound.common.CommonUtils.testBucket;
 
 import java.net.URISyntaxException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
-
-import com.google.common.base.Charsets;
-import com.google.common.io.Resources;
 
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.client.HttpClientErrorException;
+
+import com.google.common.base.Charsets;
+import com.google.common.io.Resources;
 
 import cucumber.api.java.After;
 import cucumber.api.java.Before;
@@ -334,4 +337,5 @@ public class CreateSteps {
     return json;
   }
 
+  
 }
