@@ -40,7 +40,8 @@ public class CommonUtils {
       tmMockUtils.enableRequestRecorder();
       tmMockUtils.resetMock();
       tmMockUtils.clearDownDatabase();
-
+      queueClients.createQueue();
+      
       gatewayEventMonitor.enableEventMonitor(rabbitLocation, rabbitUsername, rabbitPassword);
       gatewayEventMonitor.reset();
       queueClients.reset();
