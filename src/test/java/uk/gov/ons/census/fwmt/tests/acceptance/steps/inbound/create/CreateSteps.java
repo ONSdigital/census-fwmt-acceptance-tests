@@ -5,15 +5,19 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static uk.gov.ons.census.fwmt.tests.acceptance.steps.inbound.common.CommonUtils.testBucket;
 
+import java.net.URISyntaxException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
-
-import com.google.common.base.Charsets;
-import com.google.common.io.Resources;
 
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.client.HttpClientErrorException;
+
+import com.google.common.base.Charsets;
+import com.google.common.io.Resources;
 
 import cucumber.api.java.After;
 import cucumber.api.java.Before;
@@ -57,6 +61,8 @@ public class CreateSteps {
   private String ceEstabCreateJson = null;
 
   private String ceUnitCreateJson = null;
+  
+  private String hhCreateJson = null;
 
   private GatewayEventDTO event_COMET_CREATE_PRE_SENDING;
 
@@ -73,6 +79,7 @@ public class CreateSteps {
     ceSpgUnitCreateJson = Resources.toString(Resources.getResource("files/input/spg/spgUnitCreate.json"), Charsets.UTF_8);
     ceEstabCreateJson = Resources.toString(Resources.getResource("files/input/ce/ceEstabCreate.json"), Charsets.UTF_8);
     ceUnitCreateJson = Resources.toString(Resources.getResource("files/input/ce/ceUnitCreate.json"), Charsets.UTF_8);
+    hhCreateJson = Resources.toString(Resources.getResource("files/input/hh/hhCreate.json"), Charsets.UTF_8);
     commonUtils.setup();
   }
 
@@ -129,6 +136,45 @@ public class CreateSteps {
     assertThat(hasBeenTriggered).isTrue();
   }
 
+  @Given("RM sends a HH create job request")
+  public void rm_sends_a_HH_create_job_request() throws URISyntaxException {
+    String caseId = testBucket.get("caseId");
+    testBucket.put("survey", "HH");
+
+    JSONObject json = new JSONObject(getCreateRMJson());
+
+    commonRMMessageObjects(json, caseId, "12345", "F", "F", true);
+    
+    String request = json.toString(4);
+    log.info("Request = " + request);
+    queueClient.sendToRMFieldQueue(request, "create");
+    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, RM_CREATE_REQUEST_RECEIVED, CommonUtils.TIMEOUT);
+    assertThat(hasBeenTriggered).isTrue();
+  }
+
+  
+  @Given("RM sends a HH create job request with {string} {string} {string}")
+  public void rm_sends_a_HH_create_job_request_with(String caseRef, String survey, String oa) throws URISyntaxException {
+    testBucket.put("survey", survey);
+    testBucket.put("type", null);
+    testBucket.put("oa", oa);
+   
+  
+    String caseId = testBucket.get("caseId");
+
+    JSONObject json = new JSONObject(getCreateRMJson());
+
+    commonRMMessageObjects(json, caseId, caseRef, "F", "F", true);
+    json.remove("oa");
+    json.put("oa", oa);
+    
+    String request = json.toString(4);
+    log.info("Request = " + request);
+    queueClient.sendToRMFieldQueue(request, "create");
+    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, RM_CREATE_REQUEST_RECEIVED, CommonUtils.TIMEOUT);
+    assertThat(hasBeenTriggered).isTrue();
+  }
+  
   @And("RM sends a create CE Site job request with {string} {string} {string} {string} {string}")
   public void rmSendsACECreateSiteJobRequest(String caseRef, String survey, String type, String isSecure, String isHandDeliver) throws Exception {
     String caseId = "f78607a6-bab4-11ea-b3de-0242ac130004";
@@ -154,6 +200,7 @@ public class CreateSteps {
     testBucket.put("survey", survey);
     testBucket.put("type", type);
     testBucket.put("caseId", caseId);
+
 
     JSONObject json = new JSONObject(getCreateRMJson());
 
@@ -222,6 +269,9 @@ public class CreateSteps {
     String type = testBucket.get("type");
     String survey = testBucket.get("survey");
 
+    if (survey.equals("HH"))
+      return hhCreateJson;
+    
     switch (type) {
       case "Estab" :
         return ceSpgEstabCreateJson;
@@ -288,4 +338,5 @@ public class CreateSteps {
     return json;
   }
 
+  
 }

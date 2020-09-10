@@ -95,6 +95,9 @@ public class OutcomeSteps {
     private static final String COMET_CE_STANDALONE_OUTCOME_RECEIVED = "COMET_CE_STANDALONE_OUTCOME_RECEIVED";
 
     private static final String RM_CREATE_REQUEST_RECEIVED = "RM_CREATE_REQUEST_RECEIVED";
+    private static final String COMET_HH_SPLITADDRESS_RECEIVED = "COMET_HH_SPLITADDRESS_RECEIVED";
+    private static final String COMET_HH_STANDALONE_RECEIVED = "COMET_HH_STANDALONE_RECEIVED";
+    private static final String COMET_HH_OUTCOME_RECEIVED = "COMET_HH_OUTCOME_RECEIVED";
 
     @Autowired
     private QueueClient queueClient;
@@ -337,6 +340,9 @@ public class OutcomeSteps {
         case "CE":
           response = sendCe(request);
             break;
+        case "HH":
+          response = sendHH(request);
+            break;
         default:
             break;
         }
@@ -370,6 +376,21 @@ public class OutcomeSteps {
         break;
       default:
         response = tmMockUtils.sendTMSPGResponseMessage(request, caseId);
+      }
+      return response;
+    }
+
+    private int sendHH(String request) {
+      int response;
+      switch (businessFunction) {
+      case "New Unit Reported":
+        response = tmMockUtils.sendTMHHNewUnitAddressResponseMessage(request);
+        break;
+      case "New Standalone Address":
+        response = tmMockUtils.sendTMHHNewStandaloneAddressResponseMessage(request);
+        break;
+      default:
+        response = tmMockUtils.sendTMHHResponseMessage(request, caseId);
       }
       return response;
     }
@@ -446,23 +467,26 @@ public class OutcomeSteps {
         }
     }
 
-    private void confirmOutcomeServiceReceivesMessage() {
-        String event = null;
-        switch (surveyType) {
-        case "SPG":
-          event = getSpgRequestReceivedEventName();
-            break;
-        case "CE":
-          event = getCeRequestReceivedEventName();
-            break;
-        default:
-            break;
-        }
+   private void confirmOutcomeServiceReceivesMessage() {
+     String event = null;
+     switch (surveyType) {
+     case "SPG":
+       event = getSpgRequestReceivedEventName();
+         break;
+     case "CE":
+       event = getCeRequestReceivedEventName();
+         break;
+     case "HH":
+       event = getHhRequestReceivedEventName();
+         break;
+     default:
+         break;
+     }
 
-        String messageCaseId = getMessageCaseId();
-        boolean isMsgRecieved = gatewayEventMonitor.hasEventTriggered(messageCaseId, event, CommonUtils.TIMEOUT);
-        assertThat(isMsgRecieved).isTrue();
-    }
+     String messageCaseId = getMessageCaseId();
+     boolean isMsgRecieved = gatewayEventMonitor.hasEventTriggered(messageCaseId, event, CommonUtils.TIMEOUT);
+     assertThat(isMsgRecieved).isTrue();
+ }
 
     private String getMessageCaseId() {
       String messageCaseId;
@@ -505,6 +529,22 @@ public class OutcomeSteps {
         break;
       default:
         event = COMET_CE_OUTCOME_RECEIVED;
+      }
+      return event;
+    }
+
+    private String getHhRequestReceivedEventName() {
+      String event;
+      switch (businessFunction) {
+      case "New Unit Reported":
+      case "Switch Feedback Site":
+        event = COMET_HH_SPLITADDRESS_RECEIVED;
+        break;
+      case "New Standalone Address":
+        event = COMET_HH_STANDALONE_RECEIVED;
+        break;
+      default:
+        event = COMET_HH_OUTCOME_RECEIVED;
       }
       return event;
     }

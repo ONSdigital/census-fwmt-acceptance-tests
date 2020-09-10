@@ -31,9 +31,6 @@ public final class TMMockUtils {
   @Value("${service.outcome.url}")
   private String outcomeServiceUrl;
 
-  @Value("${service.outcome.household.endpoint}")
-  private String householdOutcomeEndpoint;
-
   @Value("${service.outcome.CCSPL.endpoint}")
   private String ccsPLOutcomeEnpoint;
 
@@ -48,6 +45,15 @@ public final class TMMockUtils {
 
   @Value("${service.outcome.SPGStandalone.endpoint}")
   private String spgStandaloneOutcomeEndpoint;
+
+  @Value("${service.outcome.HH.endpoint}")
+  private String hhOutcomeEndpoint;
+
+  @Value("${service.outcome.HHNewUnit.endpoint}")
+  private String hhNewUnitOutcomeEndpoint;
+
+  @Value("${service.outcome.HHStandalone.endpoint}")
+  private String hhStandaloneOutcomeEndpoint;
 
   @Value("${service.outcome.CE.endpoint}")
   private String ceOutcomeEndpoint;
@@ -118,7 +124,7 @@ public final class TMMockUtils {
     headers.setContentType(MediaType.APPLICATION_JSON);
 
     RestTemplate restTemplate = new RestTemplate();
-    String postUrl = outcomeServiceUrl + householdOutcomeEndpoint + caseId;
+    String postUrl = outcomeServiceUrl + hhOutcomeEndpoint + caseId;
 
     HttpEntity<String> post = new HttpEntity<>(data, headers);
     ResponseEntity<Void> response = restTemplate.exchange(postUrl, HttpMethod.POST, post, Void.class);
@@ -168,6 +174,20 @@ public final class TMMockUtils {
     return response.getStatusCode().value();
   }  
 
+  public int sendTMHHResponseMessage(String data, String caseId) {
+    HttpHeaders headers = createBasicAuthHeaders(outcomeServiceUsername, outcomeServicePassword);
+
+    headers.setContentType(MediaType.APPLICATION_JSON);
+
+    RestTemplate restTemplate = new RestTemplate();
+    String postUrl = outcomeServiceUrl + hhOutcomeEndpoint + caseId;
+
+    HttpEntity<String> post = new HttpEntity<>(data, headers);
+    ResponseEntity<Void> response = restTemplate.exchange(postUrl, HttpMethod.POST, post, Void.class);
+
+    return response.getStatusCode().value();
+  }  
+
   public int sendTMSPGNewStandaloneAddressResponseMessage(String data) {
     HttpHeaders headers = createBasicAuthHeaders(outcomeServiceUsername, outcomeServicePassword);
 
@@ -182,6 +202,20 @@ public final class TMMockUtils {
     return response.getStatusCode().value();
   }
 
+  public int sendTMHHNewStandaloneAddressResponseMessage(String data) {
+    HttpHeaders headers = createBasicAuthHeaders(outcomeServiceUsername, outcomeServicePassword);
+
+    headers.setContentType(MediaType.APPLICATION_JSON);
+
+    RestTemplate restTemplate = new RestTemplate();
+    String postUrl = outcomeServiceUrl + hhStandaloneOutcomeEndpoint;
+
+    HttpEntity<String> post = new HttpEntity<>(data, headers);
+    ResponseEntity<Void> response = restTemplate.exchange(postUrl, HttpMethod.POST, post, Void.class);
+
+    return response.getStatusCode().value();
+  }
+
   public int sendTMSPGNewUnitAddressResponseMessage(String data) {
     HttpHeaders headers = createBasicAuthHeaders(outcomeServiceUsername, outcomeServicePassword);
 
@@ -189,6 +223,20 @@ public final class TMMockUtils {
 
     RestTemplate restTemplate = new RestTemplate();
     String postUrl = outcomeServiceUrl + spgNewUnitOutcomeEndpoint;
+
+    HttpEntity<String> post = new HttpEntity<>(data, headers);
+    ResponseEntity<Void> response = restTemplate.exchange(postUrl, HttpMethod.POST, post, Void.class);
+
+    return response.getStatusCode().value();
+  }
+
+  public int sendTMHHNewUnitAddressResponseMessage(String data) {
+    HttpHeaders headers = createBasicAuthHeaders(outcomeServiceUsername, outcomeServicePassword);
+
+    headers.setContentType(MediaType.APPLICATION_JSON);
+
+    RestTemplate restTemplate = new RestTemplate();
+    String postUrl = outcomeServiceUrl + hhNewUnitOutcomeEndpoint;
 
     HttpEntity<String> post = new HttpEntity<>(data, headers);
     ResponseEntity<Void> response = restTemplate.exchange(postUrl, HttpMethod.POST, post, Void.class);
