@@ -15,7 +15,6 @@
 "address":{
 "organisationName":"The last rest",
 "addressType":"SPG",
-"region":"E",
 "estabType":"Care Home"
 }
 }

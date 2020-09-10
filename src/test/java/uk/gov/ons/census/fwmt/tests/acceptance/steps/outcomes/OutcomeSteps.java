@@ -285,6 +285,7 @@ public class OutcomeSteps {
     }
 
     private String replaceValueInJson(String msg, String keyName, String newValue) throws Exception{
+      System.out.println(msg);
       JsonNode actualJson = jsonObjectMapper.readTree(msg);
       msg = actualJson.toPrettyString();
       String docturedJson = msg.replaceAll("(?<=\"" + keyName + "\" : \")[^\\\"]+", newValue);
@@ -387,6 +388,7 @@ public class OutcomeSteps {
         root.put("linkedQid", linkedQid);
         root.put("fulfilmentRequested", fulfilmentRequested);
         root.put("usualResidents", usualResidents);
+        root.put("surveyType", surveyType);
 
         try {
             String request = null;
@@ -437,7 +439,7 @@ public class OutcomeSteps {
             default:
                 break;
             }
-            System.out.print("REQUEST:  " + request);
+            System.out.print("Survey Type: " + surveyType + "\nREQUEST:  " + request);
             return request;
         } catch (Exception e) {
             throw new RuntimeException("Problem with setting up", e);
@@ -543,6 +545,8 @@ public class OutcomeSteps {
         case "QUESTIONNAIRE_LINKED":
         case "NEW_ADDRESS_REPORTED":
         case "FIELD_CASE_UPDATED":
+        case "UPDATE_RESIDENT_COUNT_1":
+        case "UPDATE_RESIDENT_COUNT":
             return TEMP_FIELD_OTHERS_QUEUE;
         default:
             throw new RuntimeException("Problem matching operation");

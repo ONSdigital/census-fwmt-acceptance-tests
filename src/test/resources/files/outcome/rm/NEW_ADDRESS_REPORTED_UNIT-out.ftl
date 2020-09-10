@@ -15,7 +15,6 @@
 "survey": "CENSUS",
 "fieldCoordinatorId":"SH-TWH1-ZA",
 "fieldOfficerId":"SH-TWH1-ZA-25",
-"collectionExerciseId":"32fn45nd-0dbf-4499-bfa7-0aa4mgit8sh54",
 "address":{
 "addressLine1" : "Unit name",
 "addressLine2" : null,

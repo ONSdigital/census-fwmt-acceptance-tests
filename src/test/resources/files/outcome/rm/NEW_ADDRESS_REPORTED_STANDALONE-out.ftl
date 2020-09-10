@@ -23,8 +23,15 @@
 "latitude" : "99.99999999",
 "longitude" : "99.99999999",
 "region" : "E",
-"addressType" : "${surveyType}",
-"addressLevel" : "U"
+<#if surveyType == "CE">
+  "estabType": "Care Home",
+  "secureType": "true",
+  "addressLevel" : "E",
+<#else>
+  "addressLevel" : "U",
+  
+</#if>
+"addressType" : "${surveyType}"
 }
 }
 }

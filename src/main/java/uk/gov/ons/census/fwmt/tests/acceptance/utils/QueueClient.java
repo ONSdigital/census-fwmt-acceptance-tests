@@ -38,9 +38,7 @@ public final class QueueClient {
   @Value("${service.jobservice.password}")
   private String jobServicePassword;
 
-  private static final String FIELD_REFUSALS_QUEUE = "Field.refusals";
 
-  private static final String TEMP_FIELD_OTHERS_QUEUE = "Field.other";
 
   private static final String RM_FIELD_QUEUE = "RM.Field";
 
@@ -49,6 +47,10 @@ public final class QueueClient {
   private static final String OUTCOME_PRE_PROCESSING = "Outcome.Preprocessing";
 
   private static final String OUTCOME_PRE_PROCESSING_DLQ = "Outcome.PreprocessingDLQ";
+
+  private static final String FIELD_REFUSALS_QUEUE = "Field.refusals";
+
+  private static final String TEMP_FIELD_OTHERS_QUEUE = "Field.other";
 
   @Autowired
   private QueueUtils queueUtils;
