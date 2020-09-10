@@ -201,6 +201,7 @@ public class CreateSteps {
     testBucket.put("type", type);
     testBucket.put("caseId", caseId);
 
+
     JSONObject json = new JSONObject(getCreateRMJson());
 
     commonRMMessageObjects(json, caseId, caseRef, isSecure, isHandDeliver, true);
