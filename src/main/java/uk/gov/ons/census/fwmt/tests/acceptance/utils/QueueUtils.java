@@ -6,8 +6,7 @@ import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.GetResponse;
 import lombok.extern.slf4j.Slf4j;
-import uk.gov.ons.census.fwmt.tests.acceptance.steps.inbound.common.NodeCheck;
-import uk.gov.ons.census.fwmt.tests.acceptance.steps.inbound.common.NodeCheck.NodeCheckBuilder;
+import uk.gov.ons.census.fwmt.tests.acceptance.utils.NodeCheck.NodeCheckBuilder;
 
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.Declarables;

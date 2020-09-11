@@ -1,4 +1,4 @@
-package uk.gov.ons.census.fwmt.tests.acceptance.steps.inbound.common;
+package uk.gov.ons.census.fwmt.tests.acceptance.utils;
 
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -14,9 +14,7 @@ import org.springframework.stereotype.Component;
 import com.google.common.base.Strings;
 
 import lombok.extern.slf4j.Slf4j;
-import uk.gov.ons.census.fwmt.tests.acceptance.steps.inbound.common.NodeCheck.NodeCheckBuilder;
-import uk.gov.ons.census.fwmt.tests.acceptance.utils.QueueUtils;
-import uk.gov.ons.census.fwmt.tests.acceptance.utils.TMMockUtils;
+import uk.gov.ons.census.fwmt.tests.acceptance.utils.NodeCheck.NodeCheckBuilder;
 
 @Component
 @Slf4j

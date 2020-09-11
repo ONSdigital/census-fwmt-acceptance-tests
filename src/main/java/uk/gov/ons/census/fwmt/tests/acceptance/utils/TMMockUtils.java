@@ -14,8 +14,7 @@ import uk.gov.ons.census.fwmt.common.data.modelcase.CasePause;
 import uk.gov.ons.census.fwmt.common.data.modelcase.ModelCase;
 import uk.gov.ons.census.fwmt.data.dto.MockMessage;
 import uk.gov.ons.census.fwmt.tests.acceptance.exceptions.MockInaccessibleException;
-import uk.gov.ons.census.fwmt.tests.acceptance.steps.inbound.common.NodeCheck;
-import uk.gov.ons.census.fwmt.tests.acceptance.steps.inbound.common.NodeCheck.NodeCheckBuilder;
+import uk.gov.ons.census.fwmt.tests.acceptance.utils.NodeCheck.NodeCheckBuilder;
 
 import javax.xml.bind.JAXBContext;
 import java.io.IOException;

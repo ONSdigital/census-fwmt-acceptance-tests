@@ -1,4 +1,4 @@
-package uk.gov.ons.census.fwmt.tests.acceptance.steps.inbound.common;
+package uk.gov.ons.census.fwmt.tests.acceptance.utils;
 
 import lombok.Builder;
 import lombok.Data;
