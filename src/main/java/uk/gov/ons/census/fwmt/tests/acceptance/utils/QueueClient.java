@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 import com.google.common.base.Strings;
 
 import lombok.extern.slf4j.Slf4j;
+import uk.gov.ons.census.fwmt.tests.acceptance.steps.inbound.common.NodeCheck;
 
 @Slf4j
 @Component
@@ -143,6 +144,11 @@ public final class QueueClient {
     if (httpURLConnection.getResponseCode() != 200) {
       throw new RuntimeException("Failed : HTTP error code : " + httpURLConnection.getResponseCode());
     }
+  }
+  
+  public NodeCheck doPreFlightCheck() {
+    return queueUtils.doPreFlightCheck();
+
   }
 
 }

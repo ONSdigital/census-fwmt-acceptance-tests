@@ -14,6 +14,8 @@ import uk.gov.ons.census.fwmt.common.data.modelcase.CasePause;
 import uk.gov.ons.census.fwmt.common.data.modelcase.ModelCase;
 import uk.gov.ons.census.fwmt.data.dto.MockMessage;
 import uk.gov.ons.census.fwmt.tests.acceptance.exceptions.MockInaccessibleException;
+import uk.gov.ons.census.fwmt.tests.acceptance.steps.inbound.common.NodeCheck;
+import uk.gov.ons.census.fwmt.tests.acceptance.steps.inbound.common.NodeCheck.NodeCheckBuilder;
 
 import javax.xml.bind.JAXBContext;
 import java.io.IOException;
@@ -384,4 +386,31 @@ public final class TMMockUtils {
     }
     return exists;
   }
+  public NodeCheck checkDbUp(){
+    NodeCheckBuilder builder = NodeCheck.builder().name("Postgres").url(url);
+
+    Statement stmt = null;
+    try (Connection conn = DriverManager.getConnection(url, username, password)) {
+      if (conn != null) {
+        System.out.println("Connected to the database!");
+        stmt = conn.createStatement();
+        String sql = "SELECT * FROM fwmtg.gateway_cache";
+        stmt.execute(sql);
+        return builder.isSuccesful(true).build(); 
+      } else {
+        return builder.isSuccesful(false).failureMsg("Failed to make connection!").build(); 
+      }
+    } catch (SQLException e) {
+      return builder.isSuccesful(false).failureMsg(e.getMessage()).build(); 
+    } finally {
+      try {
+        if (stmt != null)
+          stmt.close();
+      } catch (SQLException e) {
+        return builder.isSuccesful(false).failureMsg(e.getMessage()).build(); 
+      }
+    }
+  }
+  
+  
 }
