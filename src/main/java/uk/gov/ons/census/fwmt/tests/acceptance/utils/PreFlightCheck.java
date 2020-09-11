@@ -63,7 +63,7 @@ public class PreFlightCheck {
     checks.add(checkService("job-service", jobserviceServiceUrl+"/swagger-ui.html", jobServiceUsername, jobServicePassword));
     checks.add(checkService("tm-service", tmServiceUrl+"/swagger-ui.html", tmServiceUsername, tmServicePassword));
     checks.add(tmMockUtils.checkDbUp());
-    checks.stream().forEach(n -> log.info(n.toString()));
+    checks.stream().forEach(n -> System.out.println(n.toString()));
   }
 
   public NodeCheck checkService(String name, String address, String user, String password){
