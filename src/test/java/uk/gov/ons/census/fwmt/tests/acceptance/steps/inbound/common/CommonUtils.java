@@ -24,6 +24,9 @@ public class CommonUtils {
 
     @Autowired
     private GatewayEventMonitor gatewayEventMonitor;
+    
+    @Autowired
+    private PreFlightCheck preFlightCheck;
 
     @Value("${service.rabbit.url}")
     private String rabbitLocation;
@@ -37,6 +40,7 @@ public class CommonUtils {
     public static Map<String, String> testBucket = new HashMap<>();
 
     public void setup() throws Exception {
+      preFlightCheck.doCheck();
       tmMockUtils.enableRequestRecorder();
       tmMockUtils.resetMock();
       tmMockUtils.clearDownDatabase();
@@ -51,6 +55,7 @@ public class CommonUtils {
       gatewayEventMonitor.tearDownGatewayEventMonitor();
       tmMockUtils.disableRequestRecorder();
     }
+
 
 
 

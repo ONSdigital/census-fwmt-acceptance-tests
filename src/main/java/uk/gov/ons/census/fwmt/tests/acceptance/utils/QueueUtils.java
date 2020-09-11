@@ -6,6 +6,8 @@ import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.GetResponse;
 import lombok.extern.slf4j.Slf4j;
+import uk.gov.ons.census.fwmt.tests.acceptance.steps.inbound.common.NodeCheck;
+import uk.gov.ons.census.fwmt.tests.acceptance.steps.inbound.common.NodeCheck.NodeCheckBuilder;
 
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.Declarables;
@@ -201,5 +203,16 @@ public class QueueUtils {
     channel.queueBind(TEMP_FIELD_OTHERS_QUEUE, GATEWAY_OUTCOME_EXCHANGE, GATEWAY_QUESTIONNAIRE_UPDATE_ROUTING_KEY);
     channel.queueBind(TEMP_FIELD_OTHERS_QUEUE, GATEWAY_OUTCOME_EXCHANGE, GATEWAY_CCS_PROPERTYLISTING_ROUTING_KEY);
     channel.queueBind(TEMP_FIELD_OTHERS_QUEUE, GATEWAY_OUTCOME_EXCHANGE, GATEWAY_EVENT_FIELDCASE_UPDATE_ROUTING_KEY);
+  }
+
+  public NodeCheck doPreFlightCheck() {
+    NodeCheckBuilder builder = NodeCheck.builder().name("Rabbit MQ").url(rabbitmqHost);
+    try {
+      deleteMessage(FIELD_REFUSALS_QUEUE);
+      builder.isSuccesful(true);
+    } catch (Exception e) {
+      builder.isSuccesful(false).failureMsg(e.getMessage());
+    }    
+    return builder.build();
   }
 }
