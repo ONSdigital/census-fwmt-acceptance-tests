@@ -34,12 +34,8 @@ Feature: SPG Update Tests
    Examples:
      |Survey | Type     | IsSecure | CaseRef  | HandDeliver |
      |CE     | CE Site  | F        | 12345678 | F           |
-     |CE     | CE Site  | T        | 12345678 | F           |
+‰     |CE     | CE Site  | T        | 12345678 | F           |
 
-
- Scenario: As Gateway I will fail when I receive a Unit Update to a job requests from RM for a job that doesnt exist but undeliveredAsAddress is set to false
-   Given RM sends a unit update case request where undeliveredAsAddress is "false"
-   Then the update job should fail
 
 
  Scenario: As Gateway I can receive an update job request for SPG Unit for an unexisting job and is set to undeliveredAsAddress. gateway will process as a Create message
@@ -78,4 +74,4 @@ Feature: SPG Update Tests
 		And is Processed as "HH Pause Case"
     Then it will Pause the job in TM
     And the Paused job is acknowledged by TM
-  
+ 

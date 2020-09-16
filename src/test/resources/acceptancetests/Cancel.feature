@@ -30,7 +30,3 @@ Feature: SPG Cancel Tests
       | CE     | CE Site |  F        | 12345678 | F           | CLOSE    |
       | CE     | CE Site |  T        | 12345678 | F           | CLOSE    |
 
-
-  Scenario: As Gateway I will fail when I receive a cancel job requests for RM from an unexisting job
-    Given RM sends a cancel case request
-    Then the cancel job should fail

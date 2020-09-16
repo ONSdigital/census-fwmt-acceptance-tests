@@ -1,24 +1,22 @@
 package uk.gov.ons.census.fwmt.tests.acceptance.utils;
 
+import java.io.IOException;
+import java.time.Instant;
+import java.util.Date;
+import java.util.Map;
+import java.util.concurrent.TimeoutException;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
 import com.rabbitmq.client.AMQP.BasicProperties;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.GetResponse;
+
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.ons.census.fwmt.tests.acceptance.utils.NodeCheck.NodeCheckBuilder;
-
-import org.springframework.amqp.core.BindingBuilder;
-import org.springframework.amqp.core.Declarables;
-import org.springframework.amqp.core.Queue;
-import org.springframework.amqp.core.TopicExchange;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-
-import java.io.IOException;
-import java.util.Map;
-import java.util.concurrent.TimeoutException;
 
 @Slf4j
 @Component
@@ -118,7 +116,7 @@ public class QueueUtils {
     return factory;
   }
 
-  public Boolean addMessage(String exchange, String routingkey, String message, String type) {
+  public Boolean addMessage(String exchange, String routingkey, String message, String type)  {
     Connection connection = null;
     Channel channel = null;
     try {
@@ -136,6 +134,15 @@ public class QueueUtils {
       }
       builder.contentType("application/json");
       builder.contentEncoding("UTF-8");
+      Date date = new Date(Instant.now().toEpochMilli());
+      builder.timestamp(date);
+      try {
+        Thread.sleep(1000);
+      } catch (InterruptedException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+      }
+      System.out.println("Date::" + date.toInstant().toEpochMilli());
       BasicProperties properties = builder.build();
 
       channel.basicPublish(exchange, routingkey, properties, message.getBytes());

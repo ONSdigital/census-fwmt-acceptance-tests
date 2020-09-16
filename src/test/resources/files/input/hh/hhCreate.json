@@ -2,6 +2,7 @@
   "actionInstruction":"CREATE",
   "surveyName":"CENSUS",
   "addressType":"HH",
+  "addressLevel":"U",
   "caseId":"bd6345af-d706-43d3-a13b-8c549e081a76",
   "caseRef":"7541877481",
   "fieldOfficerId":"SH-TWH1-ZJ-05",

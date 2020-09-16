@@ -325,7 +325,9 @@ public final class TMMockUtils {
       if (conn != null) {
         System.out.println("Connected to the database!");
         stmt = conn.createStatement();
-        String sql = "DELETE FROM gateway_cache";
+        String sql = "DELETE FROM message_cache";
+        stmt.executeUpdate(sql);
+        sql = "DELETE FROM gateway_cache";
         stmt.executeUpdate(sql);
         sql = "DELETE FROM request_log";
         stmt.execute(sql);
