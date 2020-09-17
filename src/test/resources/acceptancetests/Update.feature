@@ -34,7 +34,7 @@ Feature: SPG Update Tests
    Examples:
      |Survey | Type     | IsSecure | CaseRef  | HandDeliver |
      |CE     | CE Site  | F        | 12345678 | F           |
-‰     |CE     | CE Site  | T        | 12345678 | F           |
+     |CE     | CE Site  | T        | 12345678 | F           |
 
 
 
