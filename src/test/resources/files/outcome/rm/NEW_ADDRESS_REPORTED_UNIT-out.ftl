@@ -25,6 +25,9 @@
 "addressType" : "${surveyType}",
 "addressLevel" : "U"
 }
+<#if usualResidents??>
+    ,"ceExpectedCapacity" : "${usualResidents}"
+</#if>
 }
 }
 }

@@ -33,6 +33,11 @@
 </#if>
 "addressType" : "${surveyType}"
 }
+<#if usualResidents??>
+    ,"ceExpectedCapacity" : "${usualResidents}"
+<#else>
+    ,"ceExpectedCapacity" : "0"
+</#if>
 }
 }
 }

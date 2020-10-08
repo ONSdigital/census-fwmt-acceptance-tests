@@ -11,11 +11,33 @@
 "fulfilmentCode":"${fulfilmentCode}",
 "caseId":"bd6345af-d706-43d3-a13b-8c549e081a76",
 "address":{},
-"contact":{
-"title":null,
-"forename":null,
-"surname":null,
-"telNo":"07777000000"
+"contact": {
+<#if requesterTitle??>
+    "title": "${requesterTitle}",
+<#else>
+    "title":null,
+</#if>
+<#if requesterForename??>
+    "forename":"${requesterForename}",
+<#else>
+    "forename":null,
+</#if>
+<#if requesterSurname??>
+    "surname":"${requesterSurname}",
+<#else>
+    "surname":null,
+</#if>
+    "telNo":"07777000000"
+}
+<#if individualCaseId?? && surveyType == "HH">
+    ,
+    "individualCaseId": "${individualCaseId}"
+<#else>
+</#if>
+<#--"title":null,-->
+<#--"forename":null,-->
+<#--"surname":null,-->
+<#--"telNo":"07777000000"-->
 }
 }
 }
