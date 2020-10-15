@@ -11,10 +11,10 @@ Feature: Resilience Tests
       | Empty                   | Create       | Create               |                      | Newer       | Process        |
       | Empty                   | Update       | Update(held)         | Update(held)         | Newer       | No Action      |
       | Empty                   | Cancel       | Cancel(held)         | Cancel(held)         | Newer       | No Action      |
-      | Empty                   | CE Switch    |  Update(held)        | Update(held)         | Newer       | No Action      |
-      | Empty                   | CE Switch    |  Update(held)        | Update(held)         | Older       | No Action      |
-      | Create                  | CE Switch    |  Create              |                      | Newer       | Process        |
-      | Create                  | CE Switch    |  Create              |                      | Older       | Process        |
+      | Empty                   | CE Switch    | Update(held)         | Update(held)         | Newer       | No Action      |
+      | Empty                   | CE Switch    | Update(held)         | Update(held)         | Older       | No Action      |
+      | Create                  | CE Switch    | Create               |                      | Newer       | Process        |
+      | Create                  | CE Switch    | Create               |                      | Older       | Process        |
       | Create                  | Update       | Update               |                      | Newer       | Process        |
       | Create                  | Update       | Create               |                      | Older       | Reject         |
       | Create                  | Cancel       | Cancel               |                      | Newer       | Process        |
@@ -23,8 +23,8 @@ Feature: Resilience Tests
       | Update                  | Update       | Update               |                      | Older       | Reject         |
       | Update                  | Cancel       | Cancel               |                      | Newer       | Process        |
       | Update                  | Cancel       | Update               |                      | Older       | No Action      |
-      | Update                  | CE Switch    |  Update              |                      | Newer       | Process        |
-      | Update                  | CE Switch    |  Update              |                      | Older       | Process        |
+      | Update                  | CE Switch    | Update               |                      | Newer       | Process        |
+      | Update                  | CE Switch    | Update               |                      | Older       | Process        |
       | Update(Held)            | Create       | Update(held)         |                      | Newer       | Reject         |
       | Update(Held)            | Create       | Update               |                      | Older       | Merge          |
       | Update(Held)            | Update       | Update(held)         | Update(held)         | Newer       | No Action      |
@@ -37,16 +37,16 @@ Feature: Resilience Tests
       | Cancel                  | Update       | Update               |                      | Older       | Process        |
       | Cancel                  | Cancel       | Cancel               |                      | Newer       | Reject         |
       | Cancel                  | Cancel       | Cancel               |                      | Older       | No Action      |
-      | Cancel                  | CE Switch    |  Cancel              |                      | Newer       | No Action      |
-      | Cancel                  | CE Switch    |  Cancel              |                      | Older       | No Action      |
+      | Cancel                  | CE Switch    | Cancel               |                      | Newer       | No Action      |
+      | Cancel                  | CE Switch    | Cancel               |                      | Older       | No Action      |
       | Cancel(Held)            | Create       | Cancel(held)         | Cancel(held)         | Newer       | Reject         |
       | Cancel(Held)            | Create       | Cancel               |                      | Older       | Merge          |
       | Cancel(Held)            | Update       | Update(held)         | Update(held)         | Newer       | No Action      |
       | Cancel(Held)            | Update       | Cancel(held)         | Cancel(held)         | Older       | No Action      |
       | Cancel(Held)            | Cancel       | Cancel(held)         | Cancel(held)         | Newer       | No Action      |
       | Cancel(Held)            | Cancel       | Cancel(held)         | Cancel(held)         | Older       | No Action      |
-      | Cancel(Held)            | CE Switch       | Cancel(held)         | Cancel(held)         | Newer       | Reject      |
-      | Cancel(Held)            | CE Switch       | Cancel(held)         | Cancel(held)         | Older       | Reject      |
+      | Cancel(Held)            | CE Switch    | Cancel(held)         | Cancel(held)         | Newer       | Reject         |
+      | Cancel(Held)            | CE Switch    | Cancel(held)         | Cancel(held)         | Older       | Reject         |
 
 
   Scenario: As gateway I cannot process create messages once they are already present in the cache

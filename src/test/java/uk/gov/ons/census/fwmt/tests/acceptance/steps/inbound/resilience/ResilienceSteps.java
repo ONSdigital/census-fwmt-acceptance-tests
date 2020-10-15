@@ -238,22 +238,15 @@ public class ResilienceSteps {
 
     switch (actionGateway) {
       case "Create":
-        checkGatewayCache = tmMockUtils.checkActionExistsInGatewayCache(actionGateway, caseId);
-        break;
       case "Update":
-        checkGatewayCache = tmMockUtils.checkActionExistsInGatewayCache(actionGateway, caseId);
-        break;
       case "Cancel":
-        checkGatewayCache = tmMockUtils.checkActionExistsInGatewayCache(actionGateway, caseId);
-        break;
+          checkGatewayCache = tmMockUtils.checkActionExistsInGatewayCache(actionGateway, caseId);
+          break;
       case "Update(held)":
-        checkGatewayCache = tmMockUtils.checkActionExistsInGatewayCache(actionGateway, caseId);
-        checkMessageCache = tmMockUtils.checkActionExistsInMessageCache(actionMessage, caseId);
-        break;
       case "Cancel(held)":
-        checkGatewayCache = tmMockUtils.checkActionExistsInGatewayCache(actionGateway, caseId);
-        checkMessageCache = tmMockUtils.checkActionExistsInMessageCache(actionMessage, caseId);
-        break;
+          checkGatewayCache = tmMockUtils.checkActionExistsInGatewayCache(actionGateway, caseId);
+          checkMessageCache = tmMockUtils.checkActionExistsInMessageCache(actionMessage, caseId);
+          break;
       default:
         throw new GatewayException(GatewayException.Fault.SYSTEM_ERROR, actionGateway, "No such action");
     }
@@ -272,122 +265,4 @@ public class ResilienceSteps {
     boolean hasBeenTriggered = gatewayEventMonitor.hasErrorEventTriggered(caseId, ROUTING_FAILED, CommonUtils.TIMEOUT);
     assertThat(hasBeenTriggered).isTrue();
   }
-
-//  @Given("a TM doesnt have a job with case ID {string} in TM")
-//  public void aTMDoesntHaveAJobWithCaseIDInTM(String caseId) {
-//    try {
-//      testBucket.put("caseId", caseId);
-//      tmMockUtils.getCaseById(caseId);
-//      fail("Case should not exist");
-//    } catch (HttpClientErrorException e) {
-//      assertEquals(HttpStatus.NOT_FOUND, e.getStatusCode());
-//    }
-//  }
-//
-//  @And("the gateway cache with case ID {string} is empty")
-//  public void cacheIsEmpty(String caseId) throws Exception {
-//    int checkRecords = tmMockUtils.checkCaseIdExists(caseId);
-//    assertThat(checkRecords).isZero();
-//  }
-//
-//  @And("RM sends an {string} with case ID {string} that is not in the correct order")
-//  public void rmSendsACECreateJobRequest(String instruction, String caseId) throws Exception {
-//    testBucket.put("action", instruction);
-//    JSONObject json;
-//    String rmAction;
-//    if (instruction.equals("Update")) {
-//      json  = new JSONObject(updateJson);
-//      rmAction = "create";
-//    } else {
-//      json = new JSONObject(cancelJson);
-//      rmAction = "cancel";
-//    }
-//
-//    String request = json.toString(4);
-//    log.info("Request = " + request);
-//    queueClient.sendToRMFieldQueue(request, rmAction);
-//    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, MESSAGE_HELD, CommonUtils.TIMEOUT);
-//    assertThat(hasBeenTriggered).isTrue();
-//  }
-//
-//
-//
-//  @And("the create message will be older than the message with {string} and case ID {string}")
-//  public void updateMessageForOlderCreate(String storedAction, String caseId) throws Exception {
-//    tmMockUtils.updateStoredMessageTimeStamp(storedAction, caseId);
-//  }
-//
-//  @When("RM sends the Create instruction that is older than the stored message")
-//  public void olderCreateInstructionSent() throws URISyntaxException {
-//    String caseId = testBucket.get("caseId");
-//
-//    JSONObject json = new JSONObject(ceEstabCreateJson);
-//
-//    json.put("handDeliver", true);
-//
-//    String request = json.toString(4);
-//    log.info("Request = " + request);
-//    queueClient.sendToRMFieldQueue(request, "create");
-//    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, RM_CREATE_REQUEST_RECEIVED, CommonUtils.TIMEOUT);
-//    assertThat(hasBeenTriggered).isTrue();
-//  }
-//
-//  @Then("the gateway will process the {string} with case ID {string} and sends it to TM")
-//  public void gatewayProcessesStoredAction(String actionInstruction, String caseId) {
-//    String tmResponse;
-//    if (actionInstruction.equals("Update")) {
-//      tmResponse = COMET_UPDATE_ACK;
-//    } else {
-//      tmResponse = COMET_CANCEL_ACK;
-//    }
-//    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, tmResponse, CommonUtils.TIMEOUT);
-//    assertThat(hasBeenTriggered).isTrue();
-//  }
-//
-//  @When("RM sends the Create instruction that is newer than the stored message")
-//  public void newerCreateInstructionSent() throws URISyntaxException {
-//    String caseId = testBucket.get("caseId");
-//
-//    JSONObject json = new JSONObject(ceEstabCreateJson);
-//
-//    json.put("handDeliver", true);
-//
-//    String request = json.toString(4);
-//    log.info("Request = " + request);
-//    queueClient.sendToRMFieldQueue(request, "create");
-//    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, RM_CREATE_REQUEST_RECEIVED, CommonUtils.TIMEOUT);
-//    assertThat(hasBeenTriggered).isTrue();
-//  }
-//
-//  @Then("the gateway will not process the stored message")
-//  public void gatewayDoesNotProcessStoredAction() {
-//    String caseId = testBucket.get("caseId");
-//    boolean hasBeenTriggered = gatewayEventMonitor.hasErrorEventTriggered(caseId, REJECTED_RM_REQUEST, CommonUtils.TIMEOUT);
-//    assertThat(hasBeenTriggered).isTrue();
-//  }
-//
-//  @When("RM sends a {string} instruction that is newer than the stored message")
-//  public void newActionInstructionSent(String newInstruction) throws URISyntaxException {
-//    JSONObject json;
-//    String caseId = testBucket.get("caseId");
-//    String rmAction;
-//    if (newInstruction.equals("Update")) {
-//      json  = new JSONObject(updateJson);
-//      rmAction = "create";
-//    } else {
-//      json = new JSONObject(cancelJson);
-//      rmAction = "cancel";
-//    }
-//    String request = json.toString(4);
-//    log.info("Request = " + request);
-//    queueClient.sendToRMFieldQueue(request, rmAction);
-//    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, MESSAGE_HELD, CommonUtils.TIMEOUT);
-//    assertThat(hasBeenTriggered).isTrue();
-//  }
-//
-//  @Then("the gateway will update the message and store the {string}")
-//  public void updateMessage(String newStoredAction) {
-//
-//  }
-
 }
