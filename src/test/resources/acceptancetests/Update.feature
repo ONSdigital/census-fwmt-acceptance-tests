@@ -47,10 +47,10 @@ Feature: SPG Update Tests
 
  Scenario Outline: As Gateway I can receive an update to a request from RM for an existing Household job
    Given a TM doesnt have a job with case ID "bd6345af-d706-43d3-a13b-8c549e081a76" in TM
-   And RM sends a HH create job request with "<CaseRef>" "<Survey>" "<oa>"  
+   And RM sends a HH create job request with "<CaseRef>" "<Survey>" "<oa>"
    And RM sends a HH update case request for the case "<isBlankFormReturned>" "<isUndeliveredAsAddress>"
    When Gateway receives an update message for the case
-		And is Processed as "<ProcessedAs>" 
+		And is Processed as "<ProcessedAs>"
    Then it will update the job in TM
    And the updated job is acknowledged by TM
    And an associated a Pause is deleted "<IsPauseDeleted>"
@@ -68,7 +68,7 @@ Feature: SPG Update Tests
 
   Scenario: As Gateway I can receive an Pause Case to a request from RM for an existing Household job
     Given a TM doesnt have a job with case ID "bd6345af-d706-43d3-a13b-8c549e081a76" in TM
-    And RM sends a HH create job request 
+    And RM sends a HH create job request
     And RM sends a HH Pause Case request for the case
     When Gateway receives an HH Pause Case message for the case
 		And is Processed as "HH Pause Case"

@@ -30,7 +30,7 @@
        "managerForename":"John",
        "managerSurname":"Smith",
        <#if usualResidents??>
-         "usualResidents": 5        ,
+         ${usualResidents},
        </#if>
        "contactPhone":"07977123456"
       },
@@ -38,7 +38,6 @@
    
     <#if usualResidents??>
        ${usualResidents}
-      ,
     <#else>
        "ceDetails":null,
     </#if>

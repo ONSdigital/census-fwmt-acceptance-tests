@@ -22,8 +22,11 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 
 @Slf4j
 @Component
@@ -352,6 +355,149 @@ public final class TMMockUtils {
         String sql = "INSERT INTO fwmtg.gateway_cache (case_id, is_delivered, exists_in_fwmt, estab_uprn, type)\n" +
                 "VALUES ('" + caseId + "', false, " + existInFwmt +  ", " + estabUprn + ", " + type + ")";
         stmt.executeUpdate(sql);
+      } else {
+        System.out.println("Failed to make connection!");
+      }
+    } finally {
+      try {
+        if (stmt != null)
+          stmt.close();
+      } catch (SQLException ignored) {
+      }
+    }
+  }
+
+  public int checkCaseIdExists(String caseId) throws Exception {
+    Statement stmt = null;
+    ResultSet resultSet = null;
+    int recordNumbers = 0;
+    try (Connection conn = DriverManager.getConnection(url, username, password)) {
+      if (conn != null) {
+        System.out.println("Checking whether caseID is in the database!");
+        stmt = conn.createStatement();
+        String checkCaseId = "'" + caseId + "'";
+        String sql = "SELECT * FROM fwmtg.gateway_cache WHERE case_Id = " +
+                checkCaseId;
+        resultSet = stmt.executeQuery(sql);
+        while (resultSet.next()){
+          recordNumbers = resultSet.getRow();
+          break;
+        }
+      } else {
+        System.out.println("Failed to make connection!");
+      }
+    } finally {
+      try {
+        if (stmt != null)
+          stmt.close();
+      } catch (SQLException ignored) {
+      }
+    }
+    return recordNumbers;
+  }
+
+  public int checkActionExistsInMessageCache(String storedAction, String caseId) throws Exception {
+    Statement stmt = null;
+    ResultSet resultSet = null;
+    int recordNumbers = 0;
+    try (Connection conn = DriverManager.getConnection(url, username, password)) {
+      if (conn != null) {
+        System.out.println("Checking whether caseID is in the database!");
+        stmt = conn.createStatement();
+        String memoryQuery = "'" + caseId + "'" + "AND message_type = " + "'" + (storedAction).toUpperCase() + "'";
+        String sql = "SELECT * FROM fwmtg.message_cache WHERE case_Id = " +
+                memoryQuery;
+        resultSet = stmt.executeQuery(sql);
+        while (resultSet.next()){
+          recordNumbers = resultSet.getRow();
+          break;
+        }
+      } else {
+        System.out.println("Failed to make connection!");
+      }
+    } finally {
+      try {
+        if (stmt != null)
+          stmt.close();
+      } catch (SQLException ignored) {
+      }
+    }
+    return recordNumbers;
+  }
+
+  public int checkActionExistsInGatewayCache(String storedAction, String caseId) throws Exception {
+    Statement stmt = null;
+    ResultSet resultSet = null;
+    int recordNumbers = 0;
+    try (Connection conn = DriverManager.getConnection(url, username, password)) {
+      if (conn != null) {
+        System.out.println("Checking whether caseID is in the database!");
+        stmt = conn.createStatement();
+        String memoryQuery = "'" + caseId + "'" + "AND last_action_instruction = " + "'" + (storedAction).toUpperCase() + "'";
+        String sql = "SELECT * FROM fwmtg.gateway_cache WHERE case_Id = " +
+                memoryQuery;
+        resultSet = stmt.executeQuery(sql);
+        while (resultSet.next()){
+          recordNumbers = resultSet.getRow();
+          break;
+        }
+      } else {
+        System.out.println("Failed to make connection!");
+      }
+    } finally {
+      try {
+        if (stmt != null)
+          stmt.close();
+      } catch (SQLException ignored) {
+      }
+    }
+    return recordNumbers;
+  }
+
+  public String checkStoredMessage(String storedAction, String caseId) throws Exception {
+    Statement stmt = null;
+    String savedMessage = "";
+    ResultSet resultSet = null;
+    try (Connection conn = DriverManager.getConnection(url, username, password)) {
+      if (conn != null) {
+        System.out.println("Checking whether caseID is in the database!");
+        stmt = conn.createStatement();
+        String memoryQuery = "'" + caseId + "'" + "AND message_type = " + "'" + (storedAction).toUpperCase() + "'";
+        String sql = "SELECT message FROM fwmtg.message_cache WHERE case_Id = " +
+                memoryQuery;
+        resultSet = stmt.executeQuery(sql);
+        while (resultSet.next()){
+          savedMessage = resultSet.getString("message");
+          break;
+        }
+      } else {
+        System.out.println("Failed to make connection!");
+      }
+    } finally {
+      try {
+        if (stmt != null)
+          stmt.close();
+      } catch (SQLException ignored) {
+      }
+    }
+    return savedMessage;
+  }
+
+  public void updateStoredMessageTimeStamp(String storedAction, String caseId) throws Exception {
+    Statement stmt = null;
+    Instant actionTime;
+    try (Connection conn = DriverManager.getConnection(url, username, password)) {
+      if (conn != null) {
+        conn.setAutoCommit(false);
+        System.out.println("Connected to the database!");
+        stmt = conn.createStatement();
+        actionTime = Instant.now().plus(2, ChronoUnit.HOURS);
+        String checkCaseQuery = "'" + actionTime + "'" + " where case_Id = " + "'" + caseId + "'" + " AND last_action_instruction = " + "'" + (storedAction).toUpperCase() + "'";
+
+        String sql = "UPDATE fwmtg.gateway_cache SET last_action_time = " + checkCaseQuery;
+        stmt.executeUpdate(sql);
+        conn.commit();
+
       } else {
         System.out.println("Failed to make connection!");
       }

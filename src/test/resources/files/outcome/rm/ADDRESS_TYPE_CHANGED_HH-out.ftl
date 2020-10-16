@@ -12,8 +12,7 @@
 "collectionCase":{
 "id":"bd6345af-d706-43d3-a13b-8c549e081a76",
 "address":{
-"addressType":"HH",
-"region":"E"
+"addressType":"HH"
 }
 }
 }

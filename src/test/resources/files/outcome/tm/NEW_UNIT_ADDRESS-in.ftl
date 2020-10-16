@@ -7,11 +7,18 @@
 "primaryOutcomeDescription":"${primaryOutcomeDescription}",
 "secondaryOutcomeDescription":"${secondaryOutcomeDescription}",
 "outcomeCode":"${outcomeCode}",
-<#if usualResidents??>
-     ${usualResidents}
-     ,
+<#if surveyType == "CE">
+    "ceDetails":{
+    <#if usualResidents??>
+        ${usualResidents}
+    </#if>
+    },
 <#else>
-     "ceDetails":null,
+    <#if usualResidents??>
+        ${usualResidents}
+    <#else>
+        "ceDetails":null,
+    </#if>
 </#if>
 "address":{
 "addressLine1":"Unit name"

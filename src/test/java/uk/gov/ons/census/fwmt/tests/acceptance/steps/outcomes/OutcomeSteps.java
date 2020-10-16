@@ -1,33 +1,9 @@
 package uk.gov.ons.census.fwmt.tests.acceptance.steps.outcomes;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-
-import java.io.IOException;
-import java.io.StringWriter;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.TimeoutException;
-import java.util.stream.Collectors;
-
-import org.apache.logging.log4j.util.Strings;
-import org.json.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
-
 import cucumber.api.java.After;
 import cucumber.api.java.Before;
 import cucumber.api.java.en.Given;
@@ -37,12 +13,29 @@ import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateExceptionHandler;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.logging.log4j.util.Strings;
+import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import uk.gov.ons.census.fwmt.events.data.GatewayEventDTO;
 import uk.gov.ons.census.fwmt.events.utils.GatewayEventMonitor;
 import uk.gov.ons.census.fwmt.tests.acceptance.steps.inbound.common.CommonUtils;
 import uk.gov.ons.census.fwmt.tests.acceptance.utils.QueueClient;
 import uk.gov.ons.census.fwmt.tests.acceptance.utils.SpgReasonCodeLookup;
 import uk.gov.ons.census.fwmt.tests.acceptance.utils.TMMockUtils;
+
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
 
 @Slf4j
 public class OutcomeSteps {
@@ -226,12 +219,22 @@ public class OutcomeSteps {
       for (String rmMessageType : expectedRmMessages) {
         Map<String, Object> root = new HashMap();
         UUID newCaseId = UUID.randomUUID();
+        String usualResidents;
+
+        if(hasUsualResidentsCount || businessFunction.equals("Switch Feedback Site")) {
+            usualResidents = "5";
+//        } else if (surveyType.equals("CE") && businessFunction != "New Unit Reported"){
+//            usualResidents = "0";
+        } else {
+            usualResidents = "1";
+        }
 
         root.clear();
         root.put("reason", spgReasonCodeLookup.getLookup(outcomeCode));
-        root.put("fulfilmentCode", outcomeCode);
+        root.put("fulfilmentCode", "UACHHT1");
         root.put("newCaseId", newCaseId.toString());
         root.put("surveyType", surveyType);
+        root.put("usualResidents", usualResidents);
         String expectedRmMessage = createExpectedRmMessage(rmMessageType, root);
         expectedRmMessageMap.put(rmMessageType, expectedRmMessage);
       }
@@ -400,7 +403,10 @@ public class OutcomeSteps {
 
         String linkedQid = (hasLinkedQid) ? createOutcomeMessage("LINKED_QID", root) : null;
         String fulfilmentRequested = (hasFulfillmentRequest) ? createOutcomeMessage("FULFILMENT_REQUESTED", root) : null;
-        String usualResidents = (hasUsualResidentsCount) ? createOutcomeMessage("USUAL_RESIDENTS", root) : null;
+        root.put("hasUsualResidents", hasUsualResidentsCount);
+        root.put("surveyType", surveyType);
+        root.put("businessFunction", businessFunction);
+        String usualResidents = createOutcomeMessage("USUAL_RESIDENTS", root);
 
         root.put("caseId", caseId);
         root.put("primaryOutcomeDescription", primaryOutcome);
@@ -409,7 +415,6 @@ public class OutcomeSteps {
         root.put("linkedQid", linkedQid);
         root.put("fulfilmentRequested", fulfilmentRequested);
         root.put("usualResidents", usualResidents);
-        root.put("surveyType", surveyType);
 
         try {
             String request = null;
