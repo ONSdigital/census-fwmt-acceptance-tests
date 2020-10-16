@@ -89,8 +89,69 @@ Feature: Outcome Tests
    | HH         | No Action             | Irrelavant      | Irrelavant                              | 01-01-04     | F            | F                    | NO_ACTION,LINKED_QID                                                           |                                                               |            |
    | HH         | No Action             | Irrelavant      | Irrelavant                              | 01-01-04     | T            | F                    | NO_ACTION,LINKED_QID                                                           | QUESTIONNAIRE_LINKED                                          |            |
 
-   | HH         | No Action             | Irrelavant      | Irrelavant                              | 01-01-05     | F            | F                    | NO_ACTION,FULFILMENT_REQUESTED                                                 |                                                               |            |
-   | HH         | No Action             | Irrelavant      | Irrelavant                              | 01-01-05     | F            | T                    | NO_ACTION,FULFILMENT_REQUESTED                                                 | FULFILMENT_REQUESTED                                          |            |
+      | CCS        | Cancel Feedback          | Cancel Feedback | Cancel Feedback                         | 31-01-05     | F            | F                    | CANCEL_FEEDBACK,LINKED_QID                                                     | LINKED_QID                                                   | CANCEL        |
+      | CCS        | Cancel Feedback          | Cancel Feedback | Cancel Feedback                         | 31-01-05     | T            | F                    | CANCEL_FEEDBACK,LINKED_QID                                                     | LINKED_QID,LINKED_QID                                        | CANCEL        |
 
-   | HH         | Not Valid Address     | Not Valid       | Visit - Unoccupied Site                 | 01-02-06     | F            | F                    | ADDRESS_NOT_VALID                                                              | ADDRESS_NOT_VALID                                             |            |
-     
+      | CCS        | Cancel Feedback          | Cancel Feedback | Cancel Feedback                         | 31-02-01     | F            | F                    | CANCEL_FEEDBACK                                                                |                                                              | CANCEL        |
+
+      | CCS        | No Action                | Irrelevant      | Irrelevant                              | 31-02-02     | F            | F                    | NO_ACTION                                                                      | NO_ACTION                                                    |               |
+
+      | CCS        | Cancel Feedback          | Cancel Feedback | Cancel Feedback                         | 31-02-03     | F            | F                    | CANCEL_FEEDBACK,LINKED_QID                                                     | LINKED_QID                                                   | CANCEL        |
+      | CCS        | Cancel Feedback          | Cancel Feedback | Cancel Feedback                         | 31-02-03     | T            | F                    | CANCEL_FEEDBACK,LINKED_QID                                                     | LINKED_QID,LINKED_QID                                        | CANCEL        |
+
+      | CCS        | Property Listed          | Contact Made    | Property Listed                         | 31-02-04     | T            | F                    | LINKED_QID                                                                     | LINKED_QID                                                   |               |
+      | CCS        | Property Listed          | Contact Made    | Property Listed                         | 31-02-04     | F            | F                    | LINKED_QID                                                                     |                                                              |               |
+
+      | CCS        | No Action                | Irrelevant      | Irrelevant                              | 31-02-05     | F            | F                    | NO_ACTION                                                                      | NO_ACTION                                                    |               |
+      | CCS        | No Action                | Irrelevant      | Irrelevant                              | 31-02-06     | F            | F                    | NO_ACTION                                                                      | NO_ACTION                                                    |               |
+
+      | CCS        | Property Listed          | Contact Made    | Extraordinary Refusal                   | 31-02-07     | F            | F                    | EXTRAORDINARY_REFUSAL_RECEIVED                                                 | EXTRAORDINARY_REFUSAL_RECEIVED,CANCEL_FEEDBACK               | CANCEL        |
+      | CCS        | Property Listed          | Contact Made    | Hard Refusal                            | 31-02-08     | F            | F                    | HARD_REFUSAL_RECEIVED                                                          | HARD_REFUSAL_RECEIVED,CANCEL_FEEDBACK                        | CANCEL        |
+
+      | CCS        | Property Listed          | Contact Made    | Unoccupied Site                         | 31-03-01     | F            | F                    | ADDRESS_NOT_VALID                                                              | ADDRESS_NOT_VALID                                            |               |
+      | CCS        | Property Listed          | Contact Made    | Unoccupied Site                         | 31-03-02     | F            | F                    | ADDRESS_NOT_VALID                                                              | ADDRESS_NOT_VALID                                            |               |
+      | CCS        | Property Listed          | Contact Made    | Unoccupied Site                         | 31-03-03     | F            | F                    | ADDRESS_NOT_VALID                                                              | ADDRESS_NOT_VALID                                            |               |
+      | CCS        | Property Listed          | Contact Made    | Unoccupied Site                         | 31-03-04     | F            | F                    | ADDRESS_NOT_VALID                                                              | ADDRESS_NOT_VALID                                            |               |
+
+
+      | CCS        | No Action                | Irrelevant      | Irrelevant                              | 32-01-01     | F            | F                    | NO_ACTION                                                                      | NO_ACTION                                                    |               |
+      | CCS        | No Action                | Irrelevant      | Irrelevant                              | 32-01-02     | F            | F                    | NO_ACTION                                                                      | NO_ACTION                                                    |               |
+
+      | CCS        | Cancel Feedback          | Cancel Feedback | Cancel Feedback                         | 32-01-03     | F            | F                    | CANCEL_FEEDBACK                                                                |                                                              | CANCEL        |
+      | CCS        | Cancel Feedback          | Cancel Feedback | Cancel Feedback                         | 32-01-04     | F            | F                    | CANCEL_FEEDBACK                                                                |                                                              | CANCEL        |
+
+      | CCS        | Cancel Feedback          | Cancel Feedback | Cancel Feedback                         | 32-02-01     | T            | F                    | CANCEL_FEEDBACK,LINKED_QID                                                     | LINKED_QID                                                   | CANCEL        |
+      | CCS        | Cancel Feedback          | Cancel Feedback | Cancel Feedback                         | 32-02-01     | F            | F                    | CANCEL_FEEDBACK,LINKED_QID                                                     |                                                              | CANCEL        |
+
+      | CCS        | Property Listed          | Contact Made    | Linked Questionnaire                    | 32-02-02     | T            | F                    | LINKED_QID                                                                     | LINKED_QID                                                   |               |
+      | CCS        | Property Listed          | Contact Made    | Linked Questionnaire                    | 32-02-02     | F            | F                    | LINKED_QID                                                                     |                                                              |               |
+
+      | CCS        | No Action                | Irrelevant      | Irrelevant                              | 32-02-03     | F            | F                    | NO_ACTION                                                                      | NO_ACTION                                                    |               |
+      | CCS        | No Action - confirm code | Irrelevant      | Irrelevant                              | 32-02-06     | F            | F                    | NO_ACTION                                                                      | NO_ACTION                                                    |               |
+
+      | CCS        | Property Listed          | Contact Made    | Extraordinary Refusal                   | 31-02-04     | F            | F                    | EXTRAORDINARY_REFUSAL_RECEIVED,CANCEL_FEEDBACK                                 | EXTRAORDINARY_REFUSAL_RECEIVED,CANCEL_FEEDBACK               | CANCEL        |
+      | CCS        | Property Listed          | Contact Made    | Hard Refusal                            | 31-02-05     | F            | F                    | HARD_REFUSAL_RECEIVED,CANCEL_FEEDBACK                                          | HARD_REFUSAL_RECEIVED,CANCEL_FEEDBACK                        | CANCEL        |
+
+      | CCS        | Property Listed          | Contact Made    | Unoccupied Site                         | 32-03-01     | F            | F                    | ADDRESS_NOT_VALID                                                              | ADDRESS_NOT_VALID                                            |               |
+      | CCS        | Property Listed          | Contact Made    | Unoccupied Site                         | 32-03-02     | F            | F                    | ADDRESS_NOT_VALID                                                              | ADDRESS_NOT_VALID                                            |               |
+      | CCS        | Property Listed          | Contact Made    | Unoccupied Site                         | 32-03-03     | F            | F                    | ADDRESS_NOT_VALID                                                              | ADDRESS_NOT_VALID                                            |               |
+      | CCS        | Property Listed          | Contact Made    | Unoccupied Site                         | 32-03-04     | F            | F                    | ADDRESS_NOT_VALID                                                              | ADDRESS_NOT_VALID                                            |               |
+      | CCS        | Property Listed          | Contact Made    | Unoccupied Site                         | 32-03-05     | F            | F                    | ADDRESS_NOT_VALID                                                              | ADDRESS_NOT_VALID                                            |               |
+
+
+  30-01-01|INTERVIEW_REQUIRED_HH
+  30-01-02|PROPERTY_LISTED_HH,LINKED_QID
+  30-01-03|INTERVIEW_REQUIRED_HH,LINKED_QID
+  30-01-04|PROPERTY_LISTED_HH,HARD_REFUSAL_RECEIVE
+  30-01-05|PROPERTY_LISTED_HH,EXTRAORDINARY_REFUSAL_RECEIVED
+  30-01-06|PROPERTY_LISTED_HH,ADDRESS_NOT_VALID
+  30-01-07|PROPERTY_LISTED_HH,ADDRESS_NOT_VALID
+  30-02-01|INTERVIEW_REQUIRED_CE
+  30-02-02|PROPERTY_LISTED_CE
+  30-02-03|PROPERTY_LISTED_CE,LINKED_QID
+  30-02-04|INTERVIEW_REQUIRED_CE,LINKED_QI
+  30-02-05|PROPERTY_LISTED_CE,HARD_REFUSAL_RECEIVED
+  30-02-06|PROPERTY_LISTED_CE,EXTRAORDINARY_REFUSAL_RECEIVED
+  30-02-07|PROPERTY_LISTED_CE,ADDRESS_NOT_VALID
+  30-02-08|PROPERTY_LISTED_CE,ADDRESS_NOT_VALID
+  30-03-01|PROPERTY_LISTED_CE,ADDRESS_NOT_VALID

@@ -25,6 +25,7 @@ Feature: Create Tests
       | CE Unit Follow-up (Secure)  | CE     | CE Unit | T        | 12345678 | F           | CE Unit-F  | SECCU_12345678 |
       | Household England and Wales | HH     | E&W     | F        | 12345678 | F           | HH         | 12345678       |
      | Household Nisra             | HH     | NISRA   | F        | 12345678 | F           | HH         | 12345678       |
+      | CCS Interview               | CCS    | Estab   | F        | 12345678 | F           | HH           | 12345678                |
 
   Scenario Outline: As Gateway I can receive a create CE Site job request from RM after a CE Estab has been processed
     Given a TM doesnt have a job with case ID "bd6345af-d706-43d3-a13b-8c549e081a76" in TM
