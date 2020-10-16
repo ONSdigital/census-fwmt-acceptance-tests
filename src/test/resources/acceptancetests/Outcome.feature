@@ -89,6 +89,81 @@ Feature: Outcome Tests
    | HH         | No Action             | Irrelavant      | Irrelavant                              | 01-01-04     | F            | F                    | NO_ACTION,LINKED_QID                                                           |                                                               |            |
    | HH         | No Action             | Irrelavant      | Irrelavant                              | 01-01-04     | T            | F                    | NO_ACTION,LINKED_QID                                                           | QUESTIONNAIRE_LINKED                                          |            |
 
+      | HH         | No Action                | Irrelevant      | Irrelevant                              | 01-01-05     | F            | F                    | NO_ACTION,FULFILMENT_REQUESTED                                                 |                                                              |               |
+      | HH         | No Action                | Irrelevant      | Irrelevant                              | 01-01-05     | F            | T                    | NO_ACTION,FULFILMENT_REQUESTED                                                 | FULFILMENT_REQUESTED                                         |               |
+
+      | HH         | Not Valid Address        | Contact Made    | Visit - Unoccupied Site                 | 01-02-06     | F            | F                    | ADDRESS_NOT_VALID                                                              | ADDRESS_NOT_VALID                                            |               |
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      | CCS        | Interview Required       | Contact Made    | Interview Required                      | 30-01-01     | F            | F                    | PROPERTY_LISTED                                                                | PROPERTY_LISTED                                              |               |
+
+      | CCS        | Property Listed          | Contact Made    | Property Listed                         | 30-01-02     | F            | F                    | PROPERTY_LISTED,LINKED_QID                                                     | PROPERTY_LISTED                                              |               |
+      | CCS        | Property Listed          | Contact Made    | Property Listed                         | 30-01-02     | T            | F                    | PROPERTY_LISTED,LINKED_QID                                                     | PROPERTY_LISTED,LINKED_QID                                   |               |
+
+      | CCS        | Property Listed          | Contact Made    | Property Listed                         | 30-01-03     | T            | F                    | PROPERTY_LISTED,LINKED_QID                                                     | PROPERTY_LISTED,LINKED_QID                                   |               |
+      | CCS        | Property Listed          | Contact Made    | Property Listed                         | 30-01-03     | F            | F                    | PROPERTY_LISTED,LINKED_QID                                                     | PROPERTY_LISTED                                              |               |
+
+      | CCS        | Property Listed          | Contact Made    | Hard Refusal                            | 30-01-04     | F            | F                    | PROPERTY_LISTED,HARD_REFUSAL_RECEIVED                                          | PROPERTY_LISTED,HARD_REFUSAL_RECEIVED                        |               |
+
+
+      | CCS        | Property Listed          | Contact Made    | Extraordinary Refusal                   | 30-01-05     | F            | F                    | PROPERTY_LISTED,EXTRAORDINARY_REFUSAL_RECEIVED                                 | PROPERTY_LISTED,EXTRAORDINARY_REFUSAL_RECEIVED               |               |
+
+
+      | CCS        | Property Listed          | Contact Made    | Unoccupied Site                         | 30-01-06     | F            | F                    | PROPERTY_LISTED,ADDRESS_NOT_VALID                                              | PROPERTY_LISTED,ADDRESS_NOT_VALID                            |               |
+
+      | CCS        | Property Listed          | Contact Made    | Unoccupied Site                         | 30-01-07     | F            | F                    | PROPERTY_LISTED,ADDRESS_NOT_VALID                                              | PROPERTY_LISTED,ADDRESS_NOT_VALID                            |               |
+
+      | CCS        | Interview Required       | Contact Made    | Interview Required                      | 30-02-01     | F            | F                    | PROPERTY_LISTED                                                                | PROPERTY_LISTED                                              |               |
+
+      | CCS        | Property Listed          | Contact Made    | Property Listed                         | 30-02-02     | F            | F                    | PROPERTY_LISTED                                                                | PROPERTY_LISTED                                              |               |
+
+      | CCS        | Property Listed          | Contact Made    | Property Listed                         | 30-02-03     | F            | F                    | PROPERTY_LISTED,LINKED_QID                                                     | PROPERTY_LISTED                                              |               |
+      | CCS        | Property Listed          | Contact Made    | Property Listed                         | 30-02-03     | T            | F                    | PROPERTY_LISTED,LINKED_QID                                                     | PROPERTY_LISTED,LINKED_QID                                   |               |
+
+      | CCS        | Interview Required       | Contact Made    | Interview Required                      | 30-02-04     | F            | F                    | PROPERTY_LISTED,LINKED_QID                                                     | PROPERTY_LISTED                                              |               |
+      | CCS        | Interview Required       | Contact Made    | Interview Required                      | 30-02-04     | T            | F                    | PROPERTY_LISTED,LINKED_QID                                                     | PROPERTY_LISTED,LINKED_QID                                   |               |
+
+      | CCS        | Property Listed          | Contact Made    | Hard Refusal                            | 30-02-05     | F            | F                    | PROPERTY_LISTED,HARD_REFUSAL_RECEIVED                                          | PROPERTY_LISTED,HARD_REFUSAL_RECEIVED                        |               |
+
+      | CCS        | Property Listed          | Contact Made    | Extraordinary Refusal                   | 30-02-06     | F            | F                    | PROPERTY_LISTED,EXTRAORDINARY_REFUSAL_RECEIVED                                 | PROPERTY_LISTED,EXTRAORDINARY_REFUSAL_RECEIVED               |               |
+
+
+      | CCS        | Property Listed          | Contact Made    | Unoccupied Site                         | 30-02-07     | F            | F                    | PROPERTY_LISTED,ADDRESS_NOT_VALID                                              | PROPERTY_LISTED,ADDRESS_NOT_VALID                            |               |
+
+      | CCS        | Property Listed          | Contact Made    | Unoccupied Site                         | 30-01-08     | F            | F                    | PROPERTY_LISTED,ADDRESS_NOT_VALID                                              | PROPERTY_LISTED,ADDRESS_NOT_VALID                            |               |
+
+      | CCS        | Property Listed          | Contact Made    | Unoccupied Site                         | 30-02-01     | F            | F                    | PROPERTY_LISTED,ADDRESS_NOT_VALID                                              | PROPERTY_LISTED,ADDRESS_NOT_VALID                            |               |
+
+      | CCS        | No Action                | Irrelevant      | Irrelevant                              | 30-01-01     | F            | F                    | NO_ACTION                                                                      | NO_ACTION                                                    |               |
+
+      | CCS        | Cancel Feedback          | Cancel Feedback | Cancel Feedback                         | 30-01-02     | F            | F                    | CANCEL_FEEDBACK                                                                |                                                              | CANCEL        |
+
+
+
+
+
+
+
+
+
+
+      | CCS        | No Action                | Irrelevant      | Irrelevant                              | 31-01-01     | F            | F                    | NO_ACTION                                                                      | NO_ACTION                                                    |               |
+      | CCS        | Cancel Feedback          | Cancel Feedback | Cancel Feedback                         | 31-01-02     | F            | F                    | CANCEL_FEEDBACK                                                                |                                                              | CANCEL        |
+      | CCS        | No Action                | Irrelevant      | Irrelevant                              | 31-01-03     | F            | F                    | NO_ACTION                                                                      | NO_ACTION                                                    |               |
+      | CCS        | Cancel Feedback          | Cancel Feedback | Cancel Feedback                         | 31-01-04     | F            | F                    | CANCEL_FEEDBACK                                                                |                                                              | CANCEL        |
+
       | CCS        | Cancel Feedback          | Cancel Feedback | Cancel Feedback                         | 31-01-05     | F            | F                    | CANCEL_FEEDBACK,LINKED_QID                                                     | LINKED_QID                                                   | CANCEL        |
       | CCS        | Cancel Feedback          | Cancel Feedback | Cancel Feedback                         | 31-01-05     | T            | F                    | CANCEL_FEEDBACK,LINKED_QID                                                     | LINKED_QID,LINKED_QID                                        | CANCEL        |
 

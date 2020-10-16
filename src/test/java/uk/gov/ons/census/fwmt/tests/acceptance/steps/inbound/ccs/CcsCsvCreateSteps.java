@@ -13,6 +13,7 @@ import uk.gov.ons.census.fwmt.tests.acceptance.utils.TMMockUtils;
 
 import java.util.Collection;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 
 public class CcsCsvCreateSteps {
