@@ -1,5 +1,7 @@
 package uk.gov.ons.census.fwmt.tests.acceptance.steps.outcomes;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Charsets;
@@ -41,21 +43,34 @@ import static org.junit.Assert.assertEquals;
 public class OutcomeSteps {
 
     private String surveyType;
+    
     private String businessFunction;
+    
     private String primaryOutcome;
+    
     private String secondaryOutcome;
+    
     private String outcomeCode;
+    
     private boolean hasLinkedQid;
+    
     private boolean hasFulfillmentRequest;
+    
     private boolean hasUsualResidentsCount;
+    
     private List<String> expectedProcessors = new ArrayList<>();
+    
     private List<String> expectedRmMessages = new ArrayList<>();
+    
     private List<String> expectedJsMessages = new ArrayList<>();
+    
     private Map<String, String> actualRmMessageMap = new HashMap<>();
+    
     private Map<String, String> expectedRmMessageMap = new HashMap<>();
+    
     private String addressTypeChangeMsg;
+    
     private String newCaseId;
-
 
     private Collection<GatewayEventDTO> processingEvents;
 
@@ -88,9 +103,16 @@ public class OutcomeSteps {
     private static final String COMET_CE_STANDALONE_OUTCOME_RECEIVED = "COMET_CE_STANDALONE_OUTCOME_RECEIVED";
 
     private static final String RM_CREATE_REQUEST_RECEIVED = "RM_CREATE_REQUEST_RECEIVED";
+    
     private static final String COMET_HH_SPLITADDRESS_RECEIVED = "COMET_HH_SPLITADDRESS_RECEIVED";
+    
     private static final String COMET_HH_STANDALONE_RECEIVED = "COMET_HH_STANDALONE_RECEIVED";
+    
     private static final String COMET_HH_OUTCOME_RECEIVED = "COMET_HH_OUTCOME_RECEIVED";
+
+    private static final String COMET_CCS_PL_RECEIVED = "COMET_CCS_PL_RECEIVED";
+    
+    private static final String COMET_CCS_INT_RECEIVED = "COMET_CCS_INT_RECEIVED";
 
     @Autowired
     private QueueClient queueClient;
@@ -291,10 +313,10 @@ public class OutcomeSteps {
     }
 
     private String replaceValueInJson(String msg, String keyName, String newValue) throws Exception{
-      System.out.println(msg);
       JsonNode actualJson = jsonObjectMapper.readTree(msg);
-      msg = actualJson.toPrettyString();
-      String docturedJson = msg.replaceAll("(?<=\"" + keyName + "\" : \")[^\\\"]+", newValue);
+      String prettyMsg = actualJson.toPrettyString();
+      System.out.println(prettyMsg);
+      String docturedJson = prettyMsg.replaceAll("(?<=\"" + keyName + "\" : \")[^\\\"]+", newValue);
       return docturedJson;
     }
 
@@ -346,6 +368,9 @@ public class OutcomeSteps {
         case "HH":
           response = sendHH(request);
             break;
+        case "CCS PL":
+          response = sendCCSPL(request);
+            break;
         default:
             break;
         }
@@ -392,11 +417,36 @@ public class OutcomeSteps {
       case "New Standalone Address":
         response = tmMockUtils.sendTMHHNewStandaloneAddressResponseMessage(request);
         break;
+      case "Property Listed HH":
+          response = tmMockUtils.sendTMCCSPLResponseMessage(request, caseId);
+          break;
       default:
         response = tmMockUtils.sendTMHHResponseMessage(request, caseId);
       }
       return response;
     }
+
+    private int sendCCSPL(String request) {
+      int response;
+      switch (businessFunction) {
+      case "Property Listed HH":
+          response = tmMockUtils.sendTMCCSPLResponseMessage(request, caseId);
+          break;
+      case "Property Listed CE":
+        response = tmMockUtils.sendTMCCSPLResponseMessage(request, caseId);
+        break;
+      case "Interview Required HH":
+        response = tmMockUtils.sendTMCCSPLResponseMessage(request, caseId);
+        break;
+      case "Interview Required CE":
+        response = tmMockUtils.sendTMCCSPLResponseMessage(request, caseId);
+        break;
+      default:
+        response = -1;
+      }
+      return response;
+    }
+
 
    private String getTmOutcomeRequest() throws Exception {
         Map<String, Object> root = new HashMap();
@@ -462,6 +512,19 @@ public class OutcomeSteps {
             case "Switch Feedback Site":
               request = createOutcomeMessage("SWITCH_FEEDBACK_CE_SITE", root);
               break;
+            case "Property Listed HH":
+              request = createOutcomeMessage("PROPERTY_LISTED", root);
+              break;
+            case "Property Listed CE":
+              request = createOutcomeMessage("PROPERTY_LISTED", root);
+              break;
+            case "Interview Required HH":
+              request = createOutcomeMessage("INTERVIEW_REQUIRED", root);
+              break;
+            case "Interview Required CE":
+              request = createOutcomeMessage("INTERVIEW_REQUIRED", root);
+              break;
+              
             default:
                 break;
             }
@@ -484,6 +547,9 @@ public class OutcomeSteps {
      case "HH":
        event = getHhRequestReceivedEventName();
          break;
+     case "CCS PL":
+       event = getCcsPlRequestReceivedEventName();
+         break;
      default:
          break;
      }
@@ -493,12 +559,31 @@ public class OutcomeSteps {
      assertThat(isMsgRecieved).isTrue();
  }
 
+    private String getCcsPlRequestReceivedEventName() {
+      String event;
+      switch (businessFunction) {
+      case "Property Listed HH":
+      case "Property Listed CE":
+      case "Interview Required HH":
+      case "Interview Required CE":        
+        event = COMET_CCS_PL_RECEIVED;
+       break;
+      default:
+        event = null;
+      }
+      return event;
+  }
+
     private String getMessageCaseId() {
       String messageCaseId;
       switch (businessFunction) {
       case "New Standalone Address":
       case "New Unit Reported":
       case "Switch Feedback Site":
+      case "Property Listed HH":
+      case "Property Listed CE":
+      case "Interview Required HH":
+      case "Interview Required CE":
         messageCaseId = "N/A";
         break;
       default:
@@ -592,6 +677,7 @@ public class OutcomeSteps {
         case "FIELD_CASE_UPDATED":
         case "UPDATE_RESIDENT_COUNT_1":
         case "UPDATE_RESIDENT_COUNT":
+        case "CCS":
             return TEMP_FIELD_OTHERS_QUEUE;
         default:
             throw new RuntimeException("Problem matching operation");
@@ -629,7 +715,24 @@ public class OutcomeSteps {
               break;
           }
       }
-
+        if ("CCS".equals(rmMessageType)) {
+          switch (businessFunction) {
+          case "Property Listed CE":
+            rmMessageType = rmMessageType + "_PL_CE";
+            break;
+          case "Interview Required CE":
+            rmMessageType = rmMessageType + "_INT_CE";
+            break;
+          case "Property Listed HH":
+            rmMessageType = rmMessageType + "_PL_HH";
+            break;
+          case "Interview Required HH":
+            rmMessageType = rmMessageType + "_INT_HH";
+            break;
+            default:
+              break;
+           }
+        }
         Configuration configuration = new Configuration(Configuration.VERSION_2_3_28);
         configuration.setClassForTemplateLoading(OutcomeSteps.class, "/files/outcome/rm/");
         configuration.setDefaultEncoding("UTF-8");
@@ -701,8 +804,20 @@ public class OutcomeSteps {
       queueClient.sendToRMFieldQueue(request, "create");
       boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, RM_CREATE_REQUEST_RECEIVED, CommonUtils.TIMEOUT);
       assertThat(hasBeenTriggered).isTrue();
+    }
 
+    @Given("a property list case exists")
+    public void a_property_list_exists() throws Exception {
+      String ccsplCreateJson = Resources.toString(Resources.getResource("files/input/ccspl/ccsplCreate.json"), Charsets.UTF_8);
+      JSONObject json = new JSONObject(ccsplCreateJson);
 
+      commonRMMessageObjects(json, caseId, "1234", "F", "F", false);
+
+      String request = json.toString(4);
+      log.info("Request = " + request);
+      queueClient.sendToRMFieldQueue(request, "create");
+      boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, RM_CREATE_REQUEST_RECEIVED, CommonUtils.TIMEOUT);
+      assertThat(hasBeenTriggered).isTrue();
     }
 
     private JSONObject commonRMMessageObjects(JSONObject json, String caseId, String caseRef, String isSecure, String isHandDeliver, boolean extraObjects){
@@ -739,4 +854,6 @@ public class OutcomeSteps {
 
       return json;
     }
+    
+ 
 }
