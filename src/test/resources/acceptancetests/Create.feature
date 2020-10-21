@@ -15,7 +15,7 @@ Feature: Create Tests
       | SPG Unit Deliver            | SPG CE | Unit    | F        | 12345678 | T           | SPG Unit-D | 12345678       |
       | SPG Unit Follow-up          | SPG CE | Unit    | F        | 12345678 | F           | SPG Unit-F | 12345678       |
       | SPG Unit Follow-up (Secure) | SPG CE | Unit    | T        | 12345678 | F           | SPG Unit-F | SECSU_12345678 |
-      | CE Est Deliver     	        | CE     | CE Est  | F        | 12345678 | T           | CE Est-D   | 12345678       |
+      | CE Est Deliver              | CE     | CE Est  | F        | 12345678 | T           | CE Est-D   | 12345678       |
       | CE Est Deliver (Secure)     | CE     | CE Est  | T        | 12345678 | T           | CE Est-D   | SECCE_12345678 |
       | CE Est Follow-up            | CE     | CE Est  | F        | 12345678 | F           | CE Est-F   | 12345678       |
       | CE Est Follow-up (Secure)   | CE     | CE Est  | T        | 12345678 | F           | CE Est-F   | SECCE_12345678 |
@@ -27,6 +27,7 @@ Feature: Create Tests
       | Household Nisra             | HH     | NISRA   | F        | 12345678 | F           | HH         | 12345678       |
       | CCS Property Listing        | CCS    | CCS-PL  | F        | 12345678 | F           | CCS PL     | 12345678       |
 #      | CCS Interview               | CCS    | CCS-INT | F        | 12345678 | F           | CCS INT    | 12345678       |
+#      | CCS Interview               | CCS    | Estab   | F        | 12345678 | F           | HH         | 12345678       |
 
   Scenario Outline: As Gateway I can receive a create CE Site job request from RM after a CE Estab has been processed
     Given a TM doesnt have a job with case ID "bd6345af-d706-43d3-a13b-8c549e081a76" in TM
@@ -38,7 +39,7 @@ Feature: Create Tests
     And a new case with id of "bd6345af-d706-43d3-a13b-8c549e081a76" is created in TM
     Examples:
       | Survey | Type    | IsSecure | CaseRef  | HandDeliver | SurveyType | TmCaseRef      |
-     | CE     | CE Site | F        | 12345678 | F           | CE Site    | 12345678       |
+      | CE     | CE Site | F        | 12345678 | F           | CE Site    | 12345678       |
       | CE     | CE Site | T        | 12345678 | F           | CE Site    | SECCS_12345678 |
  
   Scenario Outline: As Gateway I can switch a CE survey type that has a matching estabUprn and address type
