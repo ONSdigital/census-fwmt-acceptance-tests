@@ -63,7 +63,11 @@ public class CreateSteps {
   private String ceUnitCreateJson = null;
   
   private String hhCreateJson = null;
+  
+  private String ccsPlCreateJson = null;
 
+  private String ccsIntCreateJson = null;
+  
   private GatewayEventDTO event_COMET_CREATE_PRE_SENDING;
 
   @Autowired
@@ -80,6 +84,8 @@ public class CreateSteps {
     ceEstabCreateJson = Resources.toString(Resources.getResource("files/input/ce/ceEstabCreate.json"), Charsets.UTF_8);
     ceUnitCreateJson = Resources.toString(Resources.getResource("files/input/ce/ceUnitCreate.json"), Charsets.UTF_8);
     hhCreateJson = Resources.toString(Resources.getResource("files/input/hh/hhCreate.json"), Charsets.UTF_8);
+    ccsPlCreateJson = Resources.toString(Resources.getResource("files/input/ccspl/ccsplCreate.json"), Charsets.UTF_8);
+    ccsIntCreateJson = Resources.toString(Resources.getResource("files/input/ccsint/ccsintCreate.json"), Charsets.UTF_8);
     commonUtils.setup();
   }
 
@@ -281,7 +287,11 @@ public class CreateSteps {
       case "CE Site":
         return ceEstabCreateJson;
       case "CE Unit" :
-          return ceUnitCreateJson;
+        return ceUnitCreateJson;
+      case "CCS-PL" :
+        return ccsPlCreateJson;
+      case "CCS-INT" :
+        return ccsIntCreateJson;
       default:
         throw new RuntimeException("Incorrect survey " + survey + " and type " + type);
     }
