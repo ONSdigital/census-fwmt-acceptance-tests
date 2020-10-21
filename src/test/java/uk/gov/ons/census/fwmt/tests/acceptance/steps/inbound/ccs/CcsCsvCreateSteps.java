@@ -1,9 +1,13 @@
 package uk.gov.ons.census.fwmt.tests.acceptance.steps.inbound.ccs;
 
+import com.google.common.io.Resources;
+import cucumber.api.java.After;
+import cucumber.api.java.Before;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import uk.gov.census.ffa.storage.utils.StorageUtils;
 import uk.gov.ons.census.fwmt.common.data.modelcase.ModelCase;
 import uk.gov.ons.census.fwmt.events.data.GatewayEventDTO;
 import uk.gov.ons.census.fwmt.events.utils.GatewayEventMonitor;
@@ -11,7 +15,12 @@ import uk.gov.ons.census.fwmt.tests.acceptance.utils.CSVSerivceUtils;
 import uk.gov.ons.census.fwmt.tests.acceptance.utils.QueueClient;
 import uk.gov.ons.census.fwmt.tests.acceptance.utils.TMMockUtils;
 
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Collection;
+import java.util.List;
+import java.util.concurrent.TimeoutException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
@@ -30,6 +39,9 @@ public class CcsCsvCreateSteps {
   @Autowired
   private CSVSerivceUtils csvSerivceUtils;
 
+  @Autowired
+  private StorageUtils storageUtils;
+
   private GatewayEventMonitor gatewayEventMonitor;
 
   @Value("${service.rabbit.url}")
@@ -41,7 +53,31 @@ public class CcsCsvCreateSteps {
   @Value("${service.rabbit.password}")
   private String rabbitPassword;
 
+  @Value("${service.csvservice.gcpBucket.directory.output}")
+  private String outputDirectory;
+
+  @Value("${service.csvservice.gcpBucket.directory}")
+  private String inputDirectory;
+
   private String caseId;
+
+  @Before
+  public void setup() throws IOException, TimeoutException, URISyntaxException {
+    tmMockUtils.enableRequestRecorder();
+    tmMockUtils.resetMock();
+    queueUtils.clearQueues();
+    List<URI> ccsOutputFiles = storageUtils.getFilenamesInFolder(URI.create(outputDirectory), "CCS");
+    storageUtils.move(ccsOutputFiles.get(0), URI.create(inputDirectory + "ccsTestCSV.csv"));
+
+    gatewayEventMonitor = new GatewayEventMonitor();
+    gatewayEventMonitor.enableEventMonitor(rabbitLocation, rabbitUsername, rabbitPassword);
+  }
+
+  @After
+  public void tearDownGatewayEventMonitor() throws IOException {
+    gatewayEventMonitor.tearDownGatewayEventMonitor();
+    tmMockUtils.disableRequestRecorder();
+  }
 
   @Given("the Gateway receives a CSV CCS")
   public void theGatewayReceivesACSVCCSWithCaseID() {
