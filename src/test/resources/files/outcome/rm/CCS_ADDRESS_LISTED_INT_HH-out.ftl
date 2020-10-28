@@ -1,6 +1,6 @@
 {
    "event":{
-      "type":"CCS",
+      "type":"CCS_ADDRESS_LISTED",
       "source":"FIELDWORK_GATEWAY",
       "channel":"FIELD",
       "dateTime":"2020-04-17T12:53:11.000+01",
@@ -21,8 +21,8 @@
             "postcode":"NW1 6XE",
             "latitude":"51.5237951",
             "longitude":"-0.1582785",
-            "fieldcoordinatorId":"SH-TWH1-ZA",
-            "fieldofficerId":"SH-TWH1-ZA-25",
+            "fieldCoordinatorId":"SH-TWH1-ZA",
+            "fieldOfficerId":"SH-TWH1-ZA-25",
             "oa":"W00002772",
             "region":"W0"
          }
