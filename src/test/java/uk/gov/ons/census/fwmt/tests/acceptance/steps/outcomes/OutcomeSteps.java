@@ -430,17 +430,11 @@ public class OutcomeSteps {
       int response;
       switch (businessFunction) {
       case "Property Listed HH":
+      case "Property Listed CE":
+      case "Interview Required HH":
+      case "Interview Required CE":
           response = tmMockUtils.sendTMCCSPLResponseMessage(request, caseId);
           break;
-      case "Property Listed CE":
-        response = tmMockUtils.sendTMCCSPLResponseMessage(request, caseId);
-        break;
-      case "Interview Required HH":
-        response = tmMockUtils.sendTMCCSPLResponseMessage(request, caseId);
-        break;
-      case "Interview Required CE":
-        response = tmMockUtils.sendTMCCSPLResponseMessage(request, caseId);
-        break;
       default:
         response = -1;
       }
@@ -513,16 +507,16 @@ public class OutcomeSteps {
               request = createOutcomeMessage("SWITCH_FEEDBACK_CE_SITE", root);
               break;
             case "Property Listed HH":
-              request = createOutcomeMessage("PROPERTY_LISTED", root);
-              break;
+                request = createOutcomeMessage("PROPERTY_LISTED_HH", root);
+                break;
             case "Property Listed CE":
-              request = createOutcomeMessage("PROPERTY_LISTED", root);
+              request = createOutcomeMessage("PROPERTY_LISTED_CE", root);
               break;
             case "Interview Required HH":
-              request = createOutcomeMessage("INTERVIEW_REQUIRED", root);
-              break;
+                request = createOutcomeMessage("INTERVIEW_REQUIRED_HH", root);
+                break;
             case "Interview Required CE":
-              request = createOutcomeMessage("INTERVIEW_REQUIRED", root);
+              request = createOutcomeMessage("INTERVIEW_REQUIRED_CE", root);
               break;
               
             default:
@@ -677,7 +671,7 @@ public class OutcomeSteps {
         case "FIELD_CASE_UPDATED":
         case "UPDATE_RESIDENT_COUNT_1":
         case "UPDATE_RESIDENT_COUNT":
-        case "CCS":
+        case "CCS_ADDRESS_LISTED":
             return TEMP_FIELD_OTHERS_QUEUE;
         default:
             throw new RuntimeException("Problem matching operation");
@@ -715,7 +709,7 @@ public class OutcomeSteps {
               break;
           }
       }
-        if ("CCS".equals(rmMessageType)) {
+        if ("CCS_ADDRESS_LISTED".equals(rmMessageType)) {
           switch (businessFunction) {
           case "Property Listed CE":
             rmMessageType = rmMessageType + "_PL_CE";
@@ -768,7 +762,7 @@ public class OutcomeSteps {
             String actualRmMessage = actualRmMessageMap.get(rmMessageType);
             JsonNode actualJson = jsonObjectMapper.readTree(actualRmMessage);
 
-            boolean isEqual = expectedJson.equals(actualJson);
+            boolean isEqual = expectedJson.asText().equals(actualJson.asText());
             if (!isEqual) {
                 log.info("expected and actual caseEvents are not the same: \n expected:\n {} \n\n actual: \n {}",
                         expectedJson.toPrettyString(), actualJson.toPrettyString());

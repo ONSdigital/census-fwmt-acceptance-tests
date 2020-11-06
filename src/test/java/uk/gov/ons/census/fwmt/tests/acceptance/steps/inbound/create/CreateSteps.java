@@ -288,7 +288,7 @@ public class CreateSteps {
         return ceEstabCreateJson;
       case "CE Unit" :
         return ceUnitCreateJson;
-      case "CCS-PL" :
+      case "CCS_PL" :
         return ccsPlCreateJson;
       case "CCS-INT" :
         return ccsIntCreateJson;

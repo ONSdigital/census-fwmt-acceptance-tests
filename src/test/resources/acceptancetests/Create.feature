@@ -25,7 +25,7 @@ Feature: Create Tests
       | CE Unit Follow-up (Secure)  | CE     | CE Unit | T        | 12345678 | F           | CE Unit-F  | SECCU_12345678 |
       | Household England and Wales | HH     | E&W     | F        | 12345678 | F           | HH         | 12345678       |
       | Household Nisra             | HH     | NISRA   | F        | 12345678 | F           | HH         | 12345678       |
-      | CCS Property Listing        | CCS    | CCS-PL  | F        | 12345678 | F           | CCS PL     | 12345678       |
+      | CCS Property Listing        | CCS    | CCS_PL  | F        | 12345678 | F           | CCS PL     | 12345678       |
 #      | CCS Interview               | CCS    | CCS-INT | F        | 12345678 | F           | CCS INT    | 12345678       |
 #      | CCS Interview               | CCS    | Estab   | F        | 12345678 | F           | HH         | 12345678       |
 
