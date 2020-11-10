@@ -574,10 +574,6 @@ public class OutcomeSteps {
       case "New Standalone Address":
       case "New Unit Reported":
       case "Switch Feedback Site":
-      case "Property Listed HH":
-      case "Property Listed CE":
-      case "Interview Required HH":
-      case "Interview Required CE":
         messageCaseId = "N/A";
         break;
       default:
