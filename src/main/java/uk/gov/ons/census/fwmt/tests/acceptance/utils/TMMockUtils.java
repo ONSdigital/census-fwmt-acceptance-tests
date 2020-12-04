@@ -68,6 +68,9 @@ public final class TMMockUtils {
   @Value("${service.outcome.CEStandalone.endpoint}")
   private String ceStandaloneOutcomeEndpoint;
 
+  @Value("${service.outcome.NC.endpoint}")
+  private String ncOutcomeEndpoint;
+
   @Value("${service.outcome.username}")
   private String outcomeServiceUsername;
 
@@ -283,6 +286,20 @@ public final class TMMockUtils {
 
     RestTemplate restTemplate = new RestTemplate();
     String postUrl = outcomeServiceUrl + ceNewUnitOutcomeEndpoint;
+
+    HttpEntity<String> post = new HttpEntity<>(data, headers);
+    ResponseEntity<Void> response = restTemplate.exchange(postUrl, HttpMethod.POST, post, Void.class);
+
+    return response.getStatusCode().value();
+  }
+
+  public int sendTMNCResponseMessage(String data, String caseId) {
+    HttpHeaders headers = createBasicAuthHeaders(outcomeServiceUsername, outcomeServicePassword);
+
+    headers.setContentType(MediaType.APPLICATION_JSON);
+
+    RestTemplate restTemplate = new RestTemplate();
+    String postUrl = outcomeServiceUrl + ncOutcomeEndpoint + caseId;
 
     HttpEntity<String> post = new HttpEntity<>(data, headers);
     ResponseEntity<Void> response = restTemplate.exchange(postUrl, HttpMethod.POST, post, Void.class);

@@ -371,6 +371,9 @@ public class OutcomeSteps {
         case "CCS PL":
           response = sendCCSPL(request);
             break;
+        case "NC":
+          response = sendNC(request);
+            break;
         default:
             break;
         }
@@ -439,6 +442,10 @@ public class OutcomeSteps {
         response = -1;
       }
       return response;
+    }
+
+    private int sendNC(String request) {
+      return tmMockUtils.sendTMNCResponseMessage(request, caseId);
     }
 
 
