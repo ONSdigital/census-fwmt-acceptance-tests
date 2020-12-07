@@ -1,5 +1,7 @@
 package uk.gov.ons.census.fwmt.tests.acceptance.utils;
 
+import com.google.common.base.Charsets;
+import com.google.common.io.Resources;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Value;
@@ -85,6 +87,9 @@ public final class TMMockUtils {
 
   @Value("${spring.datasource.password}")
   private String password;
+
+  @Value("${server.tm.rmapi.addHH}")
+  private String addHHHardRefusal;
 
   private RestTemplate restTemplate = new RestTemplate();
 
@@ -558,6 +563,22 @@ public final class TMMockUtils {
       }
     }
   }
-  
+
+  public void addNcHouseholderDetails(String caseId) throws IOException {
+    HttpHeaders headers = createBasicAuthHeaders(outcomeServiceUsername, outcomeServicePassword);
+    headers.setContentType(MediaType.APPLICATION_JSON);
+    RestTemplate restTemplate = new RestTemplate();
+    String postUrl = addHHHardRefusal + caseId;
+    String rmCase;
+
+    if (mockTmUrl.equals("http://localhost:8000")){
+      rmCase = Resources.toString(Resources.getResource("encryptedRmApiCase/rmCaseApiLocal.json"), Charsets.UTF_8);
+    } else {
+      rmCase = Resources.toString(Resources.getResource("encryptedRmApiCase/rmCaseApiLocal.json"), Charsets.UTF_8);
+    }
+
+    HttpEntity<String> post = new HttpEntity<>(rmCase, headers);
+    restTemplate.exchange(postUrl, HttpMethod.PUT, post, Void.class);
+  }
   
 }

@@ -10,6 +10,14 @@
 "refusal":{
 "type":"${reason}",
 "agentId":"SH-TWH1-ZA-25",
+<#if (type == "HH") && refusalType == "HARD_REFUSAL" && refusalCodes??>
+    "isHouseholder": "${isHouseHolder?c}",
+    "contact": {
+    "title": "${encryptedTitle}",
+    "forename": "${encryptedForename}",
+    "surname": "${encryptedSurname}"
+    },
+</#if>
 "collectionCase":{
 "id":"bd6345af-d706-43d3-a13b-8c549e081a76"
 }

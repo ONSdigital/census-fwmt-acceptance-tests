@@ -103,29 +103,29 @@ public final class QueueClient {
   }
 
   public void reset() throws Exception {
-    disableListeners();
+//    disableListeners();
     clearQueues(FIELD_REFUSALS_QUEUE, TEMP_FIELD_OTHERS_QUEUE, RM_FIELD_QUEUE, RM_FIELD_QUEUE_DLQ, OUTCOME_PRE_PROCESSING,
         OUTCOME_PRE_PROCESSING_DLQ);
-    enableListenenrs();
+//    enableListenenrs();
   }
 
-  private void disableListeners() {
-    try {
-      resetListeners(jobserviceServiceUrl + "/RM/stopListener", jobServiceUsername, jobServicePassword);
-      resetListeners(outcomeServiceUrl + "/StopPreprocessorListener", outcomeServiceUsername, outcomeServicePassword);
-    } catch (Exception e) {
-      throw new RuntimeException(e);
-    }
-  }
+//  private void disableListeners() {
+//    try {
+//      resetListeners(jobserviceServiceUrl + "/RM/stopListener", jobServiceUsername, jobServicePassword);
+//      resetListeners(outcomeServiceUrl + "/StopPreprocessorListener", outcomeServiceUsername, outcomeServicePassword);
+//    } catch (Exception e) {
+//      throw new RuntimeException(e);
+//    }
+//  }
 
-  private void enableListenenrs() {
-    try {
-      resetListeners(jobserviceServiceUrl + "/RM/startListener", jobServiceUsername, jobServicePassword);
-      resetListeners(outcomeServiceUrl + "/StartPreprocessorListener", outcomeServiceUsername, outcomeServicePassword);
-    } catch (Exception e) {
-      throw new RuntimeException(e);
-    }
-  }
+//  private void enableListenenrs() {
+//    try {
+//      resetListeners(jobserviceServiceUrl + "/RM/startListener", jobServiceUsername, jobServicePassword);
+//      resetListeners(outcomeServiceUrl + "/StartPreprocessorListener", outcomeServiceUsername, outcomeServicePassword);
+//    } catch (Exception e) {
+//      throw new RuntimeException(e);
+//    }
+//  }
 
   public void resetListeners(String listenerUrl, String user, String password) throws Exception {
 
