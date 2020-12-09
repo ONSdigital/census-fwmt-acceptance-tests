@@ -102,6 +102,8 @@ public class OutcomeSteps {
 
     private static final String COMET_CE_STANDALONE_OUTCOME_RECEIVED = "COMET_CE_STANDALONE_OUTCOME_RECEIVED";
 
+    private static final String COMET_NC_OUTCOME_RECEIVED = "COMET_NC_OUTCOME_RECEIVED";
+
     private static final String RM_CREATE_REQUEST_RECEIVED = "RM_CREATE_REQUEST_RECEIVED";
     
     private static final String COMET_HH_SPLITADDRESS_RECEIVED = "COMET_HH_SPLITADDRESS_RECEIVED";
@@ -551,6 +553,8 @@ public class OutcomeSteps {
      case "CCS PL":
        event = getCcsPlRequestReceivedEventName();
          break;
+     case "NC":
+       event = geNcRequestReceivedEventName();
      default:
          break;
      }
@@ -635,6 +639,19 @@ public class OutcomeSteps {
       }
       return event;
     }
+
+  private String geNcRequestReceivedEventName() {
+    String event;
+    switch (businessFunction) {
+    case "No Action":
+    case "Cancel Feedback":
+      event = COMET_NC_OUTCOME_RECEIVED;
+      break;
+    default:
+      event = null;
+    }
+    return event;
+  }
 
     private String createOutcomeMessage(String eventType, Map<String, Object> root)
             throws Exception {

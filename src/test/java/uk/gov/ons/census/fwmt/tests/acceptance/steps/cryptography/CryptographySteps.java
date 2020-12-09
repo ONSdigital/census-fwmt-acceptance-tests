@@ -82,12 +82,6 @@ public class CryptographySteps {
 
   private Collection<GatewayEventDTO> rmOutcomeEvents;
 
-  private Collection<GatewayEventDTO> jsOutcomeEvents;
-
-  private final static String messageCaseId = "bd6345af-d706-43d3-a13b-8c549e081a76";
-
-  private GatewayEventDTO event_COMET_CREATE_PRE_SENDING;
-
   @Autowired
   private QueueClient queueClient;
 
@@ -157,7 +151,7 @@ public class CryptographySteps {
   }
 
   @Then("the gateway will send the case to RM")
-  public void theGatewayWillSendTheCaseToRM() throws JsonProcessingException {
+  public void theGatewayWillSendTheCaseToRM() {
     rmOutcomeEvents = gatewayEventMonitor.grabEventsTriggered(OUTCOME_SENT, expectedRmMessages.size(), CommonUtils.TIMEOUT);
 
     assertNotNull(rmOutcomeEvents);

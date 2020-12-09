@@ -8,6 +8,7 @@ import static uk.gov.ons.census.fwmt.tests.acceptance.steps.inbound.common.Commo
 import java.net.URISyntaxException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -67,7 +68,9 @@ public class CreateSteps {
   private String ccsPlCreateJson = null;
 
   private String ccsIntCreateJson = null;
-  
+
+  private String ceHardRefusalCreate = null;
+
   private GatewayEventDTO event_COMET_CREATE_PRE_SENDING;
 
   @Autowired
@@ -86,6 +89,7 @@ public class CreateSteps {
     hhCreateJson = Resources.toString(Resources.getResource("files/input/hh/hhCreate.json"), Charsets.UTF_8);
     ccsPlCreateJson = Resources.toString(Resources.getResource("files/input/ccspl/ccsplCreate.json"), Charsets.UTF_8);
     ccsIntCreateJson = Resources.toString(Resources.getResource("files/input/ccsint/ccsintCreate.json"), Charsets.UTF_8);
+    ceHardRefusalCreate = Resources.toString(Resources.getResource("files/input/ce/ceNcEstabCreate.json"), Charsets.UTF_8);
     commonUtils.setup();
   }
 
@@ -222,13 +226,25 @@ public class CreateSteps {
   @When("the Gateway sends a Create Job message to TM")
   public void theGatewaySendsACreateJobMessageToTM() {
     String caseId = testBucket.get("caseId");
-    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, COMET_CREATE_PRE_SENDING, CommonUtils.TIMEOUT);
-    assertThat(hasBeenTriggered).isTrue();
+    if (!testBucket.get("type").equals("NC")) {
+      boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, COMET_CREATE_PRE_SENDING, CommonUtils.TIMEOUT);
+      assertThat(hasBeenTriggered).isTrue();
+    }
     List<GatewayEventDTO> events = gatewayEventMonitor.getEventsForEventType(COMET_CREATE_PRE_SENDING, 1);
     if (testBucket.get("type").equals("CE Site")) {
       event_COMET_CREATE_PRE_SENDING = events.get(1);
     } else {
       event_COMET_CREATE_PRE_SENDING = events.get(0);
+    }
+
+    if (testBucket.get("type").equals("NC")) {
+      String newCaseId = null;
+      for (GatewayEventDTO retrieveCaseId : events) {
+        newCaseId = retrieveCaseId.getCaseId();
+        testBucket.put("newCaseId", newCaseId);
+      }
+      boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(newCaseId, COMET_CREATE_ACK, CommonUtils.TIMEOUT);
+      assertThat(hasBeenTriggered).isTrue();
     }
   }
 
@@ -246,6 +262,9 @@ public class CreateSteps {
 
   @Then("a new case with id of {string} is created in TM")
   public void aNewCaseIsCreatedInTm(String caseId) throws InterruptedException {
+    if (testBucket.get("type").equals("NC")) {
+      caseId = testBucket.get("newCaseId");
+    }
     boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, COMET_CREATE_ACK, CommonUtils.TIMEOUT);
     assertThat(hasBeenTriggered).isTrue();
 
@@ -292,6 +311,8 @@ public class CreateSteps {
         return ccsPlCreateJson;
       case "CCS-INT" :
         return ccsIntCreateJson;
+      case "NC" :
+        return ceHardRefusalCreate;
       default:
         throw new RuntimeException("Incorrect survey " + survey + " and type " + type);
     }
