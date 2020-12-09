@@ -8,7 +8,7 @@ import cucumber.api.java.en.Then;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import uk.gov.census.ffa.storage.utils.StorageUtils;
-import uk.gov.ons.census.fwmt.common.data.modelcase.ModelCase;
+import uk.gov.ons.census.fwmt.common.data.tm.Case;
 import uk.gov.ons.census.fwmt.events.data.GatewayEventDTO;
 import uk.gov.ons.census.fwmt.events.utils.GatewayEventMonitor;
 import uk.gov.ons.census.fwmt.tests.acceptance.utils.CSVSerivceUtils;
@@ -100,8 +100,8 @@ public class CcsCsvCreateSteps {
     boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, COMET_CREATE_ACK, 10000L);
     assertThat(hasBeenTriggered).isTrue();
 
-    ModelCase modelCase = tmMockUtils.getCaseById(caseId);
-    assertEquals(caseId, modelCase.getId().toString());
-    assertEquals(postcode, modelCase.getAddress().getPostcode());
+    Case tmCase = tmMockUtils.getCaseById(caseId);
+    assertEquals(caseId, tmCase.getId().toString());
+    assertEquals(postcode, tmCase.getAddress().getPostcode());
   }
 }

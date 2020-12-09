@@ -12,8 +12,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
-import uk.gov.ons.census.fwmt.common.data.modelcase.CasePause;
-import uk.gov.ons.census.fwmt.common.data.modelcase.ModelCase;
+import uk.gov.ons.census.fwmt.common.data.tm.CasePause;
+import uk.gov.ons.census.fwmt.common.data.tm.Case;
 import uk.gov.ons.census.fwmt.data.dto.MockMessage;
 import uk.gov.ons.census.fwmt.tests.acceptance.exceptions.MockInaccessibleException;
 import uk.gov.ons.census.fwmt.tests.acceptance.utils.NodeCheck.NodeCheckBuilder;
@@ -114,11 +114,11 @@ public final class TMMockUtils {
     return restTemplate.getForObject(url, MockMessage[].class);
   }
 
-  public ModelCase getCaseById(String id) {
+  public Case getCaseById(String id) {
     String url = mockTmUrl + "/cases/" + id;
     log.info("getCaseById-mock_url:" + url);
-    ResponseEntity<ModelCase> responseEntity;
-    responseEntity = restTemplate.getForEntity(url, ModelCase.class);
+    ResponseEntity<Case> responseEntity;
+    responseEntity = restTemplate.getForEntity(url, Case.class);
     return responseEntity.getBody();
   }
 

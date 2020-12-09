@@ -19,7 +19,7 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.client.HttpClientErrorException;
-import uk.gov.ons.census.fwmt.common.data.modelcase.ModelCase;
+import uk.gov.ons.census.fwmt.common.data.tm.Case;
 import uk.gov.ons.census.fwmt.events.data.GatewayEventDTO;
 import uk.gov.ons.census.fwmt.events.utils.GatewayEventMonitor;
 import uk.gov.ons.census.fwmt.tests.acceptance.steps.inbound.common.CommonUtils;

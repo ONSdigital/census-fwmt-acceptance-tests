@@ -6,6 +6,7 @@ import static org.junit.Assert.assertTrue;
 import static uk.gov.ons.census.fwmt.tests.acceptance.steps.inbound.common.CommonUtils.testBucket;
 
 import java.net.URISyntaxException;
+import java.util.Collection;
 import java.util.List;
 
 import com.google.common.base.Charsets;
@@ -40,6 +41,7 @@ public class CancelSteps {
   private String spgCancel;
   private String ceEstabCancel;
   private String ceUnitCancel;
+  private String ceNcEstabCancel;
 
   private static final String RM_CANCEL_REQUEST_RECEIVED = "RM_CANCEL_REQUEST_RECEIVED";
 
@@ -48,6 +50,9 @@ public class CancelSteps {
   private static final String ROUTING_FAILED = "ROUTING_FAILED";
 
   private static final String COMET_CANCEL_PRE_SENDING = "COMET_CANCEL_PRE_SENDING";
+
+  private static final String COMET_CREATE_PRE_SENDING = "COMET_CREATE_PRE_SENDING";
+
 
 
   @Autowired
@@ -58,17 +63,18 @@ public class CancelSteps {
     spgCancel = Resources.toString(Resources.getResource("files/input/spg/spgCancel.json"), Charsets.UTF_8);
     ceEstabCancel = Resources.toString(Resources.getResource("files/input/ce/ceEstabCancel.json"), Charsets.UTF_8);
     ceUnitCancel = Resources.toString(Resources.getResource("files/input/ce/ceUnitCancel.json"), Charsets.UTF_8);
-//    commonUtils.setup();
+    ceNcEstabCancel = Resources.toString(Resources.getResource("files/input/ce/ceNCEstabCancel.json"), Charsets.UTF_8);
+    commonUtils.setup();
   }
 
   @After
   public void clearDown() throws Exception {
-//    commonUtils.clearDown();
+    commonUtils.clearDown();
   }
 
   @And("RM sends a cancel case request for the case")
   public void rmSendsCancel() throws URISyntaxException {
-    String caseId = testBucket.get("caseId");
+    String caseId = testBucket.get("caseId");;
     String type = testBucket.get("type");
 
     JSONObject json = new JSONObject(getCreateRMJson());
@@ -90,7 +96,7 @@ public class CancelSteps {
 
   @When("Gateway receives a cancel message for the case")
   public void gatewayReceivesTheMessage() {
-    String caseId = testBucket.get("caseId");
+    String caseId = testBucket.get("caseId");;
     boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, RM_CANCEL_REQUEST_RECEIVED, CommonUtils.TIMEOUT);
     assertThat(hasBeenTriggered).isTrue();
   }
@@ -145,8 +151,22 @@ public class CancelSteps {
         return ceEstabCancel;
       case "CE Unit":
         return ceUnitCancel;
+      case "NC":
+        return ceNcEstabCancel;
       default:
         throw new RuntimeException("Incorrect survey " + survey + " and type " + type);
     }
+  }
+
+  private String getNewCaseId () {
+    Collection<GatewayEventDTO> message;
+    String caseId = null;
+    message = gatewayEventMonitor.grabEventsTriggered(COMET_CREATE_PRE_SENDING, 1, 10000L);
+
+    for (GatewayEventDTO retrieveCaseId : message) {
+      caseId = retrieveCaseId.getCaseId();
+    }
+
+    return caseId;
   }
 }

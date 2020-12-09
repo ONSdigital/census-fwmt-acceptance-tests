@@ -27,7 +27,7 @@ import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
 import lombok.extern.slf4j.Slf4j;
-import uk.gov.ons.census.fwmt.common.data.modelcase.ModelCase;
+import uk.gov.ons.census.fwmt.common.data.tm.Case;
 import uk.gov.ons.census.fwmt.events.data.GatewayEventDTO;
 import uk.gov.ons.census.fwmt.events.utils.GatewayEventMonitor;
 import uk.gov.ons.census.fwmt.tests.acceptance.steps.inbound.common.CommonUtils;
@@ -268,8 +268,8 @@ public class CreateSteps {
     boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, COMET_CREATE_ACK, CommonUtils.TIMEOUT);
     assertThat(hasBeenTriggered).isTrue();
 
-    ModelCase modelCase = tmMockUtils.getCaseById(caseId);
-    assertEquals(caseId, modelCase.getId().toString());
+    Case tmCase = tmMockUtils.getCaseById(caseId);
+    assertEquals(caseId, tmCase.getId().toString());
   }
 
   @And("the existing case is updated to a switch and put back on the queue with caseId {string}")
