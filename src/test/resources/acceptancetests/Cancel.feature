@@ -16,6 +16,9 @@ Feature: SPG Cancel Tests
       | CE     | CE Est  |  F        | 12345678 | F           | CLOSE    |
       | CE     | CE Unit |  F        | 12345678 | T           | CLOSE    |
       | CE     | CE Unit |  F        | 12345678 | F           | CLOSE    |
+      | CE     | NC      |  F        | 12345678 | F           | CLOSE    |
+      | HH     | HH      |  F        | 12345678 | F           | CLOSE    |
+
 
   Scenario Outline: As Gateway I can receive a cancel CE Site job request from RM after a CE Estab has been processed
     Given a TM doesnt have a job with case ID "bd6345af-d706-43d3-a13b-8c549e081a76" in TM

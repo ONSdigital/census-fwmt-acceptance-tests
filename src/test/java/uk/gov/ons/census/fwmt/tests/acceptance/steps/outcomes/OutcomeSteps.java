@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
+import com.google.common.base.Strings;
 import cucumber.api.java.After;
 import cucumber.api.java.Before;
 import cucumber.api.java.en.Given;
@@ -15,7 +16,6 @@ import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateExceptionHandler;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.logging.log4j.util.Strings;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -101,6 +101,8 @@ public class OutcomeSteps {
     private static final String COMET_CE_UNITADDRESS_OUTCOME_RECEIVED = "COMET_CE_UNITADDRESS_OUTCOME_RECEIVED";
 
     private static final String COMET_CE_STANDALONE_OUTCOME_RECEIVED = "COMET_CE_STANDALONE_OUTCOME_RECEIVED";
+
+    private static final String COMET_NC_OUTCOME_RECEIVED = "COMET_NC_OUTCOME_RECEIVED";
 
     private static final String RM_CREATE_REQUEST_RECEIVED = "RM_CREATE_REQUEST_RECEIVED";
     
@@ -220,7 +222,7 @@ public class OutcomeSteps {
 
     @Then("It will run the following processors {string}")
     public void it_will_run_the_following_processors(String processors) {
-        String[] processorsArray = (!Strings.isBlank(processors)) ? processors.split(",") : new String[0];
+        String[] processorsArray = (!Strings.isNullOrEmpty(processors)) ? processors.split(",") : new String[0];
         expectedProcessors = Arrays.asList(processorsArray);
         collectProcessingEvents();
         confirmProcessorsAreExcecuted();
@@ -228,7 +230,7 @@ public class OutcomeSteps {
 
     @Then("create the following messages to RM {string}")
     public void create_the_following_messages_to_RM(String rmMessages) throws Exception{
-        String[] rmMessagesArray = (!Strings.isBlank(rmMessages)) ? rmMessages.split(",") : new String[0];
+        String[] rmMessagesArray = (!Strings.isNullOrEmpty(rmMessages)) ? rmMessages.split(",") : new String[0];
         expectedRmMessages = Arrays.asList(rmMessagesArray);
         collectRmOutcomeEvents();
         collectRmMessages();
@@ -327,7 +329,7 @@ public class OutcomeSteps {
 
     @Then("it will create the following messages {string} to JobService")
     public void it_will_create_the_following_messages_to_JobService(String jsMessages) {
-        String[] jsMessagesArray = (!Strings.isBlank(jsMessages)) ? jsMessages.split(",") : new String[0];
+        String[] jsMessagesArray = (!Strings.isNullOrEmpty((jsMessages))) ? jsMessages.split(",") : new String[0];
         expectedJsMessages = Arrays.asList(jsMessagesArray);
         collectJsOutcomeEvents();
         confirmJsMessagesAreSent();
@@ -551,6 +553,8 @@ public class OutcomeSteps {
      case "CCS PL":
        event = getCcsPlRequestReceivedEventName();
          break;
+     case "NC":
+       event = geNcRequestReceivedEventName();
      default:
          break;
      }
@@ -635,6 +639,19 @@ public class OutcomeSteps {
       }
       return event;
     }
+
+  private String geNcRequestReceivedEventName() {
+    String event;
+    switch (businessFunction) {
+    case "No Action":
+    case "Cancel Feedback":
+      event = COMET_NC_OUTCOME_RECEIVED;
+      break;
+    default:
+      event = null;
+    }
+    return event;
+  }
 
     private String createOutcomeMessage(String eventType, Map<String, Object> root)
             throws Exception {
