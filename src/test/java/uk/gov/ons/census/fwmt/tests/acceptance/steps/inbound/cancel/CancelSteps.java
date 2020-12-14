@@ -42,6 +42,7 @@ public class CancelSteps {
   private String ceEstabCancel;
   private String ceUnitCancel;
   private String ceNcEstabCancel;
+  private String hhCancel;
 
   private static final String RM_CANCEL_REQUEST_RECEIVED = "RM_CANCEL_REQUEST_RECEIVED";
 
@@ -64,6 +65,7 @@ public class CancelSteps {
     ceEstabCancel = Resources.toString(Resources.getResource("files/input/ce/ceEstabCancel.json"), Charsets.UTF_8);
     ceUnitCancel = Resources.toString(Resources.getResource("files/input/ce/ceUnitCancel.json"), Charsets.UTF_8);
     ceNcEstabCancel = Resources.toString(Resources.getResource("files/input/ce/ceNCEstabCancel.json"), Charsets.UTF_8);
+    hhCancel = Resources.toString(Resources.getResource("files/input/hh/hhCancel.json"), Charsets.UTF_8);
     commonUtils.setup();
   }
 
@@ -82,10 +84,11 @@ public class CancelSteps {
     json.put("caseId", caseId);
 
     json.remove("addressLevel");
-    if ("Estab".equals(type) || "CE Est".equals(type) || "CE Site".equals(type)) {
+    if ("Estab".equals(type) || "CE Est".equals(type) || "CE Site".equals(type) ||
+        (type.equals("NC") && testBucket.get("survey").equals("CE"))) {
       json.put("addressLevel", "E");
     }
-    if ("Unit".equals(type) || "CE Unit".equals(type)) {
+    if ("Unit".equals(type) || "CE Unit".equals(type) || "HH".equals(type)) {
       json.put("addressLevel", "U");
     }
 
@@ -153,6 +156,8 @@ public class CancelSteps {
         return ceUnitCancel;
       case "NC":
         return ceNcEstabCancel;
+      case "HH":
+        return hhCancel;
       default:
         throw new RuntimeException("Incorrect survey " + survey + " and type " + type);
     }

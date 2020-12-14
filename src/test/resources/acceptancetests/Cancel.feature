@@ -16,8 +16,8 @@ Feature: SPG Cancel Tests
       | CE     | CE Est  |  F        | 12345678 | F           | CLOSE    |
       | CE     | CE Unit |  F        | 12345678 | T           | CLOSE    |
       | CE     | CE Unit |  F        | 12345678 | F           | CLOSE    |
-#      | HH     | NC      |  F        | 12345678 | F           | CLOSE    |
-#      | CE     | NC      |  F        | 12345678 | F           | CLOSE    |
+      | CE     | NC      |  F        | 12345678 | F           | CLOSE    |
+      | HH     | HH      |  F        | 12345678 | F           | CLOSE    |
 
 
   Scenario Outline: As Gateway I can receive a cancel CE Site job request from RM after a CE Estab has been processed
