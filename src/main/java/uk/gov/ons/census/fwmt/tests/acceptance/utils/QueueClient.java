@@ -88,9 +88,15 @@ public final class QueueClient {
     queueUtils.addMessage(exchangeName, routingKey, message, type);
   }
 
-  public void clearQueues(String... qnames) throws URISyntaxException {
+  public void clearRMQueues(String... qnames) throws URISyntaxException {
     for (String q : qnames) {
-      clearQueue(q);
+      clearRMQueue(q);
+    }
+  }
+
+  public void clearGWQueues(String... qnames) throws URISyntaxException {
+    for (String q : qnames) {
+      clearGWQueue(q);
     }
   }
 
@@ -98,14 +104,18 @@ public final class QueueClient {
     queueUtils.createOutcomeQueues();
   }
 
-  private void clearQueue(String queueName) throws URISyntaxException {
-    queueUtils.deleteMessage(queueName);
+  private void clearRMQueue(String queueName) throws URISyntaxException {
+    queueUtils.deleteRMMessage(queueName);
+  }
+
+  private void clearGWQueue(String queueName) throws URISyntaxException {
+    queueUtils.deleteGWMessage(queueName);
   }
 
   public void reset() throws Exception {
     disableListeners();
-    clearQueues(FIELD_REFUSALS_QUEUE, TEMP_FIELD_OTHERS_QUEUE, RM_FIELD_QUEUE, RM_FIELD_QUEUE_DLQ, OUTCOME_PRE_PROCESSING,
-        OUTCOME_PRE_PROCESSING_DLQ);
+    clearRMQueues(FIELD_REFUSALS_QUEUE, TEMP_FIELD_OTHERS_QUEUE, RM_FIELD_QUEUE, RM_FIELD_QUEUE_DLQ);
+    clearGWQueues(OUTCOME_PRE_PROCESSING, OUTCOME_PRE_PROCESSING_DLQ);
     enableListenenrs();
   }
 

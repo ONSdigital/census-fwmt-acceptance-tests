@@ -28,14 +28,17 @@ public class CommonUtils {
     @Autowired
     private PreFlightCheck preFlightCheck;
 
-    @Value("${service.rabbit.url}")
-    private String rabbitLocation;
+    @Value("${service.rabbit.gw.url}")
+    private String rabbitGWLocation;
 
-    @Value("${service.rabbit.username}")
-    private String rabbitUsername;
+    @Value("${service.rabbit.gw.username}")
+    private String rabbitGWUsername;
 
-    @Value("${service.rabbit.password}")
-    private String rabbitPassword;
+    @Value("${service.rabbit.gw.password}")
+    private String rabbitGWPassword;
+
+    @Value("${service.rabbit.gw.port:5673}")
+    private int rabbitmqGWPort;
 
     public static Map<String, String> testBucket = new HashMap<>();
 
@@ -46,7 +49,7 @@ public class CommonUtils {
       tmMockUtils.clearDownDatabase();
       queueClients.createQueue();
       
-      gatewayEventMonitor.enableEventMonitor(rabbitLocation, rabbitUsername, rabbitPassword);
+      gatewayEventMonitor.enableEventMonitor(rabbitGWLocation, rabbitGWUsername, rabbitGWPassword, rabbitmqGWPort);
       gatewayEventMonitor.reset();
       queueClients.reset();
     }

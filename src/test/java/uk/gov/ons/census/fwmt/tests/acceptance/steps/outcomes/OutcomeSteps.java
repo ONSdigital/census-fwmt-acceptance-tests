@@ -126,14 +126,14 @@ public class OutcomeSteps {
     @Autowired
     private TMMockUtils tmMockUtils;
 
-    @Value("${service.rabbit.url}")
-    private String rabbitLocation;
-
-    @Value("${service.rabbit.username}")
-    private String rabbitUsername;
-
-    @Value("${service.rabbit.password}")
-    private String rabbitPassword;
+//    @Value("${service.rabbit.url}")
+//    private String rabbitLocation;
+//
+//    @Value("${service.rabbit.username}")
+//    private String rabbitUsername;
+//
+//    @Value("${service.rabbit.password}")
+//    private String rabbitPassword;
 
     private final ObjectMapper jsonObjectMapper = new ObjectMapper();
 
@@ -579,7 +579,6 @@ public class OutcomeSteps {
       String messageCaseId;
       switch (businessFunction) {
       case "New Standalone Address":
-      case "New Unit Reported":
       case "Switch Feedback Site":
         messageCaseId = "N/A";
         break;

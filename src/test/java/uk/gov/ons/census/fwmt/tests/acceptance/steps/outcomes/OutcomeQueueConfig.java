@@ -33,6 +33,7 @@ public class OutcomeQueueConfig {
 
     @Bean
     public Queue outcomePreprocessingQueue() {
+        System.out.println("I am not calling 1");
         Queue queue = QueueBuilder.durable("rm.events").build();
         queue.setAdminsThatShouldDeclare(amqpAdmin);
         return queue;
@@ -45,6 +46,7 @@ public class OutcomeQueueConfig {
 
     @Bean
     public ConnectionFactory connectionFactory() {
+        System.out.println("I am not calling 2");
         CachingConnectionFactory cachingConnectionFactory = new CachingConnectionFactory(hostname, port);
 
         cachingConnectionFactory.setVirtualHost(virtualHost);
