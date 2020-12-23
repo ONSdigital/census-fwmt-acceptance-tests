@@ -1,6 +1,5 @@
 package uk.gov.ons.census.fwmt.tests.acceptance.steps.inbound.ccs;
 
-import com.google.common.io.Resources;
 import cucumber.api.java.After;
 import cucumber.api.java.Before;
 import cucumber.api.java.en.Given;
@@ -44,14 +43,17 @@ public class CcsCsvCreateSteps {
 
   private GatewayEventMonitor gatewayEventMonitor;
 
-  @Value("${service.rabbit.url}")
-  private String rabbitLocation;
+  @Value("${service.rabbit.gw.url}")
+  private String rabbitGWLocation;
 
-  @Value("${service.rabbit.username}")
-  private String rabbitUsername;
+  @Value("${service.rabbit.gw.username}")
+  private String rabbitGWUsername;
 
-  @Value("${service.rabbit.password}")
-  private String rabbitPassword;
+  @Value("${service.rabbit.gw.password}")
+  private String rabbitGWPassword;
+
+  @Value("${service.rabbit.gw.port:5673}")
+  private int rabbitmqGWPort;
 
   @Value("${service.csvservice.gcpBucket.directory.output}")
   private String outputDirectory;
@@ -65,12 +67,12 @@ public class CcsCsvCreateSteps {
   public void setup() throws IOException, TimeoutException, URISyntaxException {
     tmMockUtils.enableRequestRecorder();
     tmMockUtils.resetMock();
-    queueUtils.clearQueues();
+    queueUtils.clearRMQueues();
     List<URI> ccsOutputFiles = storageUtils.getFilenamesInFolder(URI.create(outputDirectory), "CCS");
     storageUtils.move(ccsOutputFiles.get(0), URI.create(inputDirectory + "ccsTestCSV.csv"));
 
     gatewayEventMonitor = new GatewayEventMonitor();
-    gatewayEventMonitor.enableEventMonitor(rabbitLocation, rabbitUsername, rabbitPassword);
+    gatewayEventMonitor.enableEventMonitor(rabbitGWLocation, rabbitGWUsername, rabbitGWPassword, rabbitmqGWPort);
   }
 
   @After
