@@ -2,13 +2,11 @@ package uk.gov.ons.census.fwmt.tests.acceptance.steps.inbound.create;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 import static uk.gov.ons.census.fwmt.tests.acceptance.steps.inbound.common.CommonUtils.testBucket;
 
 import java.net.URISyntaxException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 
 import org.json.JSONObject;
@@ -26,7 +24,7 @@ import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
 import lombok.extern.slf4j.Slf4j;
-import uk.gov.ons.census.fwmt.common.data.modelcase.ModelCase;
+import uk.gov.ons.census.fwmt.common.data.tm.CaseRequest;
 import uk.gov.ons.census.fwmt.events.data.GatewayEventDTO;
 import uk.gov.ons.census.fwmt.events.utils.GatewayEventMonitor;
 import uk.gov.ons.census.fwmt.tests.acceptance.steps.inbound.common.CommonUtils;
@@ -66,7 +64,13 @@ public class CreateSteps {
   
   private String ccsPlCreateJson = null;
 
-  private String ccsIntCreateJson = null;
+  private String ccsIntCeCreateJson = null;
+
+  private String ccsIntHhCreateJson = null;
+
+  private String ncCeCreateJson = null;
+
+  private String ncHhCreateJson = null;
   
   private GatewayEventDTO event_COMET_CREATE_PRE_SENDING;
 
@@ -85,7 +89,10 @@ public class CreateSteps {
     ceUnitCreateJson = Resources.toString(Resources.getResource("files/input/ce/ceUnitCreate.json"), Charsets.UTF_8);
     hhCreateJson = Resources.toString(Resources.getResource("files/input/hh/hhCreate.json"), Charsets.UTF_8);
     ccsPlCreateJson = Resources.toString(Resources.getResource("files/input/ccspl/ccsplCreate.json"), Charsets.UTF_8);
-    ccsIntCreateJson = Resources.toString(Resources.getResource("files/input/ccsint/ccsintCreate.json"), Charsets.UTF_8);
+    ccsIntCeCreateJson = Resources.toString(Resources.getResource("files/input/ccsint/ccsCeIntCreate.json"), Charsets.UTF_8);
+    ccsIntHhCreateJson = Resources.toString(Resources.getResource("files/input/ccsint/ccsHhIntCreate.json"), Charsets.UTF_8);
+    ncCeCreateJson = Resources.toString(Resources.getResource("files/input/ce/ncCeEstabCreate.json"), Charsets.UTF_8);
+    ncHhCreateJson = Resources.toString(Resources.getResource("files/input/hh/ncHhCreate.json"), Charsets.UTF_8);
     commonUtils.setup();
   }
 
@@ -132,6 +139,11 @@ public class CreateSteps {
     String caseId = testBucket.get("caseId");
 
     JSONObject json = new JSONObject(getCreateRMJson());
+
+    if (caseId == null) {
+      caseId = json.get("caseId").toString();
+      testBucket.put("caseId", caseId);
+    }
 
     commonRMMessageObjects(json, caseId, caseRef, isSecure, isHandDeliver, false);
 
@@ -233,7 +245,7 @@ public class CreateSteps {
   }
 
   @Then("a new case is created of the right {string}")
-  public void a_new_case_is_created_of_the_right_type(String expectedSurveyType) {
+  public void a_new_case_is_created_of_the_right_type(String expectedSurveyType) throws InterruptedException {
     String actualSurveyType = event_COMET_CREATE_PRE_SENDING.getMetadata().get("Survey Type");
     assertEquals("Survey Types created for TM", expectedSurveyType, actualSurveyType);
   }
@@ -245,12 +257,23 @@ public class CreateSteps {
   }
 
   @Then("a new case with id of {string} is created in TM")
-  public void aNewCaseIsCreatedInTm(String caseId) throws InterruptedException {
+  public void aNewCaseIsCreatedInTm(String caseId) {
     boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, COMET_CREATE_ACK, CommonUtils.TIMEOUT);
     assertThat(hasBeenTriggered).isTrue();
 
-    ModelCase modelCase = tmMockUtils.getCaseById(caseId);
-    assertEquals(caseId, modelCase.getId().toString());
+    CaseRequest caseRequest = tmMockUtils.getCaseById(caseId);
+    assertNotNull(caseRequest);
+  }
+
+  @Then("a new case with id of {string} and with the correct survey type {string} is created in TM")
+  public void aNewCaseAndTypeIsCreatedInTm(String caseId, String surveyType) throws InterruptedException {
+    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, COMET_CREATE_ACK, CommonUtils.TIMEOUT);
+    Thread.sleep(1000);
+    assertThat(hasBeenTriggered).isTrue();
+
+    CaseRequest caseRequest = tmMockUtils.getCaseById(caseId);
+    assertNotNull(caseRequest);
+    assertEquals(surveyType, caseRequest.getSurveyType().toString());
   }
 
   @And("the existing case is updated to a switch and put back on the queue with caseId {string}")
@@ -271,13 +294,33 @@ public class CreateSteps {
     assertThat(hasBeenTriggered).isTrue();
   }
 
+  @Given("TM has a related job with case ID {string} for {string} in TM")
+  public void sendPreCcsCreate(String caseId, String originalType) throws URISyntaxException {
+    testBucket.put("survey", originalType);
+    testBucket.put("type", originalType);
+
+    JSONObject json = new JSONObject(getCreateRMJson());
+
+    commonRMMessageObjects(json, caseId, "12345678", "F", "T", false);
+
+    String request = json.toString(4);
+    log.info("Request = " + request);
+    queueClient.sendToRMFieldQueue(request, "create");
+    boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, RM_CREATE_REQUEST_RECEIVED, CommonUtils.TIMEOUT);
+    assertThat(hasBeenTriggered).isTrue();
+  }
+
   private String getCreateRMJson() {
     String type = testBucket.get("type");
     String survey = testBucket.get("survey");
 
-    if (survey.equals("HH"))
+    if (type == null){
+      type = "";
+    }
+
+    if (survey.equals("HH") && !type.equals("NC HH"))
       return hhCreateJson;
-    
+
     switch (type) {
       case "Estab" :
         return ceSpgEstabCreateJson;
@@ -290,8 +333,14 @@ public class CreateSteps {
         return ceUnitCreateJson;
       case "CCS_PL" :
         return ccsPlCreateJson;
-      case "CCS-INT" :
-        return ccsIntCreateJson;
+      case "CCS Int CE" :
+        return ccsIntCeCreateJson;
+      case "CCS Int HH" :
+        return ccsIntHhCreateJson;
+      case "NC CE":
+        return ncCeCreateJson;
+      case "NC HH":
+        return ncHhCreateJson;
       default:
         throw new RuntimeException("Incorrect survey " + survey + " and type " + type);
     }
@@ -321,7 +370,6 @@ public class CreateSteps {
       json.remove("secureEstablishment");
       json.put("secureEstablishment", false);
     }
-
 
     if ("T".equals(isHandDeliver)){
       json.remove("handDeliver");
