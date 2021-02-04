@@ -74,4 +74,4 @@ Feature: Create Tests
     Examples:
       | Survey | Type       | IsSecure | CaseRef  | HandDeliver | SurveyType |
       | CCS    | CCS Int CE | F        | 12345678 | F           | CCS INT    |
-      | CCS    | CCS-HH-INT | F        | 12345678 | F           | CCS INT    |
+      | CCS    | CCS Int HH | F        | 12345678 | F           | CCS INT    |

@@ -8,7 +8,7 @@
 },
 "payload":{
 "refusal":{
-"type":"${reason}",
+<#--"type":"${reason}",-->
 "agentId":"SH-TWH1-ZA-25",
 "collectionCase":{
 "id":"bd6345af-d706-43d3-a13b-8c549e081a76"

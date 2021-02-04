@@ -39,8 +39,8 @@ Feature: Resilience Tests
       | Cancel                  | Cancel       | Cancel               |                      | Older       | No Action      |
       | Cancel                  | CE Switch    | Cancel               |                      | Newer       | No Action      |
       | Cancel                  | CE Switch    | Cancel               |                      | Older       | No Action      |
-      | Cancel(Held)            | Create       | Cancel(held)         | Cancel(held)         | Newer       | Reject         |
-      | Cancel(Held)            | Create       | Cancel               |                      | Older       | Merge          |
+      | Cancel(Held)            | Create       | Cancel(held)         |                      | Newer       | No Action      |
+      | Cancel(Held)            | Create       | Cancel(held)         |                      | Older       | No Action      |
       | Cancel(Held)            | Update       | Update(held)         | Update(held)         | Newer       | No Action      |
       | Cancel(Held)            | Update       | Cancel(held)         | Cancel(held)         | Older       | No Action      |
       | Cancel(Held)            | Cancel       | Cancel(held)         | Cancel(held)         | Newer       | No Action      |

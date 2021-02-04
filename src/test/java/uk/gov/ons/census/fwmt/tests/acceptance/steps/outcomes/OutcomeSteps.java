@@ -349,8 +349,8 @@ public class OutcomeSteps {
     }
 
     private void confirmJsMessagesAreSent() {
-        List<String> actualMessages = jsOutcomeEvents.stream().filter(e -> e.getMetadata().get("address type").equals(surveyType))
-                .map(e -> e.getMetadata().get("action instruction")).collect(Collectors.toList());
+        List<String> actualMessages = jsOutcomeEvents.stream().filter(e -> e.getMetadata().get("Address Type").equals(surveyType))
+                .map(e -> e.getMetadata().get("Action Instruction")).collect(Collectors.toList());
         assertEquals(expectedJsMessages.size(), actualMessages.size());
         assertThat(expectedJsMessages.containsAll(actualMessages));
     }
@@ -372,6 +372,8 @@ public class OutcomeSteps {
           response = sendCCSPL(request);
             break;
         case "NC":
+        case "NC HH":
+        case "NC CE":
           response = sendNC(request);
             break;
         default:
@@ -580,6 +582,7 @@ public class OutcomeSteps {
       switch (businessFunction) {
       case "New Standalone Address":
       case "Switch Feedback Site":
+      case "New Unit Reported":
         messageCaseId = "N/A";
         break;
       default:
@@ -674,6 +677,7 @@ public class OutcomeSteps {
         case "UPDATE_RESIDENT_COUNT_1":
         case "UPDATE_RESIDENT_COUNT":
         case "CCS_ADDRESS_LISTED":
+        case "FEEDBACK_LONG_PAUSE":
             return TEMP_FIELD_OTHERS_QUEUE;
         default:
             throw new RuntimeException("Problem matching operation");
@@ -794,6 +798,28 @@ public class OutcomeSteps {
       JSONObject json = new JSONObject(ceSpgEstabCreateJson);
 
       commonRMMessageObjects(json, caseId, "1234", "F", "F", false);
+
+      String request = json.toString(4);
+      log.info("Request = " + request);
+      queueClient.sendToRMFieldQueue(request, "create");
+      boolean hasBeenTriggered = gatewayEventMonitor.hasEventTriggered(caseId, RM_CREATE_REQUEST_RECEIVED, CommonUtils.TIMEOUT);
+      assertThat(hasBeenTriggered).isTrue();
+    }
+
+    @Given("a NC parent case exists for {string}")
+    public void a_nc_parent_case_exists(String surveyType) throws Exception {
+      String ncCreate = "";
+      if (surveyType.equals("HH")) {
+        ncCreate = Resources.toString(Resources.getResource("files/input/hh/hhCreate.json"), Charsets.UTF_8);
+      } else {
+        ncCreate = Resources.toString(Resources.getResource("files/input/ce/ceEstabCreate.json"), Charsets.UTF_8);
+      }
+
+      JSONObject json = new JSONObject(ncCreate);
+
+      commonRMMessageObjects(json, caseId, "1234", "F", "F", false);
+
+      json.put("oldCaseId", "bd6345af-d706-43d3-a13b-8c549e081a76");
 
       String request = json.toString(4);
       log.info("Request = " + request);
