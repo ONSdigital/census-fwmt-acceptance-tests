@@ -40,7 +40,6 @@ Feature: Create Tests
       | CE Est   | CE     | NC CE   | F        | 12345678 | F           | NC         | 12345678       |
       | HH       | HH     | NC HH   | F        | 12345678 | F           | NC         | 12345678       |
 
-
   Scenario Outline: As Gateway I can receive a create CE Site job request from RM after a CE Estab has been processed
     Given a TM doesnt have a job with case ID "bd6345af-d706-43d3-a13b-8c549e081a76" in TM
     And RM sends a create job request with "12345678" "CE" "CE Est" "F" "T"
@@ -53,6 +52,8 @@ Feature: Create Tests
       | Survey | Type    | IsSecure | CaseRef  | HandDeliver | SurveyType | TmCaseRef      |
       | CE     | CE Site | F        | 12345678 | F           | CE Site    | 12345678       |
       | CE     | CE Site | T        | 12345678 | F           | CE Site    | SECCS_12345678 |
+      | CE     | CE Site | F        | 12345678 | T           | CE Site    | 12345678       |
+      | CE     | CE Site | T        | 12345678 | T           | CE Site    | SECCS_12345678 |
 
   Scenario Outline: As Gateway I can switch a CE survey type that has a matching estabUprn and address type
     Given a TM doesnt have a job with case ID "bd6345af-d706-43d3-a13b-8c549e081a76" in TM
@@ -65,6 +66,8 @@ Feature: Create Tests
       | Survey | Type    | IsSecure | HandDeliver | CaseRef  | SurveyType |
       | CE     | CE Unit | F        | T           | 12345678 | CE Site    |
       | CE     | CE Unit | F        | F           | 12345678 | CE Site    |
+      | CE     | CE Unit | T        | F           | 12345678 | CE Site    |
+      | CE     | CE Unit | T        | T           | 12345678 | CE Site    |
 
   Scenario Outline: As Gateway I can receive CCS Int create job requests from RM
     Given RM sends a create job request with "12345678" "CCS" "CCS_PL" "F" "F"
