@@ -351,6 +351,8 @@ public final class TMMockUtils {
         stmt.executeUpdate(sql);
         sql = "DELETE FROM request_log";
         stmt.execute(sql);
+        sql = "DELETE FROM quarantined_message";
+        stmt.execute(sql);
       } else {
         System.out.println("Failed to make connection!");
       }

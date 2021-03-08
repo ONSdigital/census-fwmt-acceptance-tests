@@ -46,11 +46,17 @@ public final class QueueClient {
 
   private static final String OUTCOME_PRE_PROCESSING = "Outcome.Preprocessing";
 
-  private static final String OUTCOME_PRE_PROCESSING_DLQ = "Outcome.PreprocessingDLQ";
+  private static final String OUTCOME_PRE_PROCESSING_DLQ = "Outcome.PreprocesingDLQ";
 
   private static final String FIELD_REFUSALS_QUEUE = "Field.refusals";
 
   private static final String TEMP_FIELD_OTHERS_QUEUE = "Field.other";
+
+  private static final String GW_FIELD = "GW.Field";
+
+  private static final String GW_PERMANENT_ERRORQ = "GW.Permanent.ErrorQ";
+
+  private static final String GW_TRANSIENT_ERRORQ = "GW.Transient.ErrorQ";
 
   @Autowired
   private QueueUtils queueUtils;
@@ -113,10 +119,10 @@ public final class QueueClient {
   }
 
   public void reset() throws Exception {
-    disableListeners();
-    clearRMQueues(FIELD_REFUSALS_QUEUE, TEMP_FIELD_OTHERS_QUEUE, RM_FIELD_QUEUE, RM_FIELD_QUEUE_DLQ);
+//    disableListeners();
+    clearRMQueues(FIELD_REFUSALS_QUEUE, TEMP_FIELD_OTHERS_QUEUE, RM_FIELD_QUEUE, GW_FIELD,  GW_PERMANENT_ERRORQ, GW_TRANSIENT_ERRORQ);
     clearGWQueues(OUTCOME_PRE_PROCESSING, OUTCOME_PRE_PROCESSING_DLQ);
-    enableListenenrs();
+//    enableListenenrs();
   }
 
   private void disableListeners() {

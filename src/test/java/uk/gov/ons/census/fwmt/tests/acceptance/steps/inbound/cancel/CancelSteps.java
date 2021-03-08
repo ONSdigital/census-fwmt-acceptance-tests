@@ -70,12 +70,14 @@ public class CancelSteps {
     ccsIntHhCancel = Resources.toString(Resources.getResource("files/input/ccsint/ccsIntHhCancel.json"), Charsets.UTF_8);
     ccsIntCeCancel = Resources.toString(Resources.getResource("files/input/ccsint/ccsIntCeCancel.json"), Charsets.UTF_8);
     feddbackCeCancel = Resources.toString(Resources.getResource("files/input/ce/ceUnitCancel.json"), Charsets.UTF_8);
-    //    commonUtils.setup();
+    // commonUtils.setup(); // Leaving this commented out to highlight that this should not be uncommented
+    // as its already done by the createSteps.setup(). And doing it twice has some strange results
   }
 
   @After
   public void clearDown() throws Exception {
-//    commonUtils.clearDown();
+//    commonUtils.clearDown();// Leaving this commented out to highlight that this should not be uncommented
+    // as its already done by the createSteps.setup(). And doing it twice has some strange results
   }
 
   @Then("RM sends a cancel case request for the case")

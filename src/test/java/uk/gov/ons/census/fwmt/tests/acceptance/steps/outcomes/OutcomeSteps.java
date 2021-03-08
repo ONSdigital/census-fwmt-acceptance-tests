@@ -70,15 +70,15 @@ public class OutcomeSteps {
     
     private String newCaseId;
 
+    private String caseId = null;
+
+    private String oldCaseId = null;
+
     private Collection<GatewayEventDTO> processingEvents;
 
     private Collection<GatewayEventDTO> rmOutcomeEvents;
 
     private Collection<GatewayEventDTO> jsOutcomeEvents;
-
-    private static String caseId = "bd6345af-d706-43d3-a13b-8c549e081a76";
-
-    private static String oldCaseId = "";
 
     private final static String COMET_SPG_OUTCOME_RECEIVED = "COMET_SPG_OUTCOME_RECEIVED";
 
@@ -136,7 +136,6 @@ public class OutcomeSteps {
 
     @Before
     public void setup() throws Exception {
-
         commonUtils.setup();
         surveyType = null;
         businessFunction = null;
@@ -153,6 +152,12 @@ public class OutcomeSteps {
         expectedRmMessageMap.clear();
         addressTypeChangeMsg = null;
         newCaseId = null;
+        
+        caseId = "bd6345af-d706-43d3-a13b-8c549e081a76";
+
+        oldCaseId = "";
+
+    
     }
 
     @After

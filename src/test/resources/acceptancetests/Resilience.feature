@@ -35,7 +35,7 @@ Feature: Resilience Tests
       | Update(Held)            | CE Switch    | Update(held)         | Update(held)         | Older       | Reject         |
       | Cancel                  | Update       | Update               |                      | Newer       | Process        |
       | Cancel                  | Update       | Update               |                      | Older       | Process        |
-      | Cancel                  | Cancel       | Cancel               |                      | Newer       | Reject         |
+      | Cancel                  | Cancel       | Cancel               |                      | Newer       | Process        |
       | Cancel                  | Cancel       | Cancel               |                      | Older       | No Action      |
       | Cancel                  | CE Switch    | Cancel               |                      | Newer       | No Action      |
       | Cancel                  | CE Switch    | Cancel               |                      | Older       | No Action      |
