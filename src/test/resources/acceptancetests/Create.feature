@@ -70,7 +70,8 @@ Feature: Create Tests
       | CE     | CE Unit | T        | T           | 12345678 | CE Site    |
 
   Scenario Outline: As Gateway I can receive CCS Int create job requests from RM
-    Given RM sends a create job request with "12345678" "CCS" "CCS_PL" "F" "F"
+    Given a TM doesnt have a job with case ID "bd6345af-d706-43d3-a13b-8c549e081a76" in TM
+    And RM sends a create job request with "12345678" "CCS" "CCS_PL" "F" "F"
     And RM sends a create job request with "<CaseRef>" "<Survey>" "<Type>" "<IsSecure>" "<HandDeliver>"
     When the Gateway sends a Create Job message to TM
     And a new case with id of "bd6345af-d706-43d3-a13b-8c549e081a76" and with the correct survey type "<SurveyType>" is created in TM

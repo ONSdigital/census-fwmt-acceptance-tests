@@ -46,7 +46,8 @@ Feature: SPG Cancel Tests
       | HH       | HH     | NC HH   | F        | 12345678 | F           | CLOSE    |
 
   Scenario Outline: As Gateway I can receive a cancel CCS Int job request from RM after a CE Estab has been processed
-    Given RM sends a create job request with "12345678" "CCS" "CCS_PL" "F" "F"
+    Given a TM doesnt have a job with case ID "bd6345af-d706-43d3-a13b-8c549e081a76" in TM
+    And RM sends a create job request with "12345678" "CCS" "CCS_PL" "F" "F"
     And RM sends a create job request with "<CaseRef>" "<Survey>" "<Type>" "<IsSecure>" "<HandDeliver>"
     And RM sends a cancel case request for the case
     When Gateway receives a cancel message for the case
