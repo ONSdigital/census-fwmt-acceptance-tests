@@ -35,12 +35,12 @@ Feature: Resilience Tests
       | Update(Held)            | CE Switch    | Update(held)         | Update(held)         | Older       | Reject         |
       | Cancel                  | Update       | Update               |                      | Newer       | Process        |
       | Cancel                  | Update       | Update               |                      | Older       | Process        |
-      | Cancel                  | Cancel       | Cancel               |                      | Newer       | Reject         |
+      | Cancel                  | Cancel       | Cancel               |                      | Newer       | Process        |
       | Cancel                  | Cancel       | Cancel               |                      | Older       | No Action      |
       | Cancel                  | CE Switch    | Cancel               |                      | Newer       | No Action      |
       | Cancel                  | CE Switch    | Cancel               |                      | Older       | No Action      |
-      | Cancel(Held)            | Create       | Cancel(held)         | Cancel(held)         | Newer       | Reject         |
-      | Cancel(Held)            | Create       | Cancel               |                      | Older       | Merge          |
+      | Cancel(Held)            | Create       | Cancel(held)         |                      | Newer       | No Action      |
+      | Cancel(Held)            | Create       | Cancel(held)         |                      | Older       | No Action      |
       | Cancel(Held)            | Update       | Update(held)         | Update(held)         | Newer       | No Action      |
       | Cancel(Held)            | Update       | Cancel(held)         | Cancel(held)         | Older       | No Action      |
       | Cancel(Held)            | Cancel       | Cancel(held)         | Cancel(held)         | Newer       | No Action      |

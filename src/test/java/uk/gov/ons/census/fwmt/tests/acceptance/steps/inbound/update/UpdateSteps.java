@@ -35,6 +35,7 @@ import java.time.OffsetDateTime;
 @Slf4j
 public class UpdateSteps {
 
+  @Autowired
   private CommonUtils commonUtils;
 
   @Autowired
@@ -97,7 +98,7 @@ public class UpdateSteps {
     
     hhUpdateJson = Resources.toString(Resources.getResource("files/input/hh/hhUpdate.json"), Charsets.UTF_8);
     hhPauseCaseJson = Resources.toString(Resources.getResource("files/input/hh/hhPauseCase.json"), Charsets.UTF_8);
-    //    commonUtils.setup();
+//    commonUtils.setup();
  }
 
   @After

@@ -7,19 +7,18 @@
 "primaryOutcomeDescription":"${primaryOutcomeDescription}",
 "secondaryOutcomeDescription":"${secondaryOutcomeDescription}",
 "outcomeCode":"${outcomeCode}",
-<#if (linkedQid??) || (fulfilmentRequested??)>
-    "fulfilmentRequests":[
-    <#if linkedQid??>
-       ${linkedQid}
-        <#if fulfilmentRequested??>
-         ,
-        </#if>
-    </#if>
-    <#if fulfilmentRequested??>
-       ${fulfilmentRequested}
-    </#if>
-    ]
+"fulfilmentRequests":null,
+<#if surveyType == "HH">
+"refusal":{
+"isHouseholder": "true",
+"isDangerous": "true",
+"contact": {
+"title": "Mr",
+"forename": "Joe",
+"surname": "Bloggs"
+}
 <#else>
-      "fulfilmentRequests":null
+"refusal": null
 </#if>
+}
 }

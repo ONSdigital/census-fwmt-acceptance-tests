@@ -26,8 +26,19 @@ Feature: Create Tests
       | Household England and Wales | HH     | E&W     | F        | 12345678 | F           | HH         | 12345678       |
       | Household Nisra             | HH     | NISRA   | F        | 12345678 | F           | HH         | 12345678       |
       | CCS Property Listing        | CCS    | CCS_PL  | F        | 12345678 | F           | CCS PL     | 12345678       |
-#      | CCS Interview               | CCS    | CCS-INT | F        | 12345678 | F           | CCS INT    | 12345678       |
-#      | CCS Interview               | CCS    | Estab   | F        | 12345678 | F           | HH         | 12345678       |
+
+  Scenario Outline: As Gateway I can receive a NC create job requests from RM
+    Given TM has a related job with case ID "bd6345af-d706-43d3-a13b-8c549e081a76" for "<Original>" in TM
+    And a TM doesnt have a job with case ID "e0b12e26-5a6d-11eb-ae93-0242ac130002" in TM
+    And RM sends a create job request with "<CaseRef>" "<Survey>" "<Type>" "<IsSecure>" "<HandDeliver>"
+    When the Gateway sends a Create Job message to TM
+    Then a new case is created of the right "<SurveyType>"
+    And the right caseRef "<TmCaseRef>"
+    And a new case with id of "e0b12e26-5a6d-11eb-ae93-0242ac130002" is created in TM
+    Examples:
+      | Original | Survey | Type    | IsSecure | CaseRef  | HandDeliver | SurveyType | TmCaseRef      |
+      | CE Est   | CE     | NC CE   | F        | 12345678 | F           | NC         | 12345678       |
+      | HH       | HH     | NC HH   | F        | 12345678 | F           | NC         | 12345678       |
 
   Scenario Outline: As Gateway I can receive a create CE Site job request from RM after a CE Estab has been processed
     Given a TM doesnt have a job with case ID "bd6345af-d706-43d3-a13b-8c549e081a76" in TM
@@ -41,7 +52,9 @@ Feature: Create Tests
       | Survey | Type    | IsSecure | CaseRef  | HandDeliver | SurveyType | TmCaseRef      |
       | CE     | CE Site | F        | 12345678 | F           | CE Site    | 12345678       |
       | CE     | CE Site | T        | 12345678 | F           | CE Site    | SECCS_12345678 |
- 
+      | CE     | CE Site | F        | 12345678 | T           | CE Site    | 12345678       |
+      | CE     | CE Site | T        | 12345678 | T           | CE Site    | SECCS_12345678 |
+
   Scenario Outline: As Gateway I can switch a CE survey type that has a matching estabUprn and address type
     Given a TM doesnt have a job with case ID "bd6345af-d706-43d3-a13b-8c549e081a76" in TM
     And RM sends a create job request with "12345678" "CE" "CE Est" "F" "T"
@@ -53,3 +66,15 @@ Feature: Create Tests
       | Survey | Type    | IsSecure | HandDeliver | CaseRef  | SurveyType |
       | CE     | CE Unit | F        | T           | 12345678 | CE Site    |
       | CE     | CE Unit | F        | F           | 12345678 | CE Site    |
+      | CE     | CE Unit | T        | F           | 12345678 | CE Site    |
+      | CE     | CE Unit | T        | T           | 12345678 | CE Site    |
+
+  Scenario Outline: As Gateway I can receive CCS Int create job requests from RM
+    Given RM sends a create job request with "12345678" "CCS" "CCS_PL" "F" "F"
+    And RM sends a create job request with "<CaseRef>" "<Survey>" "<Type>" "<IsSecure>" "<HandDeliver>"
+    When the Gateway sends a Create Job message to TM
+    And a new case with id of "bd6345af-d706-43d3-a13b-8c549e081a76" and with the correct survey type "<SurveyType>" is created in TM
+    Examples:
+      | Survey | Type       | IsSecure | CaseRef  | HandDeliver | SurveyType |
+      | CCS    | CCS Int CE | F        | 12345678 | F           | CCS INT    |
+      | CCS    | CCS Int HH | F        | 12345678 | F           | CCS INT    |

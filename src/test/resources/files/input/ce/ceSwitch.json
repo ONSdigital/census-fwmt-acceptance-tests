@@ -2,6 +2,7 @@
   "actionInstruction":"SWITCH_CE_TYPE",
   "surveyName":"CENSUS",
   "addressType":"CE",
+  "surveyType":"CE_EST_D",
   "caseId":"bd6345af-d706-43d3-a13b-8c549e081a76",
   "caseRef":"7541877481",
   "estabType":"GRT",

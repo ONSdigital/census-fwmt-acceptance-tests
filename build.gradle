@@ -70,7 +70,7 @@ dependencies {
     runtimeOnly('org.postgresql:postgresql:42.2.5')
 
     compile 'uk.gov.ons.census.fwmt:census-fwmt-events:1.0.51-RELEASE'
-    compile 'uk.gov.ons.census.fwmt:census-fwmt-common:1.2.9-RELEASE'
+    compile 'uk.gov.ons.census.fwmt:census-fwmt-common:1.2.30-RELEASE'
     compile("uk.gov.ons.census.ffa:census-ffa-storage-utils:0.0.1-RELEASE")
     compile('uk.gov.ons.ctp.integration.common:product-reference:1.0.2')
 

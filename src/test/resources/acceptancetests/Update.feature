@@ -11,7 +11,7 @@ Feature: SPG Update Tests
   Examples:
      | Survey | Type     | IsSecure  | CaseRef  | HandDeliver |
 #      Not sure if SPG Estab is required as there are no specs on confluence. TBC
-#     | SPG CE | Estab    |  F        | 12345678 | F           |
+     | SPG CE | Estab    |  F        | 12345678 | F           |
      | SPG CE | Unit     |  F        | 12345678 | F           |
      | SPG CE | Unit     |  F        | 12345678 | T           |
      | CE     | CE Est   |  F        | 12345678 | T           |
@@ -37,7 +37,6 @@ Feature: SPG Update Tests
      |CE     | CE Site  | T        | 12345678 | F           |
 
 
-
  Scenario: As Gateway I can receive an update job request for SPG Unit for an unexisting job and is set to undeliveredAsAddress. gateway will process as a Create message
    Given RM sends a unit update case request where undeliveredAsAddress is "true"
    When Gateway receives an update message for the case
@@ -50,7 +49,7 @@ Feature: SPG Update Tests
    And RM sends a HH create job request with "<CaseRef>" "<Survey>" "<oa>"
    And RM sends a HH update case request for the case "<isBlankFormReturned>" "<isUndeliveredAsAddress>"
    When Gateway receives an update message for the case
-		And is Processed as "<ProcessedAs>"
+   And is Processed as "<ProcessedAs>"
    Then it will update the job in TM
    And the updated job is acknowledged by TM
    And an associated a Pause is deleted "<IsPauseDeleted>"
@@ -71,7 +70,7 @@ Feature: SPG Update Tests
     And RM sends a HH create job request
     And RM sends a HH Pause Case request for the case
     When Gateway receives an HH Pause Case message for the case
-		And is Processed as "HH Pause Case"
+	 And is Processed as "HH Pause Case"
     Then it will Pause the job in TM
     And the Paused job is acknowledged by TM
  
