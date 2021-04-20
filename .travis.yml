@@ -8,7 +8,7 @@ before_install:
 install: true
 script:
   - sleep 60
-  - ./gradlew testClasses --info;
+  - ./gradlew testClasses --info --refresh-dependencies;
 env:
   global:
   - SPRING_PROFILES_ACTIVE=default,integration-tests
