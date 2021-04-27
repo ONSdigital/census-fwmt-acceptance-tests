@@ -72,7 +72,7 @@ dependencies {
     compile 'uk.gov.ons.census.fwmt:census-fwmt-events:2.0.0-RELEASE'
     compile 'uk.gov.ons.census.fwmt:census-fwmt-common:2.0.0-RELEASE'
     compile("uk.gov.ons.census.ffa:census-ffa-storage-utils:0.0.4-RELEASE")
-    compile('uk.gov.ons.ctp.integration.common:product-reference:1.0.2')
+    compile('uk.gov.ons.ctp.integration.common:product-reference:1.0.14')
 
     compile("com.google.guava:guava:27.0.1-jre")
     compile 'com.google.cloud:google-cloud-nio:0.30.0-alpha'
